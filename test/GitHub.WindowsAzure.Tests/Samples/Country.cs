@@ -1,7 +1,7 @@
 ﻿using System;
 using GitHub.WindowsAzure.Table;
 
-namespace GitHub.WindowsAzure.Tests.Table
+namespace GitHub.WindowsAzure.Tests.Samples
 {
     public sealed class Country
     {
@@ -16,5 +16,13 @@ namespace GitHub.WindowsAzure.Tests.Table
         public double Area { get; set; }
 
         public DateTime Formed { get; set; }
+
+        public Guid Id { get; set; }
+
+        public int PresidentsCount { get; set; }
+
+        public byte[] TopSecretKey { get; set; }
+
+        public bool IsExists { get; set; }
     }
 }

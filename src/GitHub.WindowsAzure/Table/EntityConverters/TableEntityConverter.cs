@@ -2,33 +2,44 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GitHub.WindowsAzure.Table.Extensions;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace GitHub.WindowsAzure.Table.EntityFormatters
+namespace GitHub.WindowsAzure.Table.EntityConverters
 {
-    public class TableEntityFormatter<TEntity> : ITableEntityFormatter<TEntity> where TEntity : new()
+    /// <summary>
+    ///     Handles an entities conversions.
+    /// </summary>
+    /// <typeparam name="TEntity">Entity type.</typeparam>
+    public class TableEntityConverter<TEntity> : ITableEntityConverter<TEntity> where TEntity : new()
     {
-        private const string PartitionKey = "PartitionKey";
-        private const string RowKey = "RowKey";
         private readonly Dictionary<string, PropertyInfo> _properties;
         private readonly Type _stringType = typeof (String);
         private PropertyInfo _partitionKeyProperty;
         private PropertyInfo _rowKeyProperty;
 
-        public TableEntityFormatter()
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
+        public TableEntityConverter()
         {
             _properties = new Dictionary<String, PropertyInfo>();
 
             IntializeProperties();
         }
 
+        /// <summary>
+        ///     Creates an ITableEntity by TEntity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Table entity.</returns>
         public ITableEntity GetEntity(TEntity entity)
         {
-            var result = new DynamicTableEntity();
-
-            result.Properties.Add(PartitionKey, _partitionKeyProperty.GetStringValue(entity));
-            result.Properties.Add(RowKey, _rowKeyProperty.GetStringValue(entity));
+            var result = new DynamicTableEntity
+                             {
+                                 PartitionKey = _partitionKeyProperty.GetStringValue(entity),
+                                 RowKey = _rowKeyProperty.GetStringValue(entity),
+                                 ETag = "*"
+                             };
 
             foreach (var property in _properties)
             {
@@ -38,7 +49,11 @@ namespace GitHub.WindowsAzure.Table.EntityFormatters
             return result;
         }
 
-
+        /// <summary>
+        ///     Creates a TEntity by DynamicTableEntity.
+        /// </summary>
+        /// <param name="tableEntity">Table entity.</param>
+        /// <returns>Entity.</returns>
         public TEntity GetEntity(DynamicTableEntity tableEntity)
         {
             var result = new TEntity();
@@ -59,6 +74,9 @@ namespace GitHub.WindowsAzure.Table.EntityFormatters
             return result;
         }
 
+        /// <summary>
+        ///     Receives type properties.
+        /// </summary>
         private void IntializeProperties()
         {
             foreach (PropertyInfo property in typeof (TEntity).GetProperties())

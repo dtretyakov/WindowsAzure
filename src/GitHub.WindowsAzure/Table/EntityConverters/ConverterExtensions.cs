@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace GitHub.WindowsAzure.Table.Extensions
+namespace GitHub.WindowsAzure.Table.EntityConverters
 {
-    public static class FormatterExtensions
+    /// <summary>
+    ///     Extensions for a TableEntityConverter.
+    /// </summary>
+    public static class ConverterExtensions
     {
         private static readonly Type DateTimeType = typeof (DateTime);
 
+        /// <summary>
+        ///     Type to edm type convertion collection.
+        /// </summary>
         private static readonly Dictionary<Type, Func<object, EntityProperty>> TypeToEdm =
             new Dictionary<Type, Func<object, EntityProperty>>
                 {
@@ -23,6 +29,9 @@ namespace GitHub.WindowsAzure.Table.Extensions
                     {typeof (long), o => new EntityProperty((long) o)}
                 };
 
+        /// <summary>
+        ///     Edm type to type convertion collection.
+        /// </summary>
         private static readonly Dictionary<EdmType, Action<PropertyInfo, EntityProperty, object>> EdmToType =
             new Dictionary<EdmType, Action<PropertyInfo, EntityProperty, object>>
                 {
@@ -52,13 +61,23 @@ namespace GitHub.WindowsAzure.Table.Extensions
                     },
                 };
 
-        public static EntityProperty GetStringValue(this PropertyInfo property, object target)
+        /// <summary>
+        ///     Returns a string property value.
+        /// </summary>
+        /// <param name="property">Property info.</param>
+        /// <param name="target">Target objecy.</param>
+        /// <returns>Property value.</returns>
+        public static string GetStringValue(this PropertyInfo property, object target)
         {
-            var value = (string) property.GetValue(target);
-
-            return new EntityProperty(value);
+            return (string) property.GetValue(target);
         }
 
+        /// <summary>
+        ///     Gets an entity property value by property info.
+        /// </summary>
+        /// <param name="property">Property info.</param>
+        /// <param name="target">Target object.</param>
+        /// <returns>Entity property.</returns>
         public static EntityProperty GetEntityProperty(this PropertyInfo property, object target)
         {
             object value = property.GetValue(target);
@@ -71,6 +90,12 @@ namespace GitHub.WindowsAzure.Table.Extensions
             return TypeToEdm[property.PropertyType](value);
         }
 
+        /// <summary>
+        ///     Sets an object property value from entity property.
+        /// </summary>
+        /// <param name="property">Property info.</param>
+        /// <param name="entityProperty">Entity property.</param>
+        /// <param name="target">Target object.</param>
         public static void SetPropertyValue(this PropertyInfo property, EntityProperty entityProperty, object target)
         {
             if (!EdmToType.ContainsKey(entityProperty.PropertyType))

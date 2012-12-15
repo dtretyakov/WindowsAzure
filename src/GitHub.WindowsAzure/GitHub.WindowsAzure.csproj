@@ -39,8 +39,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Table\EntityFormatters\ITableEntityFormatter.cs" />
-    <Compile Include="Table\Extensions\FormatterExtensions.cs" />
+    <Compile Include="Table\EntityConverters\ITableEntityConverter.cs" />
+    <Compile Include="Table\EntityConverters\ConverterExtensions.cs" />
+    <Compile Include="Table\Extensions\AsyncQueryableExtensions.cs" />
+    <Compile Include="Table\Extensions\CloudTableExtensions.cs" />
     <Compile Include="Table\PartitionKeyAttribute.cs" />
     <Compile Include="Table\Queryable\ExpressionTranslators\IQueryTranslator.cs" />
     <Compile Include="Table\Queryable\ExpressionTranslators\Methods\TakeTranslator.cs" />
@@ -49,6 +51,7 @@
     <Compile Include="Table\Queryable\ExpressionTranslators\Methods\WhereTranslator.cs" />
     <Compile Include="Table\Queryable\ExpressionTranslators\Evaluator.cs" />
     <Compile Include="Table\Queryable\ExpressionTranslators\MyExpressionVisitor.cs" />
+    <Compile Include="Table\Queryable\IAsyncQueryProvider.cs" />
     <Compile Include="Table\Queryable\QueryConstants.cs" />
     <Compile Include="Table\Queryable\TableQueryProvider.cs" />
     <Compile Include="Table\Queryable\Base\Query.cs" />
@@ -57,12 +60,13 @@
     <Compile Include="Table\Queryable\Base\TypeSystem.cs" />
     <Compile Include="Table\RowKeyAttribute.cs" />
     <Compile Include="Table\TableSet.cs" />
-    <Compile Include="Table\EntityFormatters\TableEntityFormatter.cs" />
+    <Compile Include="Table\EntityConverters\TableEntityConverter.cs" />
     <Compile Include="Table\TableKeyAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

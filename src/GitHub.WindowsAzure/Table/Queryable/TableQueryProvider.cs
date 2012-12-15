@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using GitHub.WindowsAzure.Table.EntityFormatters;
+using System.Threading;
+using System.Threading.Tasks;
+using GitHub.WindowsAzure.Table.EntityConverters;
+using GitHub.WindowsAzure.Table.Extensions;
 using GitHub.WindowsAzure.Table.Queryable.Base;
 using GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators;
 using GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods;
@@ -14,10 +17,10 @@ namespace GitHub.WindowsAzure.Table.Queryable
     ///     <see cref="http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx" />
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class TableQueryProvider<TEntity> : QueryProviderBase where TEntity : new()
+    public class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider<TEntity> where TEntity : new()
     {
         private readonly CloudTable _cloudTable;
-        private readonly ITableEntityFormatter<TEntity> _formatter;
+        private readonly ITableEntityConverter<TEntity> _converter;
         private readonly IDictionary<string, IMethodTranslator> _methodTranslators;
 
         /// <summary>
@@ -25,11 +28,11 @@ namespace GitHub.WindowsAzure.Table.Queryable
         /// </summary>
         /// <param name="cloudTableClient">Cloud table client.</param>
         /// <param name="tableName">Table name.</param>
-        /// <param name="formatter">Entities formatter.</param>
+        /// <param name="converter">Entities converter.</param>
         public TableQueryProvider(CloudTableClient cloudTableClient, string tableName,
-                                  ITableEntityFormatter<TEntity> formatter)
+                                  ITableEntityConverter<TEntity> converter)
         {
-            _formatter = formatter;
+            _converter = converter;
             _cloudTable = cloudTableClient.GetTableReference(tableName);
 
             _methodTranslators = new Dictionary<string, IMethodTranslator>
@@ -45,13 +48,13 @@ namespace GitHub.WindowsAzure.Table.Queryable
         /// </summary>
         /// <param name="cloudTableClient">Cloud table client.</param>
         /// <param name="tableName">Table name.</param>
-        /// <param name="formatter">Entities formatter.</param>
-        /// <param name="methodTranslators">List of expression methods formatters.</param>
+        /// <param name="converter">Entities converter.</param>
+        /// <param name="methodTranslators">List of expression method translators.</param>
         public TableQueryProvider(CloudTableClient cloudTableClient, string tableName,
-                                  ITableEntityFormatter<TEntity> formatter,
+                                  ITableEntityConverter<TEntity> converter,
                                   IDictionary<string, IMethodTranslator> methodTranslators)
         {
-            _formatter = formatter;
+            _converter = converter;
             _methodTranslators = methodTranslators;
             _cloudTable = cloudTableClient.GetTableReference(tableName);
         }
@@ -65,11 +68,16 @@ namespace GitHub.WindowsAzure.Table.Queryable
         {
             TableQuery query = GetTableQuery(expression);
 
-            List<DynamicTableEntity> entities = _cloudTable.ExecuteQuery(query).ToList();
+            var entities = _cloudTable.ExecuteQuery(query);
 
-            IEnumerable<TEntity> result = entities.Select(p => _formatter.GetEntity(p));
+            // NOTE: Waiting for fixing
+            // https://github.com/WindowsAzure/azure-sdk-for-net/issues/144
+            if (query.TakeCount.HasValue)
+            {
+                entities = entities.Take(query.TakeCount.Value);
+            }
 
-            return result;
+            return entities.Select(p => _converter.GetEntity(p));
         }
 
         /// <summary>
@@ -108,6 +116,26 @@ namespace GitHub.WindowsAzure.Table.Queryable
             }
 
             return query;
+        }
+
+        public async Task<object> ExecuteAsync(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            TableQuery query = GetTableQuery(expression);
+
+            var entities = await _cloudTable.ExecuteQueryAsync(query);
+
+            return entities.Select(p => _converter.GetEntity(p));
+        }
+
+        public async Task<TEntity> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            TableQuery query = GetTableQuery(expression);
+
+            query.TakeCount = 1;
+
+            var entities = await _cloudTable.ExecuteQueryAsync(query);
+
+            return entities.Select(p => _converter.GetEntity(p)).FirstOrDefault();
         }
     }
 }
