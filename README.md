@@ -1,7 +1,7 @@
 # Windows Azure Storage Extensions
 
 Storage Extensions library provides generic `TableSet<TEntity>` context for managing and querying entities from [Windows Azure Storage Tables](http://blogs.msdn.com/b/windowsazurestorage/archive/2012/11/06/windows-azure-storage-client-library-2-0-tables-deep-dive.aspx).
-It's builded on top of the **Windows Azure Storage Client Library 2.0** and has next features:
+It's built on top of the **Windows Azure Storage Client Library 2.0** and has next features:
 
 **Using POCO entities**
 
@@ -18,12 +18,12 @@ Classes can use `PartitionKey` and `RowKey` attributes for defining composite ta
       * UpdateAsync()
       * RemoveAsync()
 
-**Table queryies**
+**Table queries**
 
   * TableSet implements IQueryable interface for Linq expressions
      * Where()
      * Take()
-  * Async queries by using executions (TPL)
+  * Asynchronous queries by using executions (TPL)
      * ToListAsync()
 
 ## Dependencies
