@@ -20,10 +20,10 @@ Classes can use `PartitionKey` and `RowKey` attributes for defining composite ta
 
 **Table queries**
 
-  * TableSet implements IQueryable interface for Linq expressions
+  * TableSet implements IQueryable interface for using Linq Expressions
      * Where()
      * Take()
-  * Asynchronous queries by using executions (TPL)
+  * Asynchronous queries by using Linq extensions (TPL)
      * ToListAsync()
 
 ## Dependencies
