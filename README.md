@@ -67,17 +67,17 @@ Updating an entity:
 
 ```csharp
 resultSync.Area += 333333;
-resultSync = tableSet.Update(country);
+resultSync = tableSet.Update(resultSync);
 
 resultAsync.Population *= 2;
-resultAsync = await tableSet.UpdateAsync(country);
+resultAsync = await tableSet.UpdateAsync(resultAsync);
 ```
 
 Removing entities:
 
 ```csharp
-tableSet.Remove(country);
-await tableSet.RemoveAsync(country);
+tableSet.Remove(resultSync);
+await tableSet.RemoveAsync(resultAsync);
 ```
 
 Querying entities:
