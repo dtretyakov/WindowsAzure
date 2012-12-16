@@ -26,11 +26,25 @@ Classes can use `PartitionKey` and `RowKey` attributes for defining composite ta
   * Asynchronous queries by using Linq extensions (TPL)
      * ToListAsync()
 
-## Dependencies
-Storage Extensions requires a `WindowsAzure.Storage` nuget package:
-```shell
-Install-Package WindowsAzure.Storage
+## Download
+
+### Via Git
+To get the source code of the library via git just type:
+
+```git
+git clone git://github.com/dtretyakov/WindowsAzure.git
+cd ./WindowsAzure
 ```
+
+### Via NuGet
+To install library by using Nuget package manager execute next command:
+
+```
+Install-Package WindowsAzure.StorageExtensions -Pre
+```
+
+## Dependencies
+Storage Extensions requires .NET Framework 4.5 and [WindowsAzure.Storage](https://nuget.org/packages/WindowsAzure.Storage) nuget package.
 
 ## Code Samples
 
