@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
 
-namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators
+namespace WindowsAzure.Table.Queryable.ExpressionTranslators
 {
     public abstract class MyExpressionVisitor
     {

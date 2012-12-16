@@ -1,6 +1,8 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
-namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
+namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
 {
     /// <summary>
     ///     Expression method translator.
@@ -8,10 +10,18 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
     public interface IMethodTranslator
     {
         /// <summary>
+        ///     Gets a list of accepted methods.
+        /// </summary>
+        IList<String> AcceptedMethods { get; }
+
+        /// <summary>
         ///     Provides evaluated query information.
         /// </summary>
         /// <param name="method">Expression method.</param>
+        /// <param name="nameMappings">Property name mappings.</param>
         /// <returns>Result.</returns>
-        string Translate(MethodCallExpression method);
+        IDictionary<QueryConstants, String> Translate(
+            MethodCallExpression method,
+            IDictionary<String, String> nameMappings);
     }
 }

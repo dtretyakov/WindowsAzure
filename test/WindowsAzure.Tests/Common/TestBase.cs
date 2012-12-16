@@ -7,7 +7,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace GitHub.WindowsAzure.Tests.Common
+namespace WindowsAzure.Tests.Common
 {
     public class TestBase
     {

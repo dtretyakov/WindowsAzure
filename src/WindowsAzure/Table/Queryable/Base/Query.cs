@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace GitHub.WindowsAzure.Table.Queryable.Base
+namespace WindowsAzure.Table.Queryable.Base
 {
     public class Query<T> : IOrderedQueryable<T>
     {

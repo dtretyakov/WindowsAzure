@@ -1,7 +1,7 @@
 ﻿using System;
-using GitHub.WindowsAzure.Table;
+using WindowsAzure.Table;
 
-namespace GitHub.WindowsAzure.Tests.Samples
+namespace WindowsAzure.Tests.Samples
 {
     public sealed class Country
     {

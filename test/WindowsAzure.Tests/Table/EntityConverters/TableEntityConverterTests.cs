@@ -1,15 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using GitHub.WindowsAzure.Table.EntityConverters;
-using GitHub.WindowsAzure.Tests.Samples;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Table.EntityConverters;
+using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace GitHub.WindowsAzure.Tests.Table.EntityConverters
+namespace WindowsAzure.Tests.Table.EntityConverters
 {
     public sealed class TableEntityConverterTests
     {
+        [Fact]
+        public void CheckPartionAndRowKeysNameMappings()
+        {
+            // Arrange & Act
+            var converter = new TableEntityConverter<Country>();
+
+            // Assert
+            Assert.NotNull(converter.NameMappings);
+            Assert.Equal(converter.NameMappings.Count, 2);
+            Assert.Equal(converter.NameMappings["Continent"], "PartitionKey");
+            Assert.Equal(converter.NameMappings["Name"], "RowKey");
+        }
+
         [Fact]
         public void ConvertEntityToTableEntityTest()
         {

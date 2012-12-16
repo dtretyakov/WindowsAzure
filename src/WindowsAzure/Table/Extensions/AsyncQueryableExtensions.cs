@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GitHub.WindowsAzure.Table.Queryable;
+using WindowsAzure.Table.Queryable;
 
-namespace GitHub.WindowsAzure.Table.Extensions
+namespace WindowsAzure.Table.Extensions
 {
     public static class AsyncQueryableExtensions
     {

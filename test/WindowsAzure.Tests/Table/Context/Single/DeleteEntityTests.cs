@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GitHub.WindowsAzure.Table;
-using GitHub.WindowsAzure.Tests.Samples;
+using WindowsAzure.Table;
+using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace GitHub.WindowsAzure.Tests.Table.Context.Single
+namespace WindowsAzure.Tests.Table.Context.Single
 {
     public sealed class DeleteEntityTests : TableSetTestBase
     {

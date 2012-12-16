@@ -1,10 +1,10 @@
 ﻿using System;
-using GitHub.WindowsAzure.Table;
-using GitHub.WindowsAzure.Tests.Common;
-using GitHub.WindowsAzure.Tests.Samples;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Table;
+using WindowsAzure.Tests.Common;
+using WindowsAzure.Tests.Samples;
 
-namespace GitHub.WindowsAzure.Tests.Table.Context
+namespace WindowsAzure.Tests.Table.Context
 {
     public class TableSetTestBase : TestBase, IDisposable
     {

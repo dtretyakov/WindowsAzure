@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods;
+using WindowsAzure.Table.Queryable.ExpressionTranslators.Methods;
 
-namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators
+namespace WindowsAzure.Table.Queryable.ExpressionTranslators
 {
     public class QueryTranslator : ExpressionVisitor, IQueryTranslator
     {
-        private readonly IDictionary<string, IMethodTranslator> _methodTranslators;
-        private readonly Dictionary<string, string> _result;
+        private readonly IList<IMethodTranslator> _methodTranslators;
+        private readonly IDictionary<string, string> _nameMappings;
+        private readonly Dictionary<QueryConstants, string> _result;
 
-        public QueryTranslator(IDictionary<string, IMethodTranslator> methodTranslators)
+        public QueryTranslator(IDictionary<String, String> nameMappings,
+                               IList<IMethodTranslator> methodTranslators)
         {
+            _nameMappings = nameMappings;
             _methodTranslators = methodTranslators;
-            _result = new Dictionary<string, string>();
+            _result = new Dictionary<QueryConstants, string>();
         }
 
-        public IDictionary<string, string> Translate(Expression expression)
+        public IDictionary<QueryConstants, string> Translate(Expression expression)
         {
             expression = Evaluator.PartialEval(expression);
 
@@ -31,13 +35,21 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators
             {
                 string methodName = m.Method.Name;
 
-                if (!_methodTranslators.ContainsKey(methodName))
+                // Select method translator
+                IMethodTranslator translator = _methodTranslators.FirstOrDefault(
+                    p => p.AcceptedMethods.Contains(methodName));
+
+                if (translator == null)
                 {
                     throw new NotSupportedException(
                         string.Format("The method '{0}' is not supported", methodName));
                 }
 
-                _result.Add(methodName, _methodTranslators[methodName].Translate(m));
+                // Merge translation results
+                foreach (var result in translator.Translate(m, _nameMappings))
+                {
+                    _result.Add(result.Key, result.Value);
+                }
 
                 Visit(m.Arguments[0]);
             }

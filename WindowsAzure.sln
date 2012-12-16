@@ -1,9 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.WindowsAzure", "src\GitHub.WindowsAzure\GitHub.WindowsAzure.csproj", "{0C174C38-3AD7-4810-B165-95DCC327288F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsAzure", "src\WindowsAzure\WindowsAzure.csproj", "{0C174C38-3AD7-4810-B165-95DCC327288F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHub.WindowsAzure.Tests", "test\GitHub.WindowsAzure.Tests\GitHub.WindowsAzure.Tests.csproj", "{7B133A3F-612C-4647-93B3-A8CC4FBF1E39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsAzure.Tests", "test\WindowsAzure.Tests\WindowsAzure.Tests.csproj", "{7B133A3F-612C-4647-93B3-A8CC4FBF1E39}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1156D6DA-7171-4BDA-853C-5C98ACFE916B}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

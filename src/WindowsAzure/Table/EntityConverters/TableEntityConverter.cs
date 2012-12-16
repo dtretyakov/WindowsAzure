@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace GitHub.WindowsAzure.Table.EntityConverters
+namespace WindowsAzure.Table.EntityConverters
 {
     /// <summary>
     ///     Handles an entities conversions.
@@ -12,8 +11,13 @@ namespace GitHub.WindowsAzure.Table.EntityConverters
     /// <typeparam name="TEntity">Entity type.</typeparam>
     public class TableEntityConverter<TEntity> : ITableEntityConverter<TEntity> where TEntity : new()
     {
-        private readonly Dictionary<string, PropertyInfo> _properties;
+        private readonly Type _entityType;
+        private readonly Dictionary<String, String> _nameMappings;
+        private readonly Type _partitionKeyAttributeType = typeof (PartitionKeyAttribute);
+        private readonly Dictionary<String, PropertyInfo> _properties;
+        private readonly Type _rowKeyAttributeType = typeof (RowKeyAttribute);
         private readonly Type _stringType = typeof (String);
+
         private PropertyInfo _partitionKeyProperty;
         private PropertyInfo _rowKeyProperty;
 
@@ -22,9 +26,19 @@ namespace GitHub.WindowsAzure.Table.EntityConverters
         /// </summary>
         public TableEntityConverter()
         {
+            _nameMappings = new Dictionary<string, string>();
             _properties = new Dictionary<String, PropertyInfo>();
+            _entityType = typeof (TEntity);
 
             IntializeProperties();
+        }
+
+        /// <summary>
+        ///     Gets an entity property name maping connection.
+        /// </summary>
+        public IDictionary<string, string> NameMappings
+        {
+            get { return _nameMappings; }
         }
 
         /// <summary>
@@ -75,16 +89,13 @@ namespace GitHub.WindowsAzure.Table.EntityConverters
         }
 
         /// <summary>
-        ///     Receives type properties.
+        ///     Retrieves type properties.
         /// </summary>
         private void IntializeProperties()
         {
-            foreach (PropertyInfo property in typeof (TEntity).GetProperties())
+            foreach (PropertyInfo property in _entityType.GetProperties())
             {
-                Attribute[] attributes = Attribute.GetCustomAttributes(property, typeof (TableKeyAttribute));
-                TableKeyAttribute tableKeyAttribute = attributes.Cast<TableKeyAttribute>().SingleOrDefault();
-
-                if (tableKeyAttribute is PartitionKeyAttribute)
+                if (Attribute.IsDefined(property, _partitionKeyAttributeType, false))
                 {
                     if (_partitionKeyProperty != null)
                     {
@@ -97,8 +108,13 @@ namespace GitHub.WindowsAzure.Table.EntityConverters
                     }
 
                     _partitionKeyProperty = property;
+
+                    _nameMappings.Add(property.Name, "PartitionKey");
+
+                    continue;
                 }
-                else if (tableKeyAttribute is RowKeyAttribute)
+
+                if (Attribute.IsDefined(property, _rowKeyAttributeType, false))
                 {
                     if (_rowKeyProperty != null)
                     {
@@ -111,11 +127,13 @@ namespace GitHub.WindowsAzure.Table.EntityConverters
                     }
 
                     _rowKeyProperty = property;
+
+                    _nameMappings.Add(property.Name, "RowKey");
+
+                    continue;
                 }
-                else
-                {
-                    _properties.Add(property.Name, property);
-                }
+
+                _properties.Add(property.Name, property);
             }
 
             if (_partitionKeyProperty == null)

@@ -1,27 +1,46 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
-namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
+namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
 {
     /// <summary>
     ///     Linq Take expression translator.
     /// </summary>
     public class TakeTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private int? _takeCount;
+        private readonly List<String> _acceptedMethods;
+        private String _takeCount;
 
-        public string Translate(MethodCallExpression method)
+        public TakeTranslator()
+        {
+            _acceptedMethods = new List<string> {"Take"};
+        }
+
+        public QueryConstants QuerySegment
+        {
+            get { return QueryConstants.Top; }
+        }
+
+        public IDictionary<QueryConstants, String> Translate(MethodCallExpression method,
+                                                             IDictionary<string, string> nameMappings)
         {
             Visit(method.Arguments[1]);
 
-            return _takeCount.HasValue ? _takeCount.ToString() : null;
+            return new Dictionary<QueryConstants, string>
+                       {
+                           {QueryConstants.Top, _takeCount}
+                       };
+        }
+
+        public IList<string> AcceptedMethods
+        {
+            get { return _acceptedMethods; }
         }
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Value is int)
-            {
-                _takeCount = (int) node.Value;
-            }
+            _takeCount = node.Value.ToString();
 
             return base.VisitConstant(node);
         }

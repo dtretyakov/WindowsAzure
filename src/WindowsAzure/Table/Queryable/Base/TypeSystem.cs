@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GitHub.WindowsAzure.Table.Queryable.Base
+namespace WindowsAzure.Table.Queryable.Base
 {
     internal static class TypeSystem
     {

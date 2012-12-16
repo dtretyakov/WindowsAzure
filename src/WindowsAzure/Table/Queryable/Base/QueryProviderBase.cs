@@ -3,7 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace GitHub.WindowsAzure.Table.Queryable.Base
+namespace WindowsAzure.Table.Queryable.Base
 {
     public abstract class QueryProviderBase : IQueryProvider
     {

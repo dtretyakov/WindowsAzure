@@ -1,10 +1,14 @@
-﻿namespace GitHub.WindowsAzure.Table.Queryable
+﻿namespace WindowsAzure.Table.Queryable
 {
-    public sealed class QueryConstants
+    /// <summary>
+    /// Table query segments.
+    /// </summary>
+    public enum QueryConstants
     {
-        public const string Where = "Where";
-        public const string Select = "Select";
-        public const string Take = "Take";
-        public const string First = "First";
+        Filter,
+
+        Select,
+
+        Top
     }
 }

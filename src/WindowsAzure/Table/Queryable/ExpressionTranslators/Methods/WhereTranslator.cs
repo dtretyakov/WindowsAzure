@@ -5,7 +5,7 @@ using System.Text;
 using System.Xml;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
+namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
 {
     /// <summary>
     ///     Linq Where method translator.
@@ -13,8 +13,13 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
     /// </summary>
     public class WhereTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private readonly Dictionary<ExpressionType, string> _logicalOperators =
-            new Dictionary<ExpressionType, string>
+        private readonly List<String> _acceptedMethods;
+
+        /// <summary>
+        ///     Collection of supported logical operands.
+        /// </summary>
+        private readonly Dictionary<ExpressionType, String> _logicalOperators =
+            new Dictionary<ExpressionType, String>
                 {
                     {ExpressionType.AndAlso, "and"},
                     {ExpressionType.OrElse, "or"},
@@ -27,19 +32,84 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
                     {ExpressionType.LessThanOrEqual, QueryComparisons.LessThanOrEqual}
                 };
 
-        private StringBuilder _filter;
+        /// <summary>
+        ///     Collection of supported constant types.
+        /// </summary>
+        private readonly Dictionary<Type, Func<object, String>> _serialization =
+            new Dictionary<Type, Func<object, String>>
+                {
+                    {typeof (String), o => string.Format("'{0}'", o)},
+                    {
+                        typeof (DateTime), o => string.Format(
+                            "datetime'{0}'",
+                            XmlConvert.ToString((DateTime) o, XmlDateTimeSerializationMode.RoundtripKind))
+                    },
+                    {
+                        typeof (DateTimeOffset), o => string.Format(
+                            "datetime'{0}'",
+                            XmlConvert.ToString(((DateTimeOffset) o).DateTime,
+                                                XmlDateTimeSerializationMode.RoundtripKind))
+                    },
+                    {typeof (Boolean), o => o.ToString().ToLowerInvariant()},
+                    {typeof (Int32), o => o.ToString()},
+                    {typeof (Int64), o => string.Format("{0}L", o)},
+                    {typeof (Single), o => string.Format("{0:#.0#}", o)},
+                    {typeof (Double), o => string.Format("{0:#.0#}", o)},
+                    {typeof (Guid), o => string.Format("guid'{0}'", o)},
+                    {
+                        typeof (Byte[]), o =>
+                                             {
+                                                 var stringBuilder = new StringBuilder("X'");
 
-        public string Translate(MethodCallExpression method)
+                                                 foreach (byte num in (Byte[]) o)
+                                                 {
+                                                     stringBuilder.AppendFormat("{0:x2}", num);
+                                                 }
+
+                                                 stringBuilder.Append("'");
+
+                                                 return stringBuilder.ToString();
+                                             }
+                    }
+                };
+
+        private StringBuilder _filter;
+        private IDictionary<String, String> _nameMappings;
+
+        public WhereTranslator()
         {
+            _acceptedMethods = new List<string> {"Where"};
+        }
+
+        public QueryConstants QuerySegment
+        {
+            get { return QueryConstants.Filter; }
+        }
+
+        public IDictionary<QueryConstants, String> Translate(
+            MethodCallExpression method,
+            IDictionary<string, string> nameMappings)
+        {
+            _nameMappings = nameMappings;
+
             _filter = new StringBuilder();
 
             var lambda = (LambdaExpression) StripQuotes(method.Arguments[1]);
+
             Visit(lambda.Body);
 
-            return UnwrapParentheses(_filter.ToString());
+            return new Dictionary<QueryConstants, String>
+                       {
+                           {QueryConstants.Filter, RemoveParentheses(_filter.ToString())}
+                       };
         }
 
-        private static string UnwrapParentheses(string filter)
+        public IList<string> AcceptedMethods
+        {
+            get { return _acceptedMethods; }
+        }
+
+        private static String RemoveParentheses(string filter)
         {
             if (filter.Length < 2)
             {
@@ -48,7 +118,7 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
 
             if (filter[0] == '(' && filter[filter.Length - 1] == ')')
             {
-                return UnwrapParentheses(filter.Substring(1, filter.Length - 2));
+                return RemoveParentheses(filter.Substring(1, filter.Length - 2));
             }
 
             return filter;
@@ -69,7 +139,7 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
             if (!_logicalOperators.ContainsKey(unary.NodeType))
             {
                 throw new NotSupportedException(
-                    string.Format("The binary operator '{0}' is not supported", unary.NodeType));
+                    String.Format("The binary operator '{0}' is not supported", unary.NodeType));
             }
 
             _filter.AppendFormat(" {0} ", _logicalOperators[unary.NodeType]);
@@ -90,13 +160,12 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
                 _filter.Append("(");
             }
 
-
             Visit(binary.Left);
 
             if (!_logicalOperators.ContainsKey(binary.NodeType))
             {
                 throw new NotSupportedException(
-                    string.Format("The binary operator '{0}' is not supported", binary.NodeType));
+                    String.Format("The binary operator '{0}' is not supported", binary.NodeType));
             }
 
             _filter.AppendFormat(" {0} ", _logicalOperators[binary.NodeType]);
@@ -119,50 +188,17 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
             }
             else
             {
-                switch (Type.GetTypeCode(constant.Value.GetType()))
+                Type constantType = constant.Value.GetType();
+
+                if (!_serialization.ContainsKey(constantType))
                 {
-                    case TypeCode.String:
-                        _filter.AppendFormat("'{0}'", constant.Value);
-                        break;
-
-                    case TypeCode.DateTime:
-                        _filter.AppendFormat(
-                            "datetime'{0}'",
-                            XmlConvert.ToString((DateTime) constant.Value,
-                                                XmlDateTimeSerializationMode.RoundtripKind));
-                        break;
-
-                    case TypeCode.Single:
-                    case TypeCode.Double:
-                        _filter.AppendFormat("{0:#.0#}", constant.Value);
-                        break;
-
-                    case TypeCode.Int64:
-                        _filter.AppendFormat("{0}L", constant.Value);
-                        break;
-
-                    case TypeCode.Boolean:
-                        _filter.Append(constant.Value.ToString().ToLowerInvariant());
-                        break;
-
-                    case TypeCode.Object:
-
-                        if (constant.Value is Guid)
-                        {
-                            _filter.AppendFormat("guid'{0}'", constant.Value);
-                        }
-                        else
-                        {
-                            throw new NotSupportedException(
-                                string.Format("The constant for '{0}' is not supported", constant.Value));
-                        }
-                        break;
-
-                    default:
-                        _filter.Append(constant.Value);
-                        break;
+                    throw new NotSupportedException(
+                        String.Format("The constant for '{0}' is not supported", constant.Value));
                 }
+
+                _filter.Append(_serialization[constantType](constant.Value));
             }
+
             return constant;
         }
 
@@ -170,12 +206,15 @@ namespace GitHub.WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
         {
             if (member.Expression != null && member.Expression.NodeType == ExpressionType.Parameter)
             {
-                _filter.Append(member.Member.Name);
+                _filter.Append(_nameMappings.ContainsKey(member.Member.Name)
+                                   ? _nameMappings[member.Member.Name]
+                                   : member.Member.Name);
+
                 return member;
             }
 
             throw new NotSupportedException(
-                string.Format("The member '{0}' is not supported", member.Member.Name));
+                String.Format("The member '{0}' is not supported", member.Member.Name));
         }
     }
 }

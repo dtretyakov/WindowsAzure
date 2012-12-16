@@ -1,4 +1,4 @@
-﻿namespace GitHub.WindowsAzure.Table
+﻿namespace WindowsAzure.Table
 {
     public sealed class PartitionKeyAttribute : TableKeyAttribute
     {

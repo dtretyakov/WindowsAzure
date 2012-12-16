@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GitHub.WindowsAzure.Table;
-using GitHub.WindowsAzure.Table.Extensions;
-using GitHub.WindowsAzure.Tests.Samples;
+using WindowsAzure.Table;
+using WindowsAzure.Table.Extensions;
+using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace GitHub.WindowsAzure.Tests.Table.Context.Query
+namespace WindowsAzure.Tests.Table.Context.Query
 {
     public sealed class ComplexQueryTests : TableSetTestBase
     {

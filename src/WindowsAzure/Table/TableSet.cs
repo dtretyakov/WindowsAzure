@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GitHub.WindowsAzure.Table.EntityConverters;
-using GitHub.WindowsAzure.Table.Extensions;
-using GitHub.WindowsAzure.Table.Queryable;
-using GitHub.WindowsAzure.Table.Queryable.Base;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Table.EntityConverters;
+using WindowsAzure.Table.Extensions;
+using WindowsAzure.Table.Queryable;
+using WindowsAzure.Table.Queryable.Base;
 
-namespace GitHub.WindowsAzure.Table
+namespace WindowsAzure.Table
 {
     /// <summary>
     ///     Windows Azure Table entity set.

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace GitHub.WindowsAzure.Table.Extensions
+namespace WindowsAzure.Table.Extensions
 {
     /// <summary>
     ///     Cloud Table Extensions.
