@@ -5,11 +5,10 @@ using System.Text;
 using System.Xml;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
+namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
     /// <summary>
-    ///     Linq Where method translator.
-    ///     <see cref="http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx" />
+    ///     Where expression translator.
     /// </summary>
     public class WhereTranslator : ExpressionVisitor, IMethodTranslator
     {
@@ -81,16 +80,16 @@ namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
             _acceptedMethods = new List<string> {"Where"};
         }
 
-        public QueryConstants QuerySegment
+        public QuerySegment QuerySegment
         {
-            get { return QueryConstants.Filter; }
+            get { return QuerySegment.Filter; }
         }
 
-        public IDictionary<QueryConstants, String> Translate(
+        public IDictionary<QuerySegment, String> Translate(
             MethodCallExpression method,
-            IDictionary<string, string> nameMappings)
+            IDictionary<string, string> nameChanges)
         {
-            _nameMappings = nameMappings;
+            _nameMappings = nameChanges;
 
             _filter = new StringBuilder();
 
@@ -98,9 +97,9 @@ namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
 
             Visit(lambda.Body);
 
-            return new Dictionary<QueryConstants, String>
+            return new Dictionary<QuerySegment, String>
                        {
-                           {QueryConstants.Filter, RemoveParentheses(_filter.ToString())}
+                           {QuerySegment.Filter, RemoveParentheses(_filter.ToString())}
                        };
         }
 

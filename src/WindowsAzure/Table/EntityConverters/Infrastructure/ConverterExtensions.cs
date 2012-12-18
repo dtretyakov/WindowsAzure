@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace WindowsAzure.Table.EntityConverters
+namespace WindowsAzure.Table.EntityConverters.Infrastructure
 {
     /// <summary>
     ///     Extensions for a TableEntityConverter.
@@ -69,6 +69,11 @@ namespace WindowsAzure.Table.EntityConverters
         /// <returns>Property value.</returns>
         public static String GetStringValue(this PropertyInfo property, Object target)
         {
+            if (target == null)
+            {
+                throw new ArgumentNullException("target");
+            }
+
             return (String) property.GetValue(target);
         }
 
@@ -80,6 +85,11 @@ namespace WindowsAzure.Table.EntityConverters
         /// <returns>Entity property.</returns>
         public static EntityProperty GetEntityProperty(this PropertyInfo property, Object target)
         {
+            if (target == null)
+            {
+                throw new ArgumentNullException("target");
+            }
+
             Object value = property.GetValue(target);
 
             if (!TypeToEdm.ContainsKey(property.PropertyType))
@@ -98,6 +108,16 @@ namespace WindowsAzure.Table.EntityConverters
         /// <param name="target">Target object.</param>
         public static void SetPropertyValue(this PropertyInfo property, EntityProperty entityProperty, Object target)
         {
+            if (entityProperty == null)
+            {
+                throw new ArgumentNullException("entityProperty");
+            }
+            
+            if (target == null)
+            {
+                throw new ArgumentNullException("target");
+            }
+
             if (!EdmToType.ContainsKey(entityProperty.PropertyType))
             {
                 throw new Exception("Invalid entity property EDM type.");

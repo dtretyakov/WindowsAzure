@@ -17,10 +17,10 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             var converter = new TableEntityConverter<Country>();
 
             // Assert
-            Assert.NotNull(converter.NameMappings);
-            Assert.Equal(converter.NameMappings.Count, 2);
-            Assert.Equal(converter.NameMappings["Continent"], "PartitionKey");
-            Assert.Equal(converter.NameMappings["Name"], "RowKey");
+            Assert.NotNull(converter.NameChanges);
+            Assert.Equal(converter.NameChanges.Count, 2);
+            Assert.Equal(converter.NameChanges["Continent"], "PartitionKey");
+            Assert.Equal(converter.NameChanges["Name"], "RowKey");
         }
 
         [Fact]

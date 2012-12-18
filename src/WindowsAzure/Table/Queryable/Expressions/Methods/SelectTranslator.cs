@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
+namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
     /// <summary>
-    ///     Linq Select expression translator.
+    ///     Select expression translator.
     /// </summary>
     public class SelectTranslator : ExpressionVisitor, IMethodTranslator
     {
@@ -18,20 +18,20 @@ namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
             _columns = new List<string>();
         }
 
-        public QueryConstants QuerySegment
+        public QuerySegment QuerySegment
         {
-            get { return QueryConstants.Select; }
+            get { return QuerySegment.Select; }
         }
 
-        public IDictionary<QueryConstants, String> Translate(
+        public IDictionary<QuerySegment, String> Translate(
             MethodCallExpression method,
-            IDictionary<string, string> nameMappings)
+            IDictionary<string, string> nameChanges)
         {
             Visit(method);
 
-            return new Dictionary<QueryConstants, string>
+            return new Dictionary<QuerySegment, string>
                        {
-                           {QueryConstants.Select, String.Join(",", _columns)}
+                           {QuerySegment.Select, String.Join(",", _columns)}
                        };
         }
 

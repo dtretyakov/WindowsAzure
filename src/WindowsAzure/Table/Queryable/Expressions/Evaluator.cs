@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace WindowsAzure.Table.Queryable.ExpressionTranslators
+namespace WindowsAzure.Table.Queryable.Expressions
 {
     public static class Evaluator
     {

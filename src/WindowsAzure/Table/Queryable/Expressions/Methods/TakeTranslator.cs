@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
+namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
     /// <summary>
-    ///     Linq Take expression translator.
+    ///     Take expression translator.
     /// </summary>
     public class TakeTranslator : ExpressionVisitor, IMethodTranslator
     {
@@ -17,19 +17,20 @@ namespace WindowsAzure.Table.Queryable.ExpressionTranslators.Methods
             _acceptedMethods = new List<string> {"Take"};
         }
 
-        public QueryConstants QuerySegment
+        public QuerySegment QuerySegment
         {
-            get { return QueryConstants.Top; }
+            get { return QuerySegment.Top; }
         }
 
-        public IDictionary<QueryConstants, String> Translate(MethodCallExpression method,
-                                                             IDictionary<string, string> nameMappings)
+        public IDictionary<QuerySegment, String> Translate(
+            MethodCallExpression method,
+            IDictionary<string, string> nameChanges)
         {
             Visit(method.Arguments[1]);
 
-            return new Dictionary<QueryConstants, string>
+            return new Dictionary<QuerySegment, string>
                        {
-                           {QueryConstants.Top, _takeCount}
+                           {QuerySegment.Top, _takeCount}
                        };
         }
 

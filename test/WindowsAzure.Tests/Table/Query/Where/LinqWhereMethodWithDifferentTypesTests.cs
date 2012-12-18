@@ -5,9 +5,9 @@ using WindowsAzure.Table;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Context.Query
+namespace WindowsAzure.Tests.Table.Query.Where
 {
-    public sealed class WhereWithDifferentTypesTests : TableSetTestBase
+    public sealed class LinqWhereMethodWithDifferentTypesTests : TableSetTestBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";
@@ -17,7 +17,7 @@ namespace WindowsAzure.Tests.Table.Context.Query
 
         private const string Id = "829ea8b2-3bd5-45a4-8b54-533c69e608d7";
 
-        public WhereWithDifferentTypesTests()
+        public LinqWhereMethodWithDifferentTypesTests()
         {
             TableSet<Country> tableSet = GetTableSet();
             tableSet.Add(

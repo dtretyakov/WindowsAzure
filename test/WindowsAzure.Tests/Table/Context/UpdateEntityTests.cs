@@ -4,33 +4,41 @@ using WindowsAzure.Table;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Context.Single
+namespace WindowsAzure.Tests.Table.Context
 {
-    public sealed class AddEntityTests : TableSetTestBase
+    public sealed class UpdateEntityTests : TableSetTestBase
     {
         [Fact]
-        public void AddEntitySyncTest()
+        public void UpdateEntitySyncTest()
         {
-            // Arrange
+            //Arrange
             var country = new Country
                               {
-                                  Area = 505992,
-                                  Continent = "Europe",
+                                  Area = 17075400,
+                                  Continent = "Transcontinental",
                                   TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                  Formed = new DateTime(1812, 1, 1),
+                                  Formed = new DateTime(1721, 10, 22),
                                   Id = Guid.NewGuid(),
                                   IsExists = true,
-                                  Name = "Spain",
-                                  Population = 47190493,
-                                  PresidentsCount = 8
+                                  Name = "Russia",
+                                  Population = 143300000,
+                                  PresidentsCount = 4
                               };
 
             TableSet<Country> tableSet = GetTableSet();
 
-            // Act
-            Country result = tableSet.Add(country);
+            tableSet.Add(country);
 
-            // Assert
+            // Act
+            country.Population += 333333;
+            country.IsExists = false;
+            country.PresidentsCount += 5;
+            country.TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
+
+            Country result = tableSet.Update(country);
+
+            //Assert
+            Assert.NotNull(result);
             Assert.Equal(country.Area, result.Area);
             Assert.Equal(country.Continent, result.Continent);
             Assert.Equal(country.TopSecretKey, result.TopSecretKey);
@@ -43,28 +51,36 @@ namespace WindowsAzure.Tests.Table.Context.Single
         }
 
         [Fact]
-        public async Task AddEntityAsyncTest()
+        public async Task UpdateEntityAsyncTest()
         {
-            // Arrange
+            //Arrange
             var country = new Country
                               {
-                                  Area = 357021,
+                                  Area = 243610,
                                   Continent = "Europe",
                                   TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                  Formed = new DateTime(1871, 1, 18),
+                                  Formed = new DateTime(1801, 1, 1),
                                   Id = Guid.NewGuid(),
                                   IsExists = true,
-                                  Name = "Germany",
-                                  Population = 81799600,
-                                  PresidentsCount = 11
+                                  Name = "United Kingdom",
+                                  Population = 62262000,
+                                  PresidentsCount = 0
                               };
 
             TableSet<Country> tableSet = GetTableSet();
 
-            // Act
-            Country result = await tableSet.AddAsync(country);
+            await tableSet.AddAsync(country);
 
-            // Assert
+            // Act
+            country.Population += 333333;
+            country.IsExists = false;
+            country.PresidentsCount += 5;
+            country.TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
+
+            Country result = await tableSet.UpdateAsync(country);
+
+            //Assert
+            Assert.NotNull(result);
             Assert.Equal(country.Area, result.Area);
             Assert.Equal(country.Continent, result.Continent);
             Assert.Equal(country.TopSecretKey, result.TopSecretKey);

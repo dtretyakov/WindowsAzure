@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -7,21 +8,20 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Extensions;
 using WindowsAzure.Table.Queryable.Base;
-using WindowsAzure.Table.Queryable.ExpressionTranslators;
-using WindowsAzure.Table.Queryable.ExpressionTranslators.Methods;
+using WindowsAzure.Table.Queryable.Expressions;
 
 namespace WindowsAzure.Table.Queryable
 {
     /// <summary>
     ///     Windows Azure Table Linq query provider.
-    ///     <see cref="http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx" />
+    ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider where TEntity : new()
     {
         private readonly CloudTable _cloudTable;
         private readonly ITableEntityConverter<TEntity> _converter;
-        private readonly IList<IMethodTranslator> _methodTranslators;
+        private readonly IQueryTranslator _queryTranslator;
 
         /// <summary>
         ///     Contructor.
@@ -31,16 +31,8 @@ namespace WindowsAzure.Table.Queryable
         /// <param name="converter">Entities converter.</param>
         public TableQueryProvider(CloudTableClient cloudTableClient, string tableName,
                                   ITableEntityConverter<TEntity> converter)
+            : this(cloudTableClient, tableName, converter, new QueryTranslator(converter.NameChanges))
         {
-            _converter = converter;
-            _cloudTable = cloudTableClient.GetTableReference(tableName);
-
-            _methodTranslators = new List<IMethodTranslator>
-                                     {
-                                         new SelectTranslator(),
-                                         new TakeTranslator(),
-                                         new WhereTranslator()
-                                     };
         }
 
         /// <summary>
@@ -49,13 +41,33 @@ namespace WindowsAzure.Table.Queryable
         /// <param name="cloudTableClient">Cloud table client.</param>
         /// <param name="tableName">Table name.</param>
         /// <param name="converter">Entities converter.</param>
-        /// <param name="methodTranslators">List of expression method translators.</param>
+        /// <param name="queryTranslator">LINQ Expression translator.</param>
         public TableQueryProvider(CloudTableClient cloudTableClient, string tableName,
                                   ITableEntityConverter<TEntity> converter,
-                                  IList<IMethodTranslator> methodTranslators)
+                                  IQueryTranslator queryTranslator)
         {
+            if (cloudTableClient == null)
+            {
+                throw new ArgumentNullException("cloudTableClient");
+            }
+
+            if (string.IsNullOrEmpty(tableName))
+            {
+                throw new ArgumentNullException("tableName");
+            }
+
+            if (converter == null)
+            {
+                throw new ArgumentNullException("converter");
+            }
+
+            if (queryTranslator == null)
+            {
+                throw new ArgumentNullException("queryTranslator");
+            }
+
             _converter = converter;
-            _methodTranslators = methodTranslators;
+            _queryTranslator = queryTranslator;
             _cloudTable = cloudTableClient.GetTableReference(tableName);
         }
 
@@ -66,6 +78,11 @@ namespace WindowsAzure.Table.Queryable
         /// <returns>Result.</returns>
         public override object Execute(Expression expression)
         {
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
             TableQuery query = GetTableQuery(expression);
 
             IEnumerable<DynamicTableEntity> entities = _cloudTable.ExecuteQuery(query);
@@ -89,6 +106,11 @@ namespace WindowsAzure.Table.Queryable
         public async Task<object> ExecuteAsync(Expression expression,
                                                CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
             TableQuery query = GetTableQuery(expression);
 
             IEnumerable<DynamicTableEntity> entities = await _cloudTable.ExecuteQueryAsync(query);
@@ -97,43 +119,39 @@ namespace WindowsAzure.Table.Queryable
         }
 
         /// <summary>
-        ///     Returns a query translator.
-        /// </summary>
-        /// <returns></returns>
-        private IQueryTranslator GetQueryTranslator()
-        {
-            return new QueryTranslator(_converter.NameMappings, _methodTranslators);
-        }
-
-        /// <summary>
         ///     Creates a table query by expression.
         /// </summary>
         /// <param name="expression">Query expression.</param>
         /// <returns>Table query.</returns>
-        public virtual TableQuery GetTableQuery(Expression expression)
+        public TableQuery GetTableQuery(Expression expression)
         {
-            IDictionary<QueryConstants, string> queryResult = GetQueryTranslator().Translate(expression);
+            if (expression == null)
+            {
+                throw new ArgumentNullException("expression");
+            }
+
+            IDictionary<QuerySegment, string> queryResult = _queryTranslator.Translate(expression);
 
             var query = new TableQuery();
 
-            // Select method
-            if (queryResult.ContainsKey(QueryConstants.Select))
+            // Select
+            if (queryResult.ContainsKey(QuerySegment.Select))
             {
-                query.Select(queryResult[QueryConstants.Select].Split(','));
+                query.Select(queryResult[QuerySegment.Select].Split(','));
             }
 
-            // Where method
-            if (queryResult.ContainsKey(QueryConstants.Filter))
+            // Filter
+            if (queryResult.ContainsKey(QuerySegment.Filter))
             {
-                query.FilterString = queryResult[QueryConstants.Filter];
+                query.FilterString = queryResult[QuerySegment.Filter];
             }
 
-            // Contains method
-            if (queryResult.ContainsKey(QueryConstants.Top))
+            // Top
+            if (queryResult.ContainsKey(QuerySegment.Top))
             {
                 int takeCount;
 
-                if (int.TryParse(queryResult[QueryConstants.Top], out takeCount))
+                if (int.TryParse(queryResult[QuerySegment.Top], out takeCount))
                 {
                     query.TakeCount = takeCount;
                 }

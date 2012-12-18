@@ -4,7 +4,7 @@ using WindowsAzure.Table;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Context.Single
+namespace WindowsAzure.Tests.Table.Context
 {
     public sealed class DeleteEntityTests : TableSetTestBase
     {

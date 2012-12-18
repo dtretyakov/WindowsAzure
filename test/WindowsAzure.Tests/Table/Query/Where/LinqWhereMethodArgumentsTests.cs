@@ -7,14 +7,14 @@ using WindowsAzure.Table.Extensions;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Context.Query
+namespace WindowsAzure.Tests.Table.Query.Where
 {
-    public sealed class WhereArgumentsTests : TableSetTestBase
+    public sealed class LinqWhereMethodArgumentsTests : TableSetTestBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";
 
-        public WhereArgumentsTests()
+        public LinqWhereMethodArgumentsTests()
         {
             TableSet<Country> tableSet = GetTableSet();
             tableSet.Add(

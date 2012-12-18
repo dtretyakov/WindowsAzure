@@ -4,40 +4,34 @@ using WindowsAzure.Table;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Context.Single
+namespace WindowsAzure.Tests.Table.Context
 {
-    public sealed class UpdateEntityTests : TableSetTestBase
+    public sealed class AddEntityTests : TableSetTestBase
     {
         [Fact]
-        public void UpdateEntitySyncTest()
+        public void AddEntitySyncTest()
         {
-            //Arrange
+            // Arrange
             var country = new Country
                               {
-                                  Area = 17075400,
-                                  Continent = "Transcontinental",
+                                  Area = 505992,
+                                  Continent = "Europe",
                                   TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                  Formed = new DateTime(1721, 10, 22),
+                                  Formed = new DateTime(1812, 1, 1),
                                   Id = Guid.NewGuid(),
                                   IsExists = true,
-                                  Name = "Russia",
-                                  Population = 143300000,
-                                  PresidentsCount = 4
+                                  Name = "Spain",
+                                  Population = 47190493,
+                                  PresidentsCount = 8
                               };
 
             TableSet<Country> tableSet = GetTableSet();
 
-            tableSet.Add(country);
-
             // Act
-            country.Population += 333333;
-            country.IsExists = false;
-            country.PresidentsCount += 5;
-            country.TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
+            Country result = tableSet.Add(country);
 
-            Country result = tableSet.Update(country);
-
-            //Assert
+            // Assert
+            Assert.NotNull(result);
             Assert.Equal(country.Area, result.Area);
             Assert.Equal(country.Continent, result.Continent);
             Assert.Equal(country.TopSecretKey, result.TopSecretKey);
@@ -50,35 +44,29 @@ namespace WindowsAzure.Tests.Table.Context.Single
         }
 
         [Fact]
-        public async Task UpdateEntityAsyncTest()
+        public async Task AddEntityAsyncTest()
         {
-            //Arrange
+            // Arrange
             var country = new Country
                               {
-                                  Area = 243610,
+                                  Area = 357021,
                                   Continent = "Europe",
                                   TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                  Formed = new DateTime(1801, 1, 1),
+                                  Formed = new DateTime(1871, 1, 18),
                                   Id = Guid.NewGuid(),
                                   IsExists = true,
-                                  Name = "United Kingdom",
-                                  Population = 62262000,
-                                  PresidentsCount = 0
+                                  Name = "Germany",
+                                  Population = 81799600,
+                                  PresidentsCount = 11
                               };
 
             TableSet<Country> tableSet = GetTableSet();
 
-            await tableSet.AddAsync(country);
-
             // Act
-            country.Population += 333333;
-            country.IsExists = false;
-            country.PresidentsCount += 5;
-            country.TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
+            Country result = await tableSet.AddAsync(country);
 
-            Country result = await tableSet.UpdateAsync(country);
-
-            //Assert
+            // Assert
+            Assert.NotNull(result);
             Assert.Equal(country.Area, result.Area);
             Assert.Equal(country.Continent, result.Continent);
             Assert.Equal(country.TopSecretKey, result.TopSecretKey);

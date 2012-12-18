@@ -7,7 +7,7 @@ using WindowsAzure.Table.Extensions;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Context.Query
+namespace WindowsAzure.Tests.Table.Query
 {
     public sealed class ComplexQueryTests : TableSetTestBase
     {

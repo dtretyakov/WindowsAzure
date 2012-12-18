@@ -13,7 +13,7 @@ namespace WindowsAzure.Table.EntityConverters
         /// <summary>
         ///     Gets an entity property name maping connection.
         /// </summary>
-        IDictionary<String, String> NameMappings { get; }
+        IDictionary<String, String> NameChanges { get; }
 
         /// <summary>
         ///     Converts an entity to table entity.

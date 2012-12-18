@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -71,6 +72,26 @@ namespace WindowsAzure.Table
                         ITableEntityConverter<TEntity> converter, IQueryProvider queryProvider)
             : base(queryProvider)
         {
+            if (cloudTableClient == null)
+            {
+                throw new ArgumentNullException("cloudTableClient");
+            }
+
+            if (string.IsNullOrEmpty(tableName))
+            {
+                throw new ArgumentNullException("tableName");
+            }
+
+            if (converter == null)
+            {
+                throw new ArgumentNullException("converter");
+            }
+
+            if (queryProvider == null)
+            {
+                throw new ArgumentNullException("queryProvider");
+            }
+
             _converter = converter;
             _cloudTable = cloudTableClient.GetTableReference(tableName);
             _cloudTable.CreateIfNotExists();
@@ -111,6 +132,11 @@ namespace WindowsAzure.Table
         /// <returns>Inserted entities.</returns>
         public async Task<IReadOnlyList<TEntity>> AddAsync(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
             var tableBatchOperation = new TableBatchOperation();
 
             foreach (TEntity entity in entities)
@@ -131,6 +157,11 @@ namespace WindowsAzure.Table
         /// <returns>Inserted entities.</returns>
         public IReadOnlyList<TEntity> Add(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
             var tableBatchOperation = new TableBatchOperation();
 
             foreach (TEntity entity in entities)
@@ -179,6 +210,11 @@ namespace WindowsAzure.Table
         /// <returns>Updated entities.</returns>
         public async Task<IReadOnlyList<TEntity>> UpdateAsync(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
             var tableBatchOperation = new TableBatchOperation();
 
             foreach (TEntity entity in entities)
@@ -199,6 +235,11 @@ namespace WindowsAzure.Table
         /// <returns>Updated entities.</returns>
         public IReadOnlyList<TEntity> Update(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
             var tableBatchOperation = new TableBatchOperation();
 
             foreach (TEntity entity in entities)
@@ -243,6 +284,11 @@ namespace WindowsAzure.Table
         /// <returns>Result.</returns>
         public async Task RemoveAsync(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
             var tableBatchOperation = new TableBatchOperation();
 
             foreach (TEntity entity in entities)
@@ -261,6 +307,11 @@ namespace WindowsAzure.Table
         /// <returns>Result.</returns>
         public void Remove(IEnumerable<TEntity> entities)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
             var tableBatchOperation = new TableBatchOperation();
 
             foreach (TEntity entity in entities)

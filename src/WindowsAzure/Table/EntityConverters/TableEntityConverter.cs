@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Table.EntityConverters.Infrastructure;
 
 namespace WindowsAzure.Table.EntityConverters
 {
@@ -9,36 +10,25 @@ namespace WindowsAzure.Table.EntityConverters
     ///     Handles an entities conversions.
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
-    public class TableEntityConverter<TEntity> : ITableEntityConverter<TEntity> where TEntity : new()
+    public class TableEntityConverter<TEntity> : TableEntityConverterBase,
+                                                 ITableEntityConverter<TEntity> where TEntity : new()
     {
-        private readonly Type _entityType;
-        private readonly Dictionary<String, String> _nameMappings;
-        private readonly Type _partitionKeyAttributeType = typeof (PartitionKeyAttribute);
-        private readonly Dictionary<String, PropertyInfo> _properties;
-        private readonly Type _rowKeyAttributeType = typeof (RowKeyAttribute);
-        private readonly Type _stringType = typeof (String);
-
-        private PropertyInfo _partitionKeyProperty;
-        private PropertyInfo _rowKeyProperty;
+        private readonly EntityTypeData _typeData;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         public TableEntityConverter()
         {
-            _nameMappings = new Dictionary<string, string>();
-            _properties = new Dictionary<String, PropertyInfo>();
-            _entityType = typeof (TEntity);
-
-            IntializeProperties();
+            _typeData = GetEntityTypeData(typeof (TEntity));
         }
 
         /// <summary>
         ///     Gets an entity property name maping connection.
         /// </summary>
-        public IDictionary<string, string> NameMappings
+        public IDictionary<string, string> NameChanges
         {
-            get { return _nameMappings; }
+            get { return _typeData.NameChanges; }
         }
 
         /// <summary>
@@ -50,14 +40,14 @@ namespace WindowsAzure.Table.EntityConverters
         {
             var result = new DynamicTableEntity
                              {
-                                 PartitionKey = _partitionKeyProperty.GetStringValue(entity),
-                                 RowKey = _rowKeyProperty.GetStringValue(entity),
+                                 PartitionKey = _typeData.PartitionKey.GetStringValue(entity),
+                                 RowKey = _typeData.RowKey.GetStringValue(entity),
                                  ETag = "*"
                              };
 
-            foreach (var property in _properties)
+            foreach (PropertyInfo property in _typeData.Properties)
             {
-                result.Properties.Add(property.Key, property.Value.GetEntityProperty(entity));
+                result.Properties.Add(property.Name, property.GetEntityProperty(entity));
             }
 
             return result;
@@ -70,18 +60,23 @@ namespace WindowsAzure.Table.EntityConverters
         /// <returns>Entity.</returns>
         public TEntity GetEntity(DynamicTableEntity tableEntity)
         {
+            if (tableEntity == null)
+            {
+                throw new ArgumentNullException("tableEntity");
+            }
+
             var result = new TEntity();
 
-            _partitionKeyProperty.SetValue(result, tableEntity.PartitionKey);
-            _rowKeyProperty.SetValue(result, tableEntity.RowKey);
+            _typeData.PartitionKey.SetValue(result, tableEntity.PartitionKey);
+            _typeData.RowKey.SetValue(result, tableEntity.RowKey);
 
-            foreach (var property in _properties)
+            foreach (PropertyInfo property in _typeData.Properties)
             {
                 EntityProperty entityProperty;
 
-                if (tableEntity.Properties.TryGetValue(property.Key, out entityProperty))
+                if (tableEntity.Properties.TryGetValue(property.Name, out entityProperty))
                 {
-                    property.Value.SetPropertyValue(entityProperty, result);
+                    property.SetPropertyValue(entityProperty, result);
                 }
             }
 
@@ -91,60 +86,9 @@ namespace WindowsAzure.Table.EntityConverters
         /// <summary>
         ///     Retrieves type properties.
         /// </summary>
-        private void IntializeProperties()
+        private EntityTypeData GetEntityTypeData(Type entityType)
         {
-            foreach (PropertyInfo property in _entityType.GetProperties())
-            {
-                if (Attribute.IsDefined(property, _partitionKeyAttributeType, false))
-                {
-                    if (_partitionKeyProperty != null)
-                    {
-                        throw new ArgumentException("PartitionKey attribute duplication.");
-                    }
-
-                    if (property.PropertyType != _stringType)
-                    {
-                        throw new ArgumentException("PartitionKey must be a string.");
-                    }
-
-                    _partitionKeyProperty = property;
-
-                    _nameMappings.Add(property.Name, "PartitionKey");
-
-                    continue;
-                }
-
-                if (Attribute.IsDefined(property, _rowKeyAttributeType, false))
-                {
-                    if (_rowKeyProperty != null)
-                    {
-                        throw new ArgumentException("RowKey attribute duplication.");
-                    }
-
-                    if (property.PropertyType != _stringType)
-                    {
-                        throw new ArgumentException("RowKey must be a string.");
-                    }
-
-                    _rowKeyProperty = property;
-
-                    _nameMappings.Add(property.Name, "RowKey");
-
-                    continue;
-                }
-
-                _properties.Add(property.Name, property);
-            }
-
-            if (_partitionKeyProperty == null)
-            {
-                throw new ArgumentException("PartitionKey attribute must be defined.");
-            }
-
-            if (_rowKeyProperty == null)
-            {
-                throw new ArgumentException("RowKey attribute must be defined.");
-            }
+            return TypesData.GetOrAdd(entityType, type => new EntityTypeData(entityType));
         }
     }
 }

@@ -4,25 +4,25 @@ using WindowsAzure.Table;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 
-namespace WindowsAzure.Tests.Table.Context
+namespace WindowsAzure.Tests.Table
 {
     public class TableSetTestBase : TestBase, IDisposable
     {
-        private readonly string _tableName;
+        protected readonly string TableName;
 
         protected TableSetTestBase()
         {
             CloudTableClient tableClient = GenerateCloudTableClient();
-            _tableName = "Table" + Guid.NewGuid().ToString("N");
+            TableName = "Table" + Guid.NewGuid().ToString("N");
 
-            tableClient.GetTableReference(_tableName).CreateIfNotExists();
+            tableClient.GetTableReference(TableName).CreateIfNotExists();
         }
 
         public void Dispose()
         {
             CloudTableClient tableClient = GenerateCloudTableClient();
 
-            tableClient.GetTableReference(_tableName).DeleteIfExists();
+            tableClient.GetTableReference(TableName).DeleteIfExists();
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace WindowsAzure.Tests.Table.Context
         {
             CloudTableClient tableClient = GenerateCloudTableClient();
 
-            return new TableSet<Country>(tableClient, _tableName);
+            return new TableSet<Country>(tableClient, TableName);
         }
     }
 }
