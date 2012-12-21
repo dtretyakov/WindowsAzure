@@ -67,8 +67,8 @@ namespace WindowsAzure.Table.EntityConverters
 
             var result = new TEntity();
 
-            _typeData.PartitionKey.SetValue(result, tableEntity.PartitionKey);
-            _typeData.RowKey.SetValue(result, tableEntity.RowKey);
+            _typeData.PartitionKey.SetValue(result, tableEntity.PartitionKey, null);
+            _typeData.RowKey.SetValue(result, tableEntity.RowKey, null);
 
             foreach (PropertyInfo property in _typeData.Properties)
             {

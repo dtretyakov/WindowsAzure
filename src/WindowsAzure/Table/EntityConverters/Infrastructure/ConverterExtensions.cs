@@ -35,13 +35,13 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
         private static readonly Dictionary<EdmType, Action<PropertyInfo, EntityProperty, Object>> EdmToType =
             new Dictionary<EdmType, Action<PropertyInfo, EntityProperty, Object>>
                 {
-                    {EdmType.Binary, (p, e, t) => p.SetValue(t, e.BinaryValue)},
-                    {EdmType.Boolean, (p, e, t) => p.SetValue(t, e.BooleanValue)},
-                    {EdmType.Double, (p, e, t) => p.SetValue(t, e.DoubleValue)},
-                    {EdmType.Guid, (p, e, t) => p.SetValue(t, e.GuidValue)},
-                    {EdmType.Int32, (p, e, t) => p.SetValue(t, e.Int32Value)},
-                    {EdmType.Int64, (p, e, t) => p.SetValue(t, e.Int64Value)},
-                    {EdmType.String, (p, e, t) => p.SetValue(t, e.StringValue)},
+                    {EdmType.Binary, (p, e, t) => p.SetValue(t, e.BinaryValue, null)},
+                    {EdmType.Boolean, (p, e, t) => p.SetValue(t, e.BooleanValue, null)},
+                    {EdmType.Double, (p, e, t) => p.SetValue(t, e.DoubleValue, null)},
+                    {EdmType.Guid, (p, e, t) => p.SetValue(t, e.GuidValue, null)},
+                    {EdmType.Int32, (p, e, t) => p.SetValue(t, e.Int32Value, null)},
+                    {EdmType.Int64, (p, e, t) => p.SetValue(t, e.Int64Value, null)},
+                    {EdmType.String, (p, e, t) => p.SetValue(t, e.StringValue, null)},
                     {
                         EdmType.DateTime,
                         (p, e, t) =>
@@ -50,12 +50,12 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
                                 {
                                     if (e.DateTimeOffsetValue != null)
                                     {
-                                        p.SetValue(t, e.DateTimeOffsetValue.Value.DateTime);
+                                        p.SetValue(t, e.DateTimeOffsetValue.Value.DateTime, null);
                                     }
                                 }
                                 else
                                 {
-                                    p.SetValue(t, e.DateTimeOffsetValue);
+                                    p.SetValue(t, e.DateTimeOffsetValue, null);
                                 }
                             }
                     },
@@ -74,7 +74,7 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
                 throw new ArgumentNullException("target");
             }
 
-            return (String) property.GetValue(target);
+            return (String) property.GetValue(target, null);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
                 throw new ArgumentNullException("target");
             }
 
-            Object value = property.GetValue(target);
+            Object value = property.GetValue(target, null);
 
             if (!TypeToEdm.ContainsKey(property.PropertyType))
             {
@@ -112,7 +112,7 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
             {
                 throw new ArgumentNullException("entityProperty");
             }
-            
+
             if (target == null)
             {
                 throw new ArgumentNullException("target");

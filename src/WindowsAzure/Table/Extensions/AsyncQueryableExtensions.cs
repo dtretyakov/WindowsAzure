@@ -10,76 +10,82 @@ namespace WindowsAzure.Table.Extensions
     /// </summary>
     public static class AsyncQueryableExtensions
     {
-        public static async Task<List<T>> ToListAsync<T>(this IQueryable<T> source) where T : new()
+        public static Task<List<T>> ToListAsync<T>(this IQueryable<T> source) where T : new()
         {
             var tableQueryProvider = source.Provider as TableQueryProvider<T>;
 
             if (tableQueryProvider == null)
             {
-                return source.ToList();
+                return TaskHelpers.FromResult(source.ToList());
             }
 
-            return ((IEnumerable<T>) await tableQueryProvider.ExecuteAsync(source.Expression)).ToList();
+            return tableQueryProvider.ExecuteAsync(source.Expression)
+                                     .Then(result => ((IEnumerable<T>)result).ToList());
         }
 
-        public static async Task<List<T>> TakeAsync<T>(this IQueryable<T> source, int count) where T : new()
+        public static Task<IEnumerable<T>> TakeAsync<T>(this IQueryable<T> source, int count) where T : new()
         {
             var tableQueryProvider = source.Provider as TableQueryProvider<T>;
 
             if (tableQueryProvider == null)
             {
-                return source.Take(count).ToList();
+                return TaskHelpers.FromResult(source.Take(count).AsEnumerable());
             }
 
-            return ((IEnumerable<T>) await tableQueryProvider.ExecuteAsync(source.Take(count).Expression)).ToList();
+            return tableQueryProvider.ExecuteAsync(source.Take(count).Expression)
+                                     .Then(result => (IEnumerable<T>) result);
         }
 
-        public static async Task<T> FirstAsync<T>(this IQueryable<T> source) where T : new()
+        public static Task<T> FirstAsync<T>(this IQueryable<T> source) where T : new()
         {
             var tableQueryProvider = source.Provider as TableQueryProvider<T>;
 
             if (tableQueryProvider == null)
             {
-                return source.First();
+                return TaskHelpers.FromResult(source.First());
             }
 
-            return ((IEnumerable<T>) await tableQueryProvider.ExecuteAsync(source.Take(1).Expression)).First();
+            return tableQueryProvider.ExecuteAsync(source.Take(1).Expression)
+                                     .Then(result => ((IEnumerable<T>) result).First());
         }
 
-        public static async Task<T> FirstOrDefaultAsync<T>(this IQueryable<T> source) where T : new()
+        public static Task<T> FirstOrDefaultAsync<T>(this IQueryable<T> source) where T : new()
         {
             var tableQueryProvider = source.Provider as TableQueryProvider<T>;
 
             if (tableQueryProvider == null)
             {
-                return source.FirstOrDefault();
+                return TaskHelpers.FromResult(source.FirstOrDefault());
             }
 
-            return ((IEnumerable<T>) await tableQueryProvider.ExecuteAsync(source.Take(1).Expression)).FirstOrDefault();
+            return tableQueryProvider.ExecuteAsync(source.Take(1).Expression)
+                                     .Then(result => ((IEnumerable<T>) result).FirstOrDefault());
         }
 
-        public static async Task<T> SingleAsync<T>(this IQueryable<T> source) where T : new()
+        public static Task<T> SingleAsync<T>(this IQueryable<T> source) where T : new()
         {
             var tableQueryProvider = source.Provider as TableQueryProvider<T>;
 
             if (tableQueryProvider == null)
             {
-                return source.Single();
+                return TaskHelpers.FromResult(source.Single());
             }
 
-            return ((IEnumerable<T>) await tableQueryProvider.ExecuteAsync(source.Take(2).Expression)).Single();
+            return tableQueryProvider.ExecuteAsync(source.Take(2).Expression)
+                                     .Then(result => ((IEnumerable<T>) result).Single());
         }
 
-        public static async Task<T> SingleOrDefaultAsync<T>(this IQueryable<T> source) where T : new()
+        public static Task<T> SingleOrDefaultAsync<T>(this IQueryable<T> source) where T : new()
         {
             var tableQueryProvider = source.Provider as TableQueryProvider<T>;
 
             if (tableQueryProvider == null)
             {
-                return source.SingleOrDefault();
+                return TaskHelpers.FromResult(source.SingleOrDefault());
             }
 
-            return ((IEnumerable<T>) await tableQueryProvider.ExecuteAsync(source.Take(2).Expression)).SingleOrDefault();
+            return tableQueryProvider.ExecuteAsync(source.Take(2).Expression)
+                                     .Then(result => ((IEnumerable<T>) result).SingleOrDefault());
         }
     }
 }

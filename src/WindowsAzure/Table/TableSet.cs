@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
@@ -98,17 +99,21 @@ namespace WindowsAzure.Table
         }
 
         /// <summary>
-        ///     Inserts a new entity.
+        ///     Inserts a new entity asynchronously.
         /// </summary>
         /// <param name="entity">Entity.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Inserted entity.</returns>
-        public async Task<TEntity> AddAsync(TEntity entity)
+        public Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
         {
             ITableEntity tableEntity = _converter.GetEntity(entity);
 
-            TableResult result = await _cloudTable.ExecuteAsync(TableOperation.Insert(tableEntity));
-
-            return _converter.GetEntity((DynamicTableEntity) result.Result);
+            return _cloudTable.ExecuteAsync(TableOperation.Insert(tableEntity), cancellationToken)
+                              .Then(result =>
+                                        {
+                                            var value = (DynamicTableEntity) result.Result;
+                                            return _converter.GetEntity(value);
+                                        }, cancellationToken);
         }
 
         /// <summary>
@@ -126,11 +131,14 @@ namespace WindowsAzure.Table
         }
 
         /// <summary>
-        ///     Inserts a new entities.
+        ///     Inserts a new entities asynchronously.
         /// </summary>
         /// <param name="entities">Entities collection.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Inserted entities.</returns>
-        public async Task<IReadOnlyList<TEntity>> AddAsync(IEnumerable<TEntity> entities)
+        public Task<IEnumerable<TEntity>> AddAsync(
+            IEnumerable<TEntity> entities,
+            CancellationToken cancellationToken = default (CancellationToken))
         {
             if (entities == null)
             {
@@ -145,9 +153,13 @@ namespace WindowsAzure.Table
                 tableBatchOperation.Add(TableOperation.Insert(tableEntity));
             }
 
-            IList<TableResult> result = await _cloudTable.ExecuteBatchAsync(tableBatchOperation);
-
-            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).ToList();
+            return _cloudTable
+                .ExecuteBatchAsync(tableBatchOperation, cancellationToken)
+                .Then(result => result.Select(p =>
+                                                  {
+                                                      var value = (DynamicTableEntity) p.Result;
+                                                      return _converter.GetEntity(value);
+                                                  }), cancellationToken);
         }
 
         /// <summary>
@@ -155,7 +167,7 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Inserted entities.</returns>
-        public IReadOnlyList<TEntity> Add(IEnumerable<TEntity> entities)
+        public IEnumerable<TEntity> Add(IEnumerable<TEntity> entities)
         {
             if (entities == null)
             {
@@ -172,21 +184,26 @@ namespace WindowsAzure.Table
 
             IList<TableResult> result = _cloudTable.ExecuteBatch(tableBatchOperation);
 
-            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).ToList();
+            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
         }
 
         /// <summary>
-        ///     Updates an entity.
+        ///     Updates an entity asynchronously.
         /// </summary>
         /// <param name="entity">Entity.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Updated entity.</returns>
-        public async Task<TEntity> UpdateAsync(TEntity entity)
+        public Task<TEntity> UpdateAsync(TEntity entity,
+                                         CancellationToken cancellationToken = default(CancellationToken))
         {
             ITableEntity tableEntity = _converter.GetEntity(entity);
 
-            TableResult result = await _cloudTable.ExecuteAsync(TableOperation.Replace(tableEntity));
-
-            return _converter.GetEntity((DynamicTableEntity) result.Result);
+            return _cloudTable.ExecuteAsync(TableOperation.Replace(tableEntity), cancellationToken)
+                              .Then(result =>
+                                        {
+                                            var value = (DynamicTableEntity) result.Result;
+                                            return _converter.GetEntity(value);
+                                        }, cancellationToken);
         }
 
         /// <summary>
@@ -204,11 +221,14 @@ namespace WindowsAzure.Table
         }
 
         /// <summary>
-        ///     Updates an entities.
+        ///     Updates an entities asynchronously.
         /// </summary>
         /// <param name="entities">Entities collection.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Updated entities.</returns>
-        public async Task<IReadOnlyList<TEntity>> UpdateAsync(IEnumerable<TEntity> entities)
+        public Task<IEnumerable<TEntity>> UpdateAsync(
+            IEnumerable<TEntity> entities,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (entities == null)
             {
@@ -223,9 +243,13 @@ namespace WindowsAzure.Table
                 tableBatchOperation.Add(TableOperation.Replace(tableEntity));
             }
 
-            IList<TableResult> result = await _cloudTable.ExecuteBatchAsync(tableBatchOperation);
-
-            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).ToList();
+            return _cloudTable.ExecuteBatchAsync(tableBatchOperation, cancellationToken)
+                              .Then(result => result.Select(
+                                  p =>
+                                      {
+                                          var value = (DynamicTableEntity) p.Result;
+                                          return _converter.GetEntity(value);
+                                      }), cancellationToken);
         }
 
         /// <summary>
@@ -233,7 +257,7 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Updated entities.</returns>
-        public IReadOnlyList<TEntity> Update(IEnumerable<TEntity> entities)
+        public IEnumerable<TEntity> Update(IEnumerable<TEntity> entities)
         {
             if (entities == null)
             {
@@ -250,19 +274,20 @@ namespace WindowsAzure.Table
 
             IList<TableResult> result = _cloudTable.ExecuteBatch(tableBatchOperation);
 
-            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).ToList();
+            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
         }
 
         /// <summary>
-        ///     Removes an entity.
+        ///     Removes an entity asynchronously.
         /// </summary>
         /// <param name="entity">Entity.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Result.</returns>
-        public async Task RemoveAsync(TEntity entity)
+        public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
         {
             ITableEntity tableEntity = _converter.GetEntity(entity);
 
-            await _cloudTable.ExecuteAsync(TableOperation.Delete(tableEntity));
+            return _cloudTable.ExecuteAsync(TableOperation.Delete(tableEntity), cancellationToken);
         }
 
         /// <summary>
@@ -278,11 +303,14 @@ namespace WindowsAzure.Table
         }
 
         /// <summary>
-        ///     Removes an entities.
+        ///     Removes an entities asynchronously.
         /// </summary>
         /// <param name="entities">Entities collection.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Result.</returns>
-        public async Task RemoveAsync(IEnumerable<TEntity> entities)
+        public Task RemoveAsync(
+            IEnumerable<TEntity> entities,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (entities == null)
             {
@@ -297,7 +325,7 @@ namespace WindowsAzure.Table
                 tableBatchOperation.Add(TableOperation.Delete(tableEntity));
             }
 
-            await _cloudTable.ExecuteBatchAsync(tableBatchOperation);
+            return _cloudTable.ExecuteBatchAsync(tableBatchOperation, cancellationToken);
         }
 
         /// <summary>

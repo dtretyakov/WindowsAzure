@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WindowsAzure.Table;
 using WindowsAzure.Tests.Samples;
@@ -44,7 +45,7 @@ namespace WindowsAzure.Tests.Table.Context
             TableSet<Country> tableSet = GetTableSet();
 
             // Act
-            IReadOnlyList<Country> result = tableSet.Add(countries);
+            List<Country> result = tableSet.Add(countries).ToList();
 
             // Assert
             Assert.NotNull(result);
@@ -106,7 +107,7 @@ namespace WindowsAzure.Tests.Table.Context
             TableSet<Country> tableSet = GetTableSet();
 
             // Act
-            IReadOnlyList<Country> result = await tableSet.AddAsync(countries);
+            List<Country> result = (await tableSet.AddAsync(countries)).ToList();
 
             // Assert
             Assert.NotNull(result);

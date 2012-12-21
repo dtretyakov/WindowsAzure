@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WindowsAzure.Table;
 using WindowsAzure.Tests.Samples;
@@ -49,14 +50,14 @@ namespace WindowsAzure.Tests.Table.Context
             countries[0].Population += 333333;
             countries[0].IsExists = false;
             countries[0].PresidentsCount += 5;
-            countries[0].TopSecretKey = new byte[] { 0xff, 0xee, 0xdd };
+            countries[0].TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
 
             countries[1].Population += 333333;
             countries[1].IsExists = false;
             countries[1].PresidentsCount += 5;
-            countries[1].TopSecretKey = new byte[] { 0xff, 0xee, 0xdd };
+            countries[1].TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
 
-            var result = tableSet.Update(countries);
+            List<Country> result = tableSet.Update(countries).ToList();
 
             //Assert
             Assert.NotNull(result);
@@ -123,14 +124,14 @@ namespace WindowsAzure.Tests.Table.Context
             countries[0].Population += 333333;
             countries[0].IsExists = false;
             countries[0].PresidentsCount += 5;
-            countries[0].TopSecretKey = new byte[] { 0xff, 0xee, 0xdd };
+            countries[0].TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
 
             countries[1].Population += 333333;
             countries[1].IsExists = false;
             countries[1].PresidentsCount += 5;
-            countries[1].TopSecretKey = new byte[] { 0xff, 0xee, 0xdd };
+            countries[1].TopSecretKey = new byte[] {0xff, 0xee, 0xdd};
 
-            var result = await tableSet.UpdateAsync(countries);
+            List<Country> result = (await tableSet.UpdateAsync(countries)).ToList();
 
             //Assert
             Assert.NotNull(result);

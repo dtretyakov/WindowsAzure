@@ -103,7 +103,7 @@ namespace WindowsAzure.Table.Queryable
         /// <param name="expression"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<object> ExecuteAsync(Expression expression,
+        public Task<object> ExecuteAsync(Expression expression,
                                                CancellationToken cancellationToken = default(CancellationToken))
         {
             if (expression == null)
@@ -113,9 +113,9 @@ namespace WindowsAzure.Table.Queryable
 
             TableQuery query = GetTableQuery(expression);
 
-            IEnumerable<DynamicTableEntity> entities = await _cloudTable.ExecuteQueryAsync(query);
-
-            return entities.Select(p => _converter.GetEntity(p));
+            return _cloudTable
+                .ExecuteQueryAsync(query)
+                .Then(entities => (object) entities.Select(p => _converter.GetEntity(p)), cancellationToken);
         }
 
         /// <summary>
