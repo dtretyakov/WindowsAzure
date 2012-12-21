@@ -1,30 +1,37 @@
 # Windows Azure Storage Extensions
 
-Storage Extensions library provides generic `TableSet<TEntity>` context for managing and querying entities from [Windows Azure Storage Tables](http://blogs.msdn.com/b/windowsazurestorage/archive/2012/11/06/windows-azure-storage-client-library-2-0-tables-deep-dive.aspx).
-It's built on top of the **Windows Azure Storage Client Library 2.0** and has next features:
+*Windows Azure Storage Extensions* is a framework aimed for managing and querying entities from [Windows Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
+
+It's built on top of the **[Windows Azure Storage Client Library 2.0](http://blogs.msdn.com/b/windowsazurestorage/archive/2012/11/06/windows-azure-storage-client-library-2-0-tables-deep-dive.aspx)** and provides **IQueryable** interface and has object mapping for usage of absolutely abstract **POCO** entities.
+
+## Features
 
 **Using POCO entities**
 
-Classes can use `PartitionKey` and `RowKey` attributes for defining composite table key.
+Classes can use `PartitionKey` and `RowKey` attributes for defining composite table key. See code samples below.
 
 **Table entities management**
 
-  * Synchronous
-      * Add()
-      * Update()
-      * Remove()
-  * Asynchronous (TPL)
-      * AddAsync()
-      * UpdateAsync()
-      * RemoveAsync()
+Generic `TableSet<TEntity>` context provides a synchronous & asynchronous ([TAP](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) methods for managing entities:
+
+  * *Synchronous*: Add(), Update() and Remove().
+  * *Asynchronous*: AddAsync(), UpdateAsync() and RemoveAsync().
 
 **Table queries**
 
-  * TableSet implements IQueryable interface for using Linq Expressions
-     * Where()
-     * Take()
-  * Asynchronous queries by using Linq extensions (TPL)
-     * ToListAsync()
+Table context implements `IQueryable<>` interface for using [LINQ Expressions](http://msdn.microsoft.com/en-us/library/vstudio/bb397926.aspx). Query provider implements next methods:
+* Where()
+* Take()
+
+For creating a custom queries you should take a look at [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
+
+In addition to you can use **asynchronous queries** powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx). Available methods:
+* ToListAsync()
+* TakeAsync()
+* FirstAsync()
+* FirstOrDefaultAsync()
+* SingleAsync()
+* SingleOrDefaultAsync()
 
 ## Download
 
@@ -37,18 +44,18 @@ cd ./WindowsAzure
 ```
 
 ### Via NuGet
-To install library by using Nuget package manager execute next command:
+To install library by using [Nuget package](https://nuget.org/packages/WindowsAzure.StorageExtensions/) manager execute next command:
 
 ```
 Install-Package WindowsAzure.StorageExtensions -Pre
 ```
 
 ## Dependencies
-Storage Extensions requires .NET Framework 4.5 and [WindowsAzure.Storage](https://nuget.org/packages/WindowsAzure.Storage) nuget package.
+Storage Extensions requires .NET Framework 4.0 and [WindowsAzure.Storage](https://nuget.org/packages/WindowsAzure.Storage) nuget package.
 
 ## Code Samples
 
-Declaring a new POCO class:
+* Declaring a new POCO class:
 
 ```csharp
 public sealed class Country
@@ -63,21 +70,21 @@ public sealed class Country
 }
 ```
 
-Creating a new table context:
+* Creating a new table context:
 
 ```csharp
 var tableClient = CloudStorageAccount.DevelopmentStorageAccount;
 var countryTable = new TableSet<Country>(tableClient);
 ```
 
-Adding a new entity:
+* Adding a new entity:
 
 ```csharp
 var resultSync = tableSet.Add(country);
 var resultAsync = await tableSet.AddAsync(country);
 ```
 
-Updating an entity:
+* Updating an entity:
 
 ```csharp
 resultSync.Area += 333333;
@@ -87,14 +94,14 @@ resultAsync.Population *= 2;
 resultAsync = await tableSet.UpdateAsync(resultAsync);
 ```
 
-Removing entities:
+* Removing entities:
 
 ```csharp
 tableSet.Remove(resultSync);
 await tableSet.RemoveAsync(resultAsync);
 ```
 
-Querying entities:
+* Querying entities:
 
 ```csharp
 var query = tableSet.Where(
