@@ -33,6 +33,10 @@ In addition to you can use **asynchronous queries** powered by LINQ extensions (
 * SingleAsync()
 * SingleOrDefaultAsync()
 
+**Task Cancellation**
+
+All of TAP based methods accepts a `CancellationToken` parameter for using a [Task Cancellation](http://msdn.microsoft.com/en-us/library/dd997396.aspx).
+
 ## Download
 
 ### Via Git
