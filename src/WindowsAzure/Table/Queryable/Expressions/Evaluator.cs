@@ -29,7 +29,8 @@ namespace WindowsAzure.Table.Queryable.Expressions
 
         private static bool CanBeEvaluatedLocally(Expression expression)
         {
-            return expression.NodeType != ExpressionType.Parameter;
+            return expression.NodeType != ExpressionType.Parameter &&
+                   expression.NodeType != ExpressionType.Call;
         }
 
         /// <summary>

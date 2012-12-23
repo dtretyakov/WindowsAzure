@@ -77,7 +77,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         public WhereTranslator()
         {
-            _acceptedMethods = new List<string> {"Where"};
+            _acceptedMethods = new List<string>
+                                   {
+                                       "Where",
+                                       "First",
+                                       "FirstOrDefault",
+                                       "Single",
+                                       "SingleOrDefault"
+                                   };
         }
 
         public QuerySegment QuerySegment

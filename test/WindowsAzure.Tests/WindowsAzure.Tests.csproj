@@ -74,6 +74,7 @@
     <Compile Include="Table\Context\AddEntitiesTests.cs" />
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\UpdateEntitiesTests.cs" />
+    <Compile Include="Table\Extensions\AsyncQueryExtensionsTests.cs" />
     <Compile Include="Table\Query\Take\LinqTakeMethodTests.cs" />
     <Compile Include="Table\Query\Where\LinqWhereMethodWithDifferentTypesTests.cs" />
     <Compile Include="Table\Context\AddEntityTests.cs" />
@@ -101,7 +102,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Table\Extensions\" />
     <Folder Include="Table\Query\Select\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -104,7 +104,7 @@ namespace WindowsAzure.Table.Queryable
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public Task<object> ExecuteAsync(Expression expression,
-                                               CancellationToken cancellationToken = default(CancellationToken))
+                                         CancellationToken cancellationToken = default(CancellationToken))
         {
             if (expression == null)
             {

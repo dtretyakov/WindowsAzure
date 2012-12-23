@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using WindowsAzure.Table.Queryable;
@@ -9,7 +11,7 @@ namespace WindowsAzure.Table.Extensions
     /// <summary>
     ///     LINQ extensions for a asynchronous query execution.
     /// </summary>
-    public static class AsyncQueryableExtensions
+    public static class AsyncQueryExtensions
     {
         /// <summary>
         ///     Executes a query ToList method asynchronously.
@@ -83,6 +85,31 @@ namespace WindowsAzure.Table.Extensions
         }
 
         /// <summary>
+        ///     Executes a query First method asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the query.</typeparam>
+        /// <param name="source">Query.</param>
+        /// <param name="predicate">Predicate.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Entity.</returns>
+        public static Task<T> FirstAsync<T>(
+            this IQueryable<T> source,
+            Expression<Func<T,bool>> predicate,
+            CancellationToken cancellationToken = default (CancellationToken))
+            where T : new()
+        {
+            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+
+            if (tableQueryProvider == null)
+            {
+                return TaskHelpers.FromResult(source.First());
+            }
+
+            return tableQueryProvider.ExecuteAsync(source.Where(predicate).Take(1).Expression, cancellationToken)
+                                     .Then(result => ((IEnumerable<T>)result).First(), cancellationToken);
+        }
+
+        /// <summary>
         ///     Executes a query FirstOrDefault asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity type of the query.</typeparam>
@@ -102,7 +129,32 @@ namespace WindowsAzure.Table.Extensions
             }
 
             return tableQueryProvider.ExecuteAsync(source.Take(1).Expression, cancellationToken)
-                                     .Then(result => ((IEnumerable<T>) result).FirstOrDefault(), cancellationToken);
+                                     .Then(result => ((IEnumerable<T>)result).FirstOrDefault(), cancellationToken);
+        }
+
+        /// <summary>
+        ///     Executes a query FirstOrDefault asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the query.</typeparam>
+        /// <param name="source">Query.</param>
+        /// <param name="predicate">Predicate.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Entity.</returns>
+        public static Task<T> FirstOrDefaultAsync<T>(
+            this IQueryable<T> source,
+            Expression<Func<T, bool>> predicate,
+            CancellationToken cancellationToken = default (CancellationToken))
+            where T : new()
+        {
+            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+
+            if (tableQueryProvider == null)
+            {
+                return TaskHelpers.FromResult(source.FirstOrDefault());
+            }
+
+            return tableQueryProvider.ExecuteAsync(source.Where(predicate).Take(1).Expression, cancellationToken)
+                                     .Then(result => ((IEnumerable<T>)result).FirstOrDefault(), cancellationToken);
         }
 
         /// <summary>
@@ -129,6 +181,31 @@ namespace WindowsAzure.Table.Extensions
         }
 
         /// <summary>
+        ///     Executes a query Single asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the query.</typeparam>
+        /// <param name="source">Query.</param>
+        /// <param name="predicate">Predicate.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Entity.</returns>
+        public static Task<T> SingleAsync<T>(
+            this IQueryable<T> source,
+            Expression<Func<T, bool>> predicate,
+            CancellationToken cancellationToken = default(CancellationToken))
+            where T : new()
+        {
+            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+
+            if (tableQueryProvider == null)
+            {
+                return TaskHelpers.FromResult(source.Single());
+            }
+
+            return tableQueryProvider.ExecuteAsync(source.Where(predicate).Take(2).Expression, cancellationToken)
+                                     .Then(result => ((IEnumerable<T>)result).Single(), cancellationToken);
+        }
+
+        /// <summary>
         ///     Executes a query SingleOrDefault method asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity type of the query.</typeparam>
@@ -149,6 +226,31 @@ namespace WindowsAzure.Table.Extensions
 
             return tableQueryProvider.ExecuteAsync(source.Take(2).Expression, cancellationToken)
                                      .Then(result => ((IEnumerable<T>) result).SingleOrDefault(), cancellationToken);
+        }
+
+        /// <summary>
+        ///     Executes a query SingleOrDefault method asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the query.</typeparam>
+        /// <param name="source">Query.</param>
+        /// <param name="predicate">Predicate.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Entity.</returns>
+        public static Task<T> SingleOrDefaultAsync<T>(
+            this IQueryable<T> source,
+            Expression<Func<T, bool>> predicate,
+            CancellationToken cancellationToken = default (CancellationToken))
+            where T : new()
+        {
+            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+
+            if (tableQueryProvider == null)
+            {
+                return TaskHelpers.FromResult(source.SingleOrDefault());
+            }
+
+            return tableQueryProvider.ExecuteAsync(source.Where(predicate).Take(2).Expression, cancellationToken)
+                                     .Then(result => ((IEnumerable<T>)result).SingleOrDefault(), cancellationToken);
         }
     }
 }
