@@ -1,8 +1,7 @@
 # Windows Azure Storage Extensions
 
-*Windows Azure Storage Extensions* is a framework aimed for managing and querying entities from [Windows Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
-
-It's built on top of the **[Windows Azure Storage Client Library 2.0](http://blogs.msdn.com/b/windowsazurestorage/archive/2012/11/06/windows-azure-storage-client-library-2-0-tables-deep-dive.aspx)** and provides **IQueryable** interface and has object mapping for usage of absolutely abstract **POCO** entities.
+*Windows Azure Storage Extensions* is a .NET framework aimed for managing and querying entities from [Windows Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
+It's built on top of the **[Windows Azure Storage Client Library 2.0](https://github.com/WindowsAzure/azure-sdk-for-net)**, uses **LINQ** expressions for queries, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and allow usage of abstract **POCO** entities.
 
 ## Features
 
@@ -25,7 +24,7 @@ Table context implements `IQueryable<>` interface for using [LINQ Expressions](h
 
 For creating a custom queries you should take a look at [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
 
-In addition to you can use **asynchronous queries** powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx). Available methods:
+In addition to you can use **asynchronous query** processing powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx). Available methods:
 * ToListAsync()
 * TakeAsync()
 * FirstAsync()
