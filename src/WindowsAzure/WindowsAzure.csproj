@@ -62,13 +62,19 @@
     <Compile Include="Common\TaskHelpers.cs" />
     <Compile Include="Common\TaskHelpersExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Table\EntityConverters\Infrastructure\EntityTypeData.cs" />
+    <Compile Include="Table\Attributes\ETagAttribute.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\PropertyValueAccessor.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\EntityTypeData.cs" />
+    <Compile Include="Table\EntityConverters\EntityTypeDataFactory.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\IEntityTypeData.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\IValueAccessor.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\FieldValueAccessor.cs" />
     <Compile Include="Table\EntityConverters\ITableEntityConverter.cs" />
     <Compile Include="Table\EntityConverters\Infrastructure\ConverterExtensions.cs" />
-    <Compile Include="Table\EntityConverters\TableEntityConverterBase.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\ValueAccessorFactory.cs" />
     <Compile Include="Table\Extensions\AsyncQueryExtensions.cs" />
     <Compile Include="Table\Extensions\CloudTableExtensions.cs" />
-    <Compile Include="Table\PartitionKeyAttribute.cs" />
+    <Compile Include="Table\Attributes\PartitionKeyAttribute.cs" />
     <Compile Include="Table\Queryable\Expressions\IQueryTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\TakeTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SelectTranslator.cs" />
@@ -82,10 +88,10 @@
     <Compile Include="Table\Queryable\Base\QueryProviderBase.cs" />
     <Compile Include="Table\Queryable\Expressions\QueryTranslator.cs" />
     <Compile Include="Table\Queryable\Base\TypeSystem.cs" />
-    <Compile Include="Table\RowKeyAttribute.cs" />
+    <Compile Include="Table\Attributes\RowKeyAttribute.cs" />
     <Compile Include="Table\TableSet.cs" />
     <Compile Include="Table\EntityConverters\TableEntityConverter.cs" />
-    <Compile Include="Table\TableKeyAttribute.cs" />
+    <Compile Include="Table\Attributes\TimestampAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

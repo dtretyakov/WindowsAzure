@@ -224,7 +224,7 @@ namespace System.Threading.Tasks
         /// Cast Task to Task of object
         /// </summary>
         [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
-        internal static Task<object> CastToObject(this Task task)
+        internal static Task<object> CastToobject(this Task task)
         {
             // Stay on the same thread if we can
             if (task.IsCompleted)
@@ -269,7 +269,7 @@ namespace System.Threading.Tasks
         /// Cast Task of T to Task of object
         /// </summary>
         [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
-        internal static Task<object> CastToObject<T>(this Task<T> task)
+        internal static Task<object> CastToobject<T>(this Task<T> task)
         {
             // Stay on the same thread if we can
             if (task.IsCompleted)
@@ -315,7 +315,7 @@ namespace System.Threading.Tasks
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The caught exception type is reflected into a faulted task.")]
         [SuppressMessage("Microsoft.Web.FxCop", "MW1201:DoNotCallProblematicMethodsOnTask", Justification = "The usages here are deemed safe, and provide the implementations that this rule relies upon.")]
-        internal static Task<TOuterResult> CastFromObject<TOuterResult>(this Task<object> task)
+        internal static Task<TOuterResult> CastFromobject<TOuterResult>(this Task<object> task)
         {
             // Stay on the same thread if we can
             if (task.IsCompleted)

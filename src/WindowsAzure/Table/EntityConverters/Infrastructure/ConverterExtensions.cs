@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.EntityConverters.Infrastructure
@@ -10,8 +9,6 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
     /// </summary>
     public static class ConverterExtensions
     {
-        private static readonly Type DateTimeType = typeof (DateTime);
-
         /// <summary>
         ///     Type to edm type convertion collection.
         /// </summary>
@@ -32,90 +29,49 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
         /// <summary>
         ///     Edm type to type convertion collection.
         /// </summary>
-        private static readonly Dictionary<EdmType, Action<PropertyInfo, EntityProperty, Object>> EdmToType =
-            new Dictionary<EdmType, Action<PropertyInfo, EntityProperty, Object>>
+        private static readonly Dictionary<EdmType, Func<EntityProperty, object>> EdmToType =
+            new Dictionary<EdmType, Func<EntityProperty, object>>
                 {
-                    {EdmType.Binary, (p, e, t) => p.SetValue(t, e.BinaryValue, null)},
-                    {EdmType.Boolean, (p, e, t) => p.SetValue(t, e.BooleanValue, null)},
-                    {EdmType.Double, (p, e, t) => p.SetValue(t, e.DoubleValue, null)},
-                    {EdmType.Guid, (p, e, t) => p.SetValue(t, e.GuidValue, null)},
-                    {EdmType.Int32, (p, e, t) => p.SetValue(t, e.Int32Value, null)},
-                    {EdmType.Int64, (p, e, t) => p.SetValue(t, e.Int64Value, null)},
-                    {EdmType.String, (p, e, t) => p.SetValue(t, e.StringValue, null)},
-                    {
-                        EdmType.DateTime,
-                        (p, e, t) =>
-                            {
-                                if (p.PropertyType == DateTimeType)
-                                {
-                                    if (e.DateTimeOffsetValue != null)
-                                    {
-                                        p.SetValue(t, e.DateTimeOffsetValue.Value.DateTime, null);
-                                    }
-                                }
-                                else
-                                {
-                                    p.SetValue(t, e.DateTimeOffsetValue, null);
-                                }
-                            }
-                    },
+                    {EdmType.Binary, p => p.BinaryValue},
+                    {EdmType.Boolean, p => p.BooleanValue},
+                    {EdmType.Double, p => p.DoubleValue},
+                    {EdmType.Guid, p => p.GuidValue},
+                    {EdmType.Int32, p => p.Int32Value},
+                    {EdmType.Int64, p => p.Int64Value},
+                    {EdmType.String, p => p.StringValue},
+                    {EdmType.DateTime,p => p.DateTimeOffsetValue.Value.DateTime}
                 };
-
-        /// <summary>
-        ///     Returns a string property value.
-        /// </summary>
-        /// <param name="property">Property info.</param>
-        /// <param name="target">Target objecy.</param>
-        /// <returns>Property value.</returns>
-        public static String GetStringValue(this PropertyInfo property, Object target)
-        {
-            if (target == null)
-            {
-                throw new ArgumentNullException("target");
-            }
-
-            return (String) property.GetValue(target, null);
-        }
 
         /// <summary>
         ///     Gets an entity property value by property info.
         /// </summary>
-        /// <param name="property">Property info.</param>
-        /// <param name="target">Target object.</param>
+        /// <param name="propertyType">Property type.</param>
+        /// <param name="value">Value.</param>
         /// <returns>Entity property.</returns>
-        public static EntityProperty GetEntityProperty(this PropertyInfo property, Object target)
+        public static EntityProperty GetEntityProperty(this Type propertyType, object value)
         {
-            if (target == null)
+            if (value == null)
             {
-                throw new ArgumentNullException("target");
+                throw new ArgumentNullException("value");
             }
 
-            Object value = property.GetValue(target, null);
-
-            if (!TypeToEdm.ContainsKey(property.PropertyType))
+            if (!TypeToEdm.ContainsKey(propertyType))
             {
-                throw new Exception(String.Format("Invalid property type: {0}", property.Name));
+                throw new ArgumentOutOfRangeException("propertyType");
             }
 
-            return TypeToEdm[property.PropertyType](value);
+            return TypeToEdm[propertyType](value);
         }
 
         /// <summary>
         ///     Sets an object property value from entity property.
         /// </summary>
-        /// <param name="property">Property info.</param>
         /// <param name="entityProperty">Entity property.</param>
-        /// <param name="target">Target object.</param>
-        public static void SetPropertyValue(this PropertyInfo property, EntityProperty entityProperty, Object target)
+        public static object GetValue(this EntityProperty entityProperty)
         {
             if (entityProperty == null)
             {
                 throw new ArgumentNullException("entityProperty");
-            }
-
-            if (target == null)
-            {
-                throw new ArgumentNullException("target");
             }
 
             if (!EdmToType.ContainsKey(entityProperty.PropertyType))
@@ -123,7 +79,7 @@ namespace WindowsAzure.Table.EntityConverters.Infrastructure
                 throw new Exception("Invalid entity property EDM type.");
             }
 
-            EdmToType[entityProperty.PropertyType](property, entityProperty, target);
+            return EdmToType[entityProperty.PropertyType](entityProperty);
         }
     }
 }

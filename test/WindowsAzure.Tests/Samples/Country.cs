@@ -1,5 +1,5 @@
 ﻿using System;
-using WindowsAzure.Table;
+using WindowsAzure.Table.Attributes;
 
 namespace WindowsAzure.Tests.Samples
 {

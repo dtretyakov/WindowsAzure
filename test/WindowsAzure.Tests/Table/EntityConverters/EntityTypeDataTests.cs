@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using WindowsAzure.Table.EntityConverters.Infrastructure;
+using WindowsAzure.Table.EntityConverters.TypeData;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
@@ -12,7 +12,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         public void CreateEntityTypeDataTest()
         {
             // Arrange & Act
-            var entityTypeData = new EntityTypeData(typeof (Country));
+            var entityTypeData = new EntityTypeData<Country>();
 
             // Assert
             Assert.NotNull(entityTypeData);
@@ -42,6 +42,39 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(entityTypeData.NameChanges["Continent"], "PartitionKey");
             Assert.True(entityTypeData.NameChanges.ContainsKey("Continent"));
             Assert.Equal(entityTypeData.NameChanges["Name"], "RowKey");
+        }
+
+        [Fact]
+        public void CreateEntityTypeDataWithDifferentAccessorsTest()
+        {
+            // Arrange & Act
+            var entityTypeData = new EntityTypeData<User>();
+
+            // Assert
+            Assert.NotNull(entityTypeData);
+
+            // Check PropertyInfo
+            Assert.NotNull(entityTypeData.PartitionKey);
+            Assert.Equal(entityTypeData.PartitionKey.Name, "FirstName");
+
+            Assert.NotNull(entityTypeData.RowKey);
+            Assert.Equal(entityTypeData.RowKey.Name, "LastName");
+
+            Assert.NotNull(entityTypeData.Properties);
+            List<string> propertyInfoNames = entityTypeData.Properties.Select(p => p.Name).ToList();
+
+            Assert.Contains("PublicProperty", propertyInfoNames);
+            Assert.Contains("PublicField", propertyInfoNames);
+            Assert.Contains("PrivateSetterProperty", propertyInfoNames);
+            Assert.Contains("PrivateGetterProperty", propertyInfoNames);
+
+            // Check name changes
+            Assert.NotNull(entityTypeData.NameChanges);
+
+            Assert.True(entityTypeData.NameChanges.ContainsKey("FirstName"));
+            Assert.Equal(entityTypeData.NameChanges["FirstName"], "PartitionKey");
+            Assert.True(entityTypeData.NameChanges.ContainsKey("LastName"));
+            Assert.Equal(entityTypeData.NameChanges["LastName"], "RowKey");
         }
     }
 }
