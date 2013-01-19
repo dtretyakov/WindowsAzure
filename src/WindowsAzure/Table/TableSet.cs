@@ -188,6 +188,95 @@ namespace WindowsAzure.Table
         }
 
         /// <summary>
+        ///     Inserts or updates an entity asynchronously.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Inserted entity.</returns>
+        public Task<TEntity> AddOrUpdateAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
+        {
+            ITableEntity tableEntity = _converter.GetEntity(entity);
+
+            return _cloudTable.ExecuteAsync(TableOperation.InsertOrReplace(tableEntity), cancellationToken)
+                              .Then(result =>
+                              {
+                                  var value = (DynamicTableEntity)result.Result;
+                                  return _converter.GetEntity(value);
+                              }, cancellationToken);
+        }
+
+        /// <summary>
+        ///     Inserts or updates an entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Inserted entity.</returns>
+        public TEntity AddOrUpdate(TEntity entity)
+        {
+            ITableEntity tableEntity = _converter.GetEntity(entity);
+
+            TableResult result = _cloudTable.Execute(TableOperation.InsertOrReplace(tableEntity));
+
+            return _converter.GetEntity((DynamicTableEntity)result.Result);
+        }
+
+        /// <summary>
+        ///     Inserts or updates an entities asynchronously.
+        /// </summary>
+        /// <param name="entities">Entities collection.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Inserted entities.</returns>
+        public Task<IEnumerable<TEntity>> AddOrUpdateAsync(
+            IEnumerable<TEntity> entities,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            var tableBatchOperation = new TableBatchOperation();
+
+            foreach (TEntity entity in entities)
+            {
+                ITableEntity tableEntity = _converter.GetEntity(entity);
+                tableBatchOperation.Add(TableOperation.InsertOrReplace(tableEntity));
+            }
+
+            return _cloudTable
+                .ExecuteBatchAsync(tableBatchOperation, cancellationToken)
+                .Then(result => result.Select(p =>
+                {
+                    var value = (DynamicTableEntity)p.Result;
+                    return _converter.GetEntity(value);
+                }), cancellationToken);
+        }
+
+        /// <summary>
+        ///     Inserts or updates an entities.
+        /// </summary>
+        /// <param name="entities">Entities collection.</param>
+        /// <returns>Inserted entities.</returns>
+        public IEnumerable<TEntity> AddOrUpdate(IEnumerable<TEntity> entities)
+        {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            var tableBatchOperation = new TableBatchOperation();
+
+            foreach (TEntity entity in entities)
+            {
+                ITableEntity tableEntity = _converter.GetEntity(entity);
+                tableBatchOperation.Add(TableOperation.InsertOrReplace(tableEntity));
+            }
+
+            IList<TableResult> result = _cloudTable.ExecuteBatch(tableBatchOperation);
+
+            return result.Select(p => _converter.GetEntity((DynamicTableEntity)p.Result)).AsEnumerable();
+        }
+
+        /// <summary>
         ///     Updates an entity asynchronously.
         /// </summary>
         /// <param name="entity">Entity.</param>
