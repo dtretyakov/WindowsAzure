@@ -95,7 +95,6 @@ namespace WindowsAzure.Table
 
             _converter = converter;
             _cloudTable = cloudTableClient.GetTableReference(tableName);
-            _cloudTable.CreateIfNotExists();
         }
 
         /// <summary>
