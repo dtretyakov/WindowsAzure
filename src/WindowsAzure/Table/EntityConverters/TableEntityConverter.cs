@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage.Table;
-using WindowsAzure.Table.EntityConverters.Infrastructure;
 using WindowsAzure.Table.EntityConverters.TypeData;
 
 namespace WindowsAzure.Table.EntityConverters
@@ -37,19 +35,7 @@ namespace WindowsAzure.Table.EntityConverters
         /// <returns>Table entity.</returns>
         public ITableEntity GetEntity(T entity)
         {
-            var result = new DynamicTableEntity
-                             {
-                                 PartitionKey = (String) _typeData.PartitionKey.GetValue(entity),
-                                 RowKey = (String) _typeData.RowKey.GetValue(entity),
-                                 ETag = _typeData.ETag != null ? (string) _typeData.ETag.GetValue(entity) : "*"
-                             };
-
-            foreach (var property in _typeData.Properties)
-            {
-                result.Properties.Add(property.Name, property.Type.GetEntityProperty(property.GetValue(entity)));
-            }
-
-            return result;
+            return _typeData.GetEntity(entity);
         }
 
         /// <summary>
@@ -59,37 +45,7 @@ namespace WindowsAzure.Table.EntityConverters
         /// <returns>Entity.</returns>
         public T GetEntity(DynamicTableEntity tableEntity)
         {
-            if (tableEntity == null)
-            {
-                throw new ArgumentNullException("tableEntity");
-            }
-
-            var result = new T();
-
-            _typeData.PartitionKey.SetValue(result, tableEntity.PartitionKey);
-            _typeData.RowKey.SetValue(result, tableEntity.RowKey);
-
-            if (_typeData.ETag != null)
-            {
-                _typeData.ETag.SetValue(result, tableEntity.ETag);
-            }
-
-            if (_typeData.Timestamp != null)
-            {
-                _typeData.Timestamp.SetValue(result, tableEntity.Timestamp);
-            }
-
-            foreach (var property in _typeData.Properties)
-            {
-                EntityProperty entityProperty;
-
-                if (tableEntity.Properties.TryGetValue(property.Name, out entityProperty))
-                {
-                    property.SetValue(result, entityProperty.GetValue());
-                }
-            }
-
-            return result;
+            return _typeData.GetEntity(tableEntity);
         }
     }
 }

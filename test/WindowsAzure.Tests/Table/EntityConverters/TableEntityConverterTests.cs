@@ -11,7 +11,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
     public sealed class TableEntityConverterTests
     {
         [Fact]
-        public void CheckPartionAndRowKeysNameMappings()
+        public void TableEntityConverterCreateTest()
         {
             // Arrange & Act
             var converter = new TableEntityConverter<Country>();
@@ -24,7 +24,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void ConvertEntityToTableEntityTest()
+        public void TableEntityConverterConvertToTableEntityTest()
         {
             // Arrange
             var converter = new TableEntityConverter<Country>();
@@ -55,9 +55,9 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(properties["Area"].DoubleValue, country.Area);
             Assert.Equal(properties["TopSecretKey"].BinaryValue, country.TopSecretKey);
             Assert.True(properties["Formed"].DateTimeOffsetValue.HasValue);
-// ReSharper disable PossibleInvalidOperationException
+            // ReSharper disable PossibleInvalidOperationException
             Assert.Equal(properties["Formed"].DateTimeOffsetValue.Value.DateTime, country.Formed);
-// ReSharper restore PossibleInvalidOperationException
+            // ReSharper restore PossibleInvalidOperationException
             Assert.Equal(properties["Id"].GuidValue, country.Id);
             Assert.Equal(properties["IsExists"].BooleanValue, country.IsExists);
             Assert.Equal(properties["Population"].Int64Value, country.Population);
@@ -65,7 +65,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void ConvertTableEntityToEntityTest()
+        public void TableEntityConverterConvertToEntityTest()
         {
             // Arrange
             var converter = new TableEntityConverter<Country>();
@@ -98,9 +98,9 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(tableEntity.Properties["Area"].DoubleValue, country.Area);
             Assert.Equal(tableEntity.Properties["TopSecretKey"].BinaryValue, country.TopSecretKey);
             Assert.True(tableEntity.Properties["Formed"].DateTimeOffsetValue.HasValue);
-// ReSharper disable PossibleInvalidOperationException
+            // ReSharper disable PossibleInvalidOperationException
             Assert.Equal(tableEntity.Properties["Formed"].DateTimeOffsetValue.Value.DateTime, country.Formed);
-// ReSharper restore PossibleInvalidOperationException
+            // ReSharper restore PossibleInvalidOperationException
             Assert.Equal(tableEntity.Properties["Id"].GuidValue, country.Id);
             Assert.Equal(tableEntity.Properties["IsExists"].BooleanValue, country.IsExists);
             Assert.Equal(tableEntity.Properties["Population"].Int64Value, country.Population);

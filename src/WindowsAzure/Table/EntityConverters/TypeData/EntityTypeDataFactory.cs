@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using WindowsAzure.Table.EntityConverters.TypeData;
 
-namespace WindowsAzure.Table.EntityConverters
+namespace WindowsAzure.Table.EntityConverters.TypeData
 {
     /// <summary>
     ///     Manages entity type data collections.
     /// </summary>
     public static class EntityTypeDataFactory
     {
+        /// <summary>
+        ///     Entity type data cache.
+        /// </summary>
         private static readonly ConcurrentDictionary<Type, object> TypesData =
             new ConcurrentDictionary<Type, object>();
 
@@ -17,7 +19,7 @@ namespace WindowsAzure.Table.EntityConverters
         /// </summary>
         /// <typeparam name="T">Entity type.</typeparam>
         /// <returns>Entity type data.</returns>
-        public static IEntityTypeData<T> GetEntityTypeData<T>()
+        public static IEntityTypeData<T> GetEntityTypeData<T>() where T : new()
         {
             return (IEntityTypeData<T>) TypesData.GetOrAdd(typeof (T), type => new EntityTypeData<T>());
         }

@@ -71,11 +71,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\TestBase.cs" />
+    <Compile Include="Samples\EntityWithFields.cs" />
+    <Compile Include="Samples\EntityWithProperties.cs" />
     <Compile Include="Samples\User.cs" />
     <Compile Include="Table\Context\AddEntitiesTests.cs" />
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\UpdateEntitiesTests.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\ValueAccessorsTests.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\FieldValueAccessorTests.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\PropertyValueAccessorTests.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\ValueAccesorFactoryTests.cs" />
     <Compile Include="Table\Extensions\AsyncQueryExtensionsTests.cs" />
     <Compile Include="Table\Query\Take\LinqTakeMethodTests.cs" />
     <Compile Include="Table\Query\Where\LinqWhereMethodWithDifferentTypesTests.cs" />
@@ -83,9 +87,7 @@
     <Compile Include="Table\TableSetTestBase.cs" />
     <Compile Include="Table\Context\UpdateEntityTests.cs" />
     <Compile Include="Table\Context\DeleteEntityTests.cs" />
-    <Compile Include="Table\EntityConverters\ExtensionsGetEntityPropertyTests.cs" />
-    <Compile Include="Table\EntityConverters\EntityTypeDataTests.cs" />
-    <Compile Include="Table\EntityConverters\ExtensionsSetPropertyValueTests.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\EntityTypeDataTests.cs" />
     <Compile Include="Table\EntityConverters\TableEntityConverterTests.cs" />
     <Compile Include="Table\Query\ComplexQueryTests.cs" />
     <Compile Include="Samples\Country.cs" />

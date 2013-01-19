@@ -1,30 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Attributes;
+using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
     /// <summary>
-    ///     Keeps en entity type data.
+    ///     Keeps an entity type data.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class EntityTypeData<T> : IEntityTypeData<T>
+    public sealed class EntityTypeData<T> : IEntityTypeData<T> where T : new()
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
         private readonly Type _datetimeType = typeof (DateTime);
+        private readonly Type _etagAttributeType = typeof (ETagAttribute);
+        private readonly List<IValueAccessor<T>> _memberAccessors;
         private readonly Dictionary<String, String> _nameChanges;
         private readonly Type _partitionKeyAttributeType = typeof (PartitionKeyAttribute);
-        private readonly List<IValueAccessor<T>> _properties;
         private readonly Type _rowKeyAttributeType = typeof (RowKeyAttribute);
         private readonly Type _stringType = typeof (String);
         private readonly Type _timestampAttributeType = typeof (TimestampAttribute);
-        private readonly Type _etagAttributeType = typeof(ETagAttribute);
+        private IValueAccessor<T> _etag;
         private IValueAccessor<T> _partitionKey;
         private IValueAccessor<T> _rowKey;
         private IValueAccessor<T> _timestamp;
-        private IValueAccessor<T> _etag;
 
         /// <summary>
         ///     Constructor.
@@ -34,7 +36,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             Type entityType = typeof (T);
 
             _nameChanges = new Dictionary<string, string>();
-            _properties = new List<IValueAccessor<T>>();
+            _memberAccessors = new List<IValueAccessor<T>>();
 
             var typeMembers = new List<MemberInfo>(entityType.GetProperties(Flags));
             typeMembers.AddRange(entityType.GetFields(Flags));
@@ -43,44 +45,77 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
-        ///     Gets a partiton key accessor.
+        ///     Converts DynamicTableEntity into POCO entity.
         /// </summary>
-        public IValueAccessor<T> PartitionKey
+        /// <param name="tableEntity">Table entity.</param>
+        /// <returns>POCO entity.</returns>
+        public T GetEntity(DynamicTableEntity tableEntity)
         {
-            get { return _partitionKey; }
+            if (tableEntity == null)
+            {
+                throw new ArgumentNullException("tableEntity");
+            }
+
+            var result = new T();
+
+            if (_partitionKey != null)
+            {
+                _partitionKey.SetValue(result, new EntityProperty(tableEntity.PartitionKey));
+            }
+
+            if (_rowKey != null)
+            {
+                _rowKey.SetValue(result, new EntityProperty(tableEntity.RowKey));
+            }
+
+            if (_etag != null)
+            {
+                _etag.SetValue(result, new EntityProperty(tableEntity.ETag));
+            }
+
+            if (_timestamp != null)
+            {
+                _timestamp.SetValue(result, new EntityProperty(tableEntity.Timestamp));
+            }
+
+            foreach (var member in _memberAccessors)
+            {
+                EntityProperty entityProperty;
+
+                if (tableEntity.Properties.TryGetValue(member.Name, out entityProperty))
+                {
+                    member.SetValue(result, entityProperty);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
-        ///     Gets a row key accessor.
+        ///     Converts POCO entity into ITableEntity.
         /// </summary>
-        public IValueAccessor<T> RowKey
+        /// <param name="entity">POCO entity.</param>
+        /// <returns>Table entity.</returns>
+        public ITableEntity GetEntity(T entity)
         {
-            get { return _rowKey; }
+            var result = new DynamicTableEntity
+                             {
+                                 PartitionKey =
+                                     _partitionKey != null ? _partitionKey.GetValue(entity).StringValue : string.Empty,
+                                 RowKey = _rowKey != null ? _rowKey.GetValue(entity).StringValue : string.Empty,
+                                 ETag = _etag != null ? _etag.GetValue(entity).StringValue : "*"
+                             };
+
+            foreach (var property in _memberAccessors)
+            {
+                result.Properties.Add(property.Name, property.GetValue(entity));
+            }
+
+            return result;
         }
 
         /// <summary>
-        ///     Gets a timestamp accessor.
-        /// </summary>
-        public IValueAccessor<T> Timestamp
-        {
-            get { return _timestamp; }
-        }
-
-        /// <summary>
-        /// Gets an etag accessor.
-        /// </summary>
-        public IValueAccessor<T> ETag { get { return _etag; } }
-
-        /// <summary>
-        ///     Gets a properties value accessors.
-        /// </summary>
-        public IEnumerable<IValueAccessor<T>> Properties
-        {
-            get { return _properties; }
-        }
-
-        /// <summary>
-        ///     Gets an entity partition & row key name changes.
+        ///     Gets an entity members name changes.
         /// </summary>
         public IDictionary<string, string> NameChanges
         {
@@ -88,7 +123,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
-        /// Processes partition key accessor.
+        ///     Processes partition key accessor.
         /// </summary>
         /// <param name="valueAccessor">Partition key accessor.</param>
         private void ProcessPartitionKey(IValueAccessor<T> valueAccessor)
@@ -109,7 +144,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
-        /// Processes row ket accessor.
+        ///     Processes row ket accessor.
         /// </summary>
         /// <param name="valueAccessor">Row ket accessor.</param>
         private void ProcessRowKey(IValueAccessor<T> valueAccessor)
@@ -130,7 +165,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
-        /// Processes timestamp accessor.
+        ///     Processes timestamp accessor.
         /// </summary>
         /// <param name="valueAccessor">Timestamp accessor.</param>
         private void ProcessTimestamp(IValueAccessor<T> valueAccessor)
@@ -149,7 +184,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
-        /// Processes ETag accessor.
+        ///     Processes ETag accessor.
         /// </summary>
         /// <param name="valueAccessor">Timestamp accessor.</param>
         private void ProcessETag(IValueAccessor<T> valueAccessor)
@@ -168,7 +203,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
-        /// Processes type members.
+        ///     Processes type members.
         /// </summary>
         /// <param name="memberInfos">Type memebers.</param>
         private void ProcessMembers(IEnumerable<MemberInfo> memberInfos)
@@ -177,28 +212,28 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             {
                 IValueAccessor<T> valueAccessor = ValueAccessorFactory.Create<T>(memberInfo);
 
-                // Checks property for a partition key attribute
+                // Checks member for a partition key attribute
                 if (Attribute.IsDefined(memberInfo, _partitionKeyAttributeType, false))
                 {
                     ProcessPartitionKey(valueAccessor);
                     continue;
                 }
 
-                // Checks property for a row key attribute
+                // Checks member for a row key attribute
                 if (Attribute.IsDefined(memberInfo, _rowKeyAttributeType, false))
                 {
                     ProcessRowKey(valueAccessor);
                     continue;
                 }
 
-                // Checks property for a timestamp attribute
+                // Checks member for a timestamp attribute
                 if (Attribute.IsDefined(memberInfo, _timestampAttributeType, false))
                 {
                     ProcessTimestamp(valueAccessor);
                     continue;
                 }
 
-                // Checks property for an etag attribute
+                // Checks member for an etag attribute
                 if (Attribute.IsDefined(memberInfo, _etagAttributeType, false))
                 {
                     ProcessETag(valueAccessor);
@@ -206,17 +241,13 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 }
 
                 // Keep as a regular property
-                _properties.Add(valueAccessor);
+                _memberAccessors.Add(valueAccessor);
             }
 
-            if (_partitionKey == null)
+            // Checks for a key attributes
+            if (_partitionKey == null && _rowKey == null)
             {
-                throw new ArgumentException("PartitionKey attribute must be defined.");
-            }
-
-            if (_rowKey == null)
-            {
-                throw new ArgumentException("RowKey attribute must be defined.");
+                throw new ArgumentException("PartitionKey or RowKey attribute must be defined.");
             }
         }
     }

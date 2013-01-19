@@ -1,37 +1,27 @@
 ﻿using System.Collections.Generic;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
     public interface IEntityTypeData<T>
     {
         /// <summary>
-        ///     Gets a partiton key accessor.
-        /// </summary>
-        IValueAccessor<T> PartitionKey { get; }
-
-        /// <summary>
-        ///     Gets a row key accessor.
-        /// </summary>
-        IValueAccessor<T> RowKey { get; }
-
-        /// <summary>
-        ///     Gets a timestamp accessor.
-        /// </summary>
-        IValueAccessor<T> Timestamp { get; }
-
-        /// <summary>
-        ///     Gets a etag accessor.
-        /// </summary>
-        IValueAccessor<T> ETag { get; }
-
-        /// <summary>
-        ///     Gets a properties accessors.
-        /// </summary>
-        IEnumerable<IValueAccessor<T>> Properties { get; }
-
-        /// <summary>
-        ///     Gets an entity partition & row key name changes.
+        ///     Gets an entity members name changes.
         /// </summary>
         IDictionary<string, string> NameChanges { get; }
+
+        /// <summary>
+        ///     Converts DynamicTableEntity into POCO entity.
+        /// </summary>
+        /// <param name="tableEntity">Table entity.</param>
+        /// <returns>POCO entity.</returns>
+        T GetEntity(DynamicTableEntity tableEntity);
+
+        /// <summary>
+        ///     Converts POCO entity into ITableEntity.
+        /// </summary>
+        /// <param name="entity">POCO entity.</param>
+        /// <returns>Table entity.</returns>
+        ITableEntity GetEntity(T entity);
     }
 }
