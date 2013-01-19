@@ -94,5 +94,32 @@ namespace WindowsAzure.Tests.Table.Query
             Assert.Contains(Finland, values.Select(p => p.Name));
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
+
+        [Fact]
+        public async Task QueryTableSetTwiceTest()
+        {
+            // Arrange
+            const int value = 1800;
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            IQueryable<Country> queryTwoEntity =
+                tableSet.Where(
+                    p => p.Formed > new DateTime(value, 1, 1) &&
+                         (p.PresidentsCount < 10 ||
+                          p.Population < 10000000 && p.PresidentsCount > 10 && p.IsExists));
+
+            var queryOneEntity = tableSet.Where(p => p.Name == Germany);
+
+            var result = await queryOneEntity.SingleAsync();
+            List<Country> results = await queryTwoEntity.ToListAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(result.Name, Germany);
+            Assert.Equal(results.Count, 2);
+            Assert.Contains(Finland, results.Select(p => p.Name));
+            Assert.Contains(Spain, results.Select(p => p.Name));
+        }
     }
 }

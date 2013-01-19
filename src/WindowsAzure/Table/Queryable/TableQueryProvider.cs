@@ -16,7 +16,7 @@ namespace WindowsAzure.Table.Queryable
     ///     Windows Azure Table Linq query provider.
     ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TEntity">Entity type.</typeparam>
     public class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider where TEntity : new()
     {
         private readonly CloudTable _cloudTable;
@@ -98,7 +98,7 @@ namespace WindowsAzure.Table.Queryable
         }
 
         /// <summary>
-        ///     Executes
+        ///     Executes expression query asynchronously.
         /// </summary>
         /// <param name="expression"></param>
         /// <param name="cancellationToken"></param>

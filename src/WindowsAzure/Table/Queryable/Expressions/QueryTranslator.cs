@@ -13,7 +13,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
     {
         private readonly IList<IMethodTranslator> _methodTranslators;
         private readonly IDictionary<string, string> _nameChanges;
-        private readonly Dictionary<QuerySegment, string> _result;
+        private Dictionary<QuerySegment, string> _result;
 
         /// <summary>
         ///     Constructor.
@@ -39,7 +39,6 @@ namespace WindowsAzure.Table.Queryable.Expressions
         {
             _nameChanges = nameChanges;
             _methodTranslators = methodTranslators;
-            _result = new Dictionary<QuerySegment, string>();
         }
 
         /// <summary>
@@ -49,6 +48,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// <returns>Collection of query segments.</returns>
         public IDictionary<QuerySegment, string> Translate(Expression expression)
         {
+            _result = new Dictionary<QuerySegment, string>();
             expression = Evaluator.PartialEval(expression);
 
             Visit(expression);
