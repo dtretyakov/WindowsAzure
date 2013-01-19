@@ -75,6 +75,8 @@
     <Compile Include="Samples\EntityWithProperties.cs" />
     <Compile Include="Samples\User.cs" />
     <Compile Include="Table\Context\AddEntitiesTests.cs" />
+    <Compile Include="Table\Context\AddOrUpdateEntitiesTests.cs" />
+    <Compile Include="Table\Context\AddOrUpdateEntityTests.cs" />
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\UpdateEntitiesTests.cs" />
     <Compile Include="Table\EntityConverters\TypeData\FieldValueAccessorTests.cs" />
