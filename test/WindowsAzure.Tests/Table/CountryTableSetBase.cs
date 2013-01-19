@@ -6,11 +6,11 @@ using WindowsAzure.Tests.Samples;
 
 namespace WindowsAzure.Tests.Table
 {
-    public class TableSetTestBase : TestBase, IDisposable
+    public class CountryTableSetBase : TestBase, IDisposable
     {
         protected readonly string TableName;
 
-        protected TableSetTestBase()
+        protected CountryTableSetBase()
         {
             CloudTableClient tableClient = GenerateCloudTableClient();
             TableName = "Table" + Guid.NewGuid().ToString("N");

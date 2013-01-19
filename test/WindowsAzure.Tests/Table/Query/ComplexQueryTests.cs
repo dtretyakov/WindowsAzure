@@ -9,7 +9,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Query
 {
-    public sealed class ComplexQueryTests : TableSetTestBase
+    public sealed class ComplexQueryTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";

@@ -9,7 +9,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Query.Where
 {
-    public sealed class LinqWhereMethodArgumentsTests : TableSetTestBase
+    public sealed class LinqWhereMethodArgumentsTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";

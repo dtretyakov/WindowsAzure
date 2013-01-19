@@ -106,5 +106,33 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(tableEntity.Properties["Population"].Int64Value, country.Population);
             Assert.Equal(tableEntity.Properties["PresidentsCount"].Int32Value, country.PresidentsCount);
         }
+
+        [Fact]
+        public void TableEntityConverterConvertToTableEntityWithFewKeysTest()
+        {
+            // Arrange
+            var converter = new TableEntityConverter<LogEntry>();
+            var entry = new LogEntry
+                            {
+                                Id = Guid.NewGuid().ToString("N"),
+                                ETag = "MyETag",
+                                Timestamp = DateTime.UtcNow,
+                                Message = "My message"
+                            };
+
+            var context = new OperationContext();
+
+            // Act
+            ITableEntity tableEntity = converter.GetEntity(entry);
+            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(context);
+
+            // Assert
+            Assert.Equal(tableEntity.ETag, entry.ETag);
+            Assert.Equal(tableEntity.PartitionKey, entry.Id);
+            Assert.Equal(tableEntity.RowKey, string.Empty);
+            Assert.Equal(tableEntity.Timestamp, default(DateTimeOffset));
+
+            Assert.Equal(properties["Message"].StringValue, entry.Message);
+        }
     }
 }

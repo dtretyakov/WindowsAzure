@@ -6,7 +6,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Context
 {
-    public sealed class AddEntityTests : TableSetTestBase
+    public sealed class AddEntityTests : CountryTableSetBase
     {
         [Fact]
         public void AddEntitySyncTest()

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Query
 {
-    public sealed class TableQueryProviderTests : TableSetTestBase
+    public sealed class TableQueryProviderTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";

@@ -9,7 +9,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Extensions
 {
-    public sealed class AsyncQueryExtensionsTests : TableSetTestBase
+    public sealed class AsyncQueryExtensionsTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";

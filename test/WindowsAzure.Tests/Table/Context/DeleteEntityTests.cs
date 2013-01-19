@@ -6,7 +6,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Context
 {
-    public sealed class DeleteEntityTests : TableSetTestBase
+    public sealed class DeleteEntityTests : CountryTableSetBase
     {
         [Fact]
         public void DeleteEntitySyncTest()

@@ -63,6 +63,11 @@
     <Compile Include="Common\TaskHelpersExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Table\Attributes\ETagAttribute.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\KeyProperties\ETagAccessor.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\KeyProperties\IKeyProperty.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\KeyProperties\PartitionKeyAccessor.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\KeyProperties\RowKeyAccessor.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\KeyProperties\TimestampAccessor.cs" />
     <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\EntityPropertyFactory.cs" />
     <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\ExpressionValueAccesorBase.cs" />
     <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\PropertyValueAccessor.cs" />

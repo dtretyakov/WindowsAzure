@@ -8,7 +8,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Context
 {
-    public sealed class UpdateEntitiesTests : TableSetTestBase
+    public sealed class UpdateEntitiesTests : CountryTableSetBase
     {
         [Fact]
         public void UpdateEntitiesSyncTest()
