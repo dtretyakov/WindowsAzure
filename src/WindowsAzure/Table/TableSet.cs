@@ -15,7 +15,7 @@ namespace WindowsAzure.Table
     ///     Windows Azure Table entity set.
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
-    public sealed class TableSet<TEntity> : Query<TEntity> where TEntity : new()
+    public sealed class TableSet<TEntity> : Query<TEntity> where TEntity : class, new()
     {
         private readonly CloudTable _cloudTable;
         private readonly ITableEntityConverter<TEntity> _converter;

@@ -5,21 +5,21 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
-namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
+namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 {
     /// <summary>
-    ///     Handles access to RowKey value.
+    ///     Handles access to PartitionKey value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class RowKeyAccessor<T> : IKeyProperty<T>
+    public sealed class PartitionKeyAccessor<T> : IKeyProperty<T>
     {
-        private readonly Type _rowKeyAttributeType;
+        private readonly Type _partitionKeyAttributeType;
         private readonly Type _stringType;
         private IValueAccessor<T> _accessor;
 
-        public RowKeyAccessor()
+        public PartitionKeyAccessor()
         {
-            _rowKeyAttributeType = typeof (RowKeyAttribute);
+            _partitionKeyAttributeType = typeof (PartitionKeyAttribute);
             _stringType = typeof (String);
 
             NameChanges = new Dictionary<string, string>();
@@ -32,25 +32,25 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
 
         public bool Validate(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
-            // Checks member for a row key attribute
-            if (!Attribute.IsDefined(memberInfo, _rowKeyAttributeType, false))
+            // Checks member for a partition key attribute
+            if (!Attribute.IsDefined(memberInfo, _partitionKeyAttributeType, false))
             {
                 return false;
             }
 
             if (_accessor != null)
             {
-                throw new ArgumentException("RowKey attribute duplication.");
+                throw new ArgumentException("PartitionKey attribute duplication.");
             }
 
             if (accessor.Type != _stringType)
             {
-                throw new ArgumentException("RowKey must have a string type.");
+                throw new ArgumentException("PartitionKey must have a string type.");
             }
 
             _accessor = accessor;
 
-            NameChanges.Add(accessor.Name, "RowKey");
+            NameChanges.Add(accessor.Name, "PartitionKey");
 
             return true;
         }
@@ -59,13 +59,18 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
         {
             if (_accessor != null)
             {
-                _accessor.SetValue(entity, new EntityProperty(tableEntity.RowKey));
+                _accessor.SetValue(entity, new EntityProperty(tableEntity.PartitionKey));
             }
         }
 
         public void FillTableEntity(T entity, DynamicTableEntity tableEntity)
         {
-            tableEntity.RowKey = _accessor != null ? _accessor.GetValue(entity).StringValue : string.Empty;
+            if (_accessor != null)
+            {
+                tableEntity.PartitionKey = _accessor.GetValue(entity).StringValue;
+            }
+
+            tableEntity.PartitionKey = tableEntity.PartitionKey ?? string.Empty;
         }
 
         public IDictionary<string, string> NameChanges { get; private set; }

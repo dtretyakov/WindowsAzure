@@ -5,7 +5,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
-namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
+namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 {
     /// <summary>
     ///     Handles access to Timestamp value.

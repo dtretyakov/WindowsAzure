@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
-using WindowsAzure.Table.EntityConverters.TypeData.KeyProperties;
+using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
@@ -12,12 +12,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     ///     Keeps an entity type data.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class EntityTypeData<T> : IEntityTypeData<T> where T : new()
+    public sealed class EntityTypeData<T> : IEntityTypeData<T> where T : class, new()
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
-        private readonly List<IKeyProperty<T>> _keyProperties;
-        private readonly List<IValueAccessor<T>> _memberAccessors;
+        private readonly List<IProperty<T>> _properties;
         private readonly IDictionary<string, string> _nameChanges;
 
         /// <summary>
@@ -25,15 +24,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// </summary>
         public EntityTypeData()
         {
-            _memberAccessors = new List<IValueAccessor<T>>();
             _nameChanges = new Dictionary<string, string>();
-            _keyProperties = new List<IKeyProperty<T>>
-                                 {
-                                     new PartitionKeyAccessor<T>(),
-                                     new RowKeyAccessor<T>(),
-                                     new TimestampAccessor<T>(),
-                                     new ETagAccessor<T>()
-                                 };
+            _properties = new List<IProperty<T>>();
 
             Type entityType = typeof(T);
             var typeMembers = new List<MemberInfo>(entityType.GetProperties(Flags));
@@ -56,19 +48,9 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             var result = new T();
 
-            foreach (var keyProperty in _keyProperties)
+            foreach (var property in _properties)
             {
-                keyProperty.FillEntity(tableEntity, result);
-            }
-
-            foreach (var member in _memberAccessors)
-            {
-                EntityProperty entityProperty;
-
-                if (tableEntity.Properties.TryGetValue(member.Name, out entityProperty))
-                {
-                    member.SetValue(result, entityProperty);
-                }
+                property.FillEntity(tableEntity, result);
             }
 
             return result;
@@ -81,16 +63,16 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <returns>Table entity.</returns>
         public ITableEntity GetEntity(T entity)
         {
-            var result = new DynamicTableEntity();
-
-            foreach (var keyProperty in _keyProperties)
+            if (entity == null)
             {
-                keyProperty.FillTableEntity(entity, result);
+                throw new ArgumentNullException("entity");
             }
 
-            foreach (var property in _memberAccessors)
+            var result = new DynamicTableEntity();
+
+            foreach (var property in _properties)
             {
-                result.Properties.Add(property.Name, property.GetValue(entity));
+                property.FillTableEntity(entity, result);
             }
 
             return result;
@@ -110,30 +92,43 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <param name="memberInfos">Type memebers.</param>
         private void ProcessMembers(IEnumerable<MemberInfo> memberInfos)
         {
+            // List of available key properties
+            var keyProperties = new List<IKeyProperty<T>>
+                                 {
+                                     new PartitionKeyAccessor<T>(),
+                                     new RowKeyAccessor<T>(),
+                                     new TimestampAccessor<T>(),
+                                     new ETagAccessor<T>()
+                                 };
+
+            // Create accessors for entity members
             foreach (MemberInfo memberInfo in memberInfos)
             {
                 IValueAccessor<T> valueAccessor = ValueAccessorFactory.Create<T>(memberInfo);
 
-                if (_keyProperties.Any(p => p.Validate(memberInfo, valueAccessor)))
+                if (keyProperties.Any(p => p.Validate(memberInfo, valueAccessor)))
                 {
                     continue;
                 }
 
                 // Keep as a regular property
-                _memberAccessors.Add(valueAccessor);
+                _properties.Add(new RegularProperty<T>(memberInfo, valueAccessor));
             }
 
-            // Get name changes
-            foreach (var pair in _keyProperties.SelectMany(keyProperty => keyProperty.NameChanges))
-            {
-                _nameChanges.Add(pair.Key, pair.Value);
-            }
-
-            // Checks for a key attributes
-            if (_keyProperties.Count(p => (p is PartitionKeyAccessor<T> || p is RowKeyAccessor<T>) && p.HasAccessor) == 0)
+            // At least one key property should be defined
+            if (keyProperties.Count(p => (p is PartitionKeyAccessor<T> || p is RowKeyAccessor<T>) && p.HasAccessor) == 0)
             {
                 throw new ArgumentException(
                     string.Format("PartitionKey or RowKey attribute should be defined for type '{0}'.", typeof(T)));
+            }
+
+            // Merge properties
+            _properties.AddRange(keyProperties);
+
+            // Get name changes
+            foreach (var pair in _properties.SelectMany(keyProperty => keyProperty.NameChanges))
+            {
+                _nameChanges.Add(pair.Key, pair.Value);
             }
         }
     }

@@ -5,24 +5,24 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
-namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
+namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 {
     /// <summary>
-    ///     Handles access to PartitionKey value.
+    ///     Handles access to ETag value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class PartitionKeyAccessor<T> : IKeyProperty<T>
+    public sealed class ETagAccessor<T> : IKeyProperty<T>
     {
-        private readonly Type _partitionKeyAttributeType;
+        private readonly Type _eTagAttributeType;
         private readonly Type _stringType;
         private IValueAccessor<T> _accessor;
 
-        public PartitionKeyAccessor()
+        public ETagAccessor()
         {
-            _partitionKeyAttributeType = typeof (PartitionKeyAttribute);
+            _eTagAttributeType = typeof (ETagAttribute);
             _stringType = typeof (String);
 
-            NameChanges = new Dictionary<string, string>();
+            NameChanges = new Dictionary<String, String>();
         }
 
         public bool HasAccessor
@@ -32,25 +32,22 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
 
         public bool Validate(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
-            // Checks member for a partition key attribute
-            if (!Attribute.IsDefined(memberInfo, _partitionKeyAttributeType, false))
+            if (!Attribute.IsDefined(memberInfo, _eTagAttributeType, false))
             {
                 return false;
             }
 
             if (_accessor != null)
             {
-                throw new ArgumentException("PartitionKey attribute duplication.");
+                throw new ArgumentException("ETag attribute duplication.");
             }
 
             if (accessor.Type != _stringType)
             {
-                throw new ArgumentException("PartitionKey must have a string type.");
+                throw new ArgumentException("ETag must have a String type.");
             }
 
             _accessor = accessor;
-
-            NameChanges.Add(accessor.Name, "PartitionKey");
 
             return true;
         }
@@ -59,13 +56,21 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
         {
             if (_accessor != null)
             {
-                _accessor.SetValue(entity, new EntityProperty(tableEntity.PartitionKey));
+                _accessor.SetValue(entity, new EntityProperty(tableEntity.ETag));
             }
         }
 
         public void FillTableEntity(T entity, DynamicTableEntity tableEntity)
         {
-            tableEntity.PartitionKey = _accessor != null ? _accessor.GetValue(entity).StringValue : string.Empty;
+            if (_accessor != null)
+            {
+                tableEntity.ETag = _accessor.GetValue(entity).StringValue;
+            }
+
+            if (string.IsNullOrEmpty(tableEntity.ETag))
+            {
+                tableEntity.ETag = "*";
+            }
         }
 
         public IDictionary<string, string> NameChanges { get; private set; }

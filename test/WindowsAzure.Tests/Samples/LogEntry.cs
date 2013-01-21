@@ -6,7 +6,8 @@ namespace WindowsAzure.Tests.Samples
     public sealed class LogEntry
     {
         [PartitionKey] public string Id;
-        public string Message;
+
+        [Property(Name = "OldMessage")] public string Message;
 
         [Timestamp] public DateTime Timestamp;
 

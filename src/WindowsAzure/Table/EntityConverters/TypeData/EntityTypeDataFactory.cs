@@ -19,7 +19,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// </summary>
         /// <typeparam name="T">Entity type.</typeparam>
         /// <returns>Entity type data.</returns>
-        public static IEntityTypeData<T> GetEntityTypeData<T>() where T : new()
+        public static IEntityTypeData<T> GetEntityTypeData<T>() where T : class, new()
         {
             return (IEntityTypeData<T>) TypesData.GetOrAdd(typeof (T), type => new EntityTypeData<T>());
         }

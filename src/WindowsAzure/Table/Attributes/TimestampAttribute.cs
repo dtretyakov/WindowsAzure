@@ -2,7 +2,7 @@
 
 namespace WindowsAzure.Table.Attributes
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class TimestampAttribute : Attribute
     {
     }

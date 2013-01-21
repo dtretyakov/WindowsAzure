@@ -132,7 +132,56 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(tableEntity.RowKey, string.Empty);
             Assert.Equal(tableEntity.Timestamp, default(DateTimeOffset));
 
-            Assert.Equal(properties["Message"].StringValue, entry.Message);
+            Assert.Equal(properties["OldMessage"].StringValue, entry.Message);
+        }
+
+        [Fact]
+        public void TableEntityConverterConvertToTableEntityWithMappingsTest()
+        {
+            // Arrange
+            var converter = new TableEntityConverter<LogEntry>();
+            var entity = new LogEntry
+                             {
+                                 Id = "My id",
+                                 Message = "My message"
+                             };
+
+            var context = new OperationContext();
+
+            // Act
+            ITableEntity tableEntity = converter.GetEntity(entity);
+            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(context);
+
+            // Assert
+            Assert.Equal(tableEntity.ETag, "*");
+            Assert.Equal(tableEntity.PartitionKey, entity.Id);
+            Assert.Equal(tableEntity.RowKey, string.Empty);
+
+            Assert.Equal(properties["OldMessage"].StringValue, entity.Message);
+        }
+
+        [Fact]
+        public void TableEntityConverterConvertToEntityWithMappingsTest()
+        {
+            // Arrange
+            var converter = new TableEntityConverter<LogEntry>();
+            var tableEntity = new DynamicTableEntity
+                                  {
+                                      PartitionKey = "My partiton key",
+                                      Properties = new Dictionary<string, EntityProperty>
+                                                       {
+                                                           {"OldMessage", new EntityProperty("My message")}
+                                                       }
+                                  };
+
+            // Act
+            LogEntry entity = converter.GetEntity(tableEntity);
+
+            // Assert
+            Assert.Equal(tableEntity.PartitionKey, entity.Id);
+            Assert.Null(tableEntity.RowKey);
+
+            Assert.Equal(tableEntity.Properties["OldMessage"].StringValue, entity.Message);
         }
     }
 }

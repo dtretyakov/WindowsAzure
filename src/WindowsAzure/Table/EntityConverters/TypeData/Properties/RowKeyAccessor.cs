@@ -5,24 +5,24 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
-namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
+namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 {
     /// <summary>
-    ///     Handles access to ETag value.
+    ///     Handles access to RowKey value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class ETagAccessor<T> : IKeyProperty<T>
+    public sealed class RowKeyAccessor<T> : IKeyProperty<T>
     {
-        private readonly Type _eTagAttributeType;
+        private readonly Type _rowKeyAttributeType;
         private readonly Type _stringType;
         private IValueAccessor<T> _accessor;
 
-        public ETagAccessor()
+        public RowKeyAccessor()
         {
-            _eTagAttributeType = typeof (ETagAttribute);
+            _rowKeyAttributeType = typeof (RowKeyAttribute);
             _stringType = typeof (String);
 
-            NameChanges = new Dictionary<String, String>();
+            NameChanges = new Dictionary<string, string>();
         }
 
         public bool HasAccessor
@@ -32,22 +32,25 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
 
         public bool Validate(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
-            if (!Attribute.IsDefined(memberInfo, _eTagAttributeType, false))
+            // Checks member for a row key attribute
+            if (!Attribute.IsDefined(memberInfo, _rowKeyAttributeType, false))
             {
                 return false;
             }
 
             if (_accessor != null)
             {
-                throw new ArgumentException("ETag attribute duplication.");
+                throw new ArgumentException("RowKey attribute duplication.");
             }
 
             if (accessor.Type != _stringType)
             {
-                throw new ArgumentException("ETag must have a String type.");
+                throw new ArgumentException("RowKey must have a string type.");
             }
 
             _accessor = accessor;
+
+            NameChanges.Add(accessor.Name, "RowKey");
 
             return true;
         }
@@ -56,13 +59,18 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.KeyProperties
         {
             if (_accessor != null)
             {
-                _accessor.SetValue(entity, new EntityProperty(tableEntity.ETag));
+                _accessor.SetValue(entity, new EntityProperty(tableEntity.RowKey));
             }
         }
 
         public void FillTableEntity(T entity, DynamicTableEntity tableEntity)
         {
-            tableEntity.ETag = _accessor != null ? _accessor.GetValue(entity).StringValue : "*";
+            if (_accessor != null)
+            {
+                tableEntity.RowKey = _accessor.GetValue(entity).StringValue;
+            }
+
+            tableEntity.RowKey = tableEntity.RowKey ?? string.Empty;
         }
 
         public IDictionary<string, string> NameChanges { get; private set; }

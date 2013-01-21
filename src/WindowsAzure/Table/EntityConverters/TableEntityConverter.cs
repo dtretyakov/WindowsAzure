@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.EntityConverters
     ///     Handles an entities conversions.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public class TableEntityConverter<T> : ITableEntityConverter<T> where T : new()
+    public class TableEntityConverter<T> : ITableEntityConverter<T> where T : class, new()
     {
         private readonly IEntityTypeData<T> _typeData;
 

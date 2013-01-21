@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using WindowsAzure.Table;
 using WindowsAzure.Table.Extensions;
@@ -10,6 +9,8 @@ namespace WindowsAzure.Tests.Table.Query
 {
     public sealed class QueryLogEntryEntitiesTests : LogEntryTableSetBase
     {
+        private const string MessageTemplate = "My message {0}";
+
         public QueryLogEntryEntitiesTests()
         {
             TableSet<LogEntry> tableSet = GetTableSet();
@@ -20,7 +21,7 @@ namespace WindowsAzure.Tests.Table.Query
                     new LogEntry
                         {
                             Id = Guid.NewGuid().ToString("N"),
-                            Message = string.Format("My message {0}", i)
+                            Message = string.Format(MessageTemplate, i)
                         });
             }
         }
@@ -50,12 +51,25 @@ namespace WindowsAzure.Tests.Table.Query
 
             // Act
             LogEntry result1 = await tableSet.FirstAsync();
-            Thread.Sleep(2000);
             LogEntry result2 = await tableSet.SingleAsync(p => p.Id == result1.Id);
 
             // Assert
             Assert.Equal(result1.Id, result2.Id);
             Assert.Equal(result1.ETag, result2.ETag);
+        }
+
+        [Fact]
+        public async Task QueryLogEntryByMessageValueTest()
+        {
+            // Arrange
+            TableSet<LogEntry> tableSet = GetTableSet();
+            string message = string.Format(MessageTemplate, 2);
+
+            // Act
+            LogEntry result = await tableSet.FirstAsync(p => p.Message == message);
+
+            // Assert
+            Assert.Equal(result.Message, message);
         }
     }
 }
