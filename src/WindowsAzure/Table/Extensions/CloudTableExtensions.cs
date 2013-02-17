@@ -12,7 +12,7 @@ namespace WindowsAzure.Table.Extensions
     public static class CloudTableExtensions
     {
         /// <summary>
-        ///     Begins an asynchronous operation to create a table.
+        ///     Creates a table asynchronously.
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
@@ -34,7 +34,7 @@ namespace WindowsAzure.Table.Extensions
         }
 
         /// <summary>
-        ///     Begins an asynchronous operation to delete a table.
+        ///     Creates the table if it does not already exist asynchronously.
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
@@ -58,7 +58,7 @@ namespace WindowsAzure.Table.Extensions
         }
 
         /// <summary>
-        ///     Begins an asynchronous operation to delete a table.
+        ///     Deletes a table asynchronously.
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
@@ -80,14 +80,14 @@ namespace WindowsAzure.Table.Extensions
         }
 
         /// <summary>
-        ///     Begins an asynchronous operation to delete the tables if it exists.
+        ///     Deletes the table if it exists asynchronously.
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>
         ///     <c>true</c> if the table was deleted; otherwise, <c>false</c>.
         /// </returns>
-        public static Task<bool> DeleteIfNotExistsAsync(
+        public static Task<bool> DeleteIfExistsAsync(
             this CloudTable cloudTable,
             CancellationToken cancellationToken = default (CancellationToken))
         {
@@ -171,23 +171,23 @@ namespace WindowsAzure.Table.Extensions
             return cloudTable
                 .ExecuteQuerySegmentedAsync(tableQuery, continuationToken, cancellationToken)
                 .Then(result =>
-                          {
-                              tableEntities.AddRange(result.Results);
+                    {
+                        tableEntities.AddRange(result.Results);
 
-                              TableContinuationToken continuation = result.ContinuationToken;
+                        TableContinuationToken continuation = result.ContinuationToken;
 
-                              // Checks whether enumeration has completed
-                              if (continuation != null && tableQuery.TakeCount.HasValue &&
-                                  tableQuery.TakeCount.Value < tableEntities.Count)
-                              {
-                                  cancellationToken.ThrowIfCancellationRequested();
+                        // Checks whether enumeration has completed
+                        if (continuation != null && tableQuery.TakeCount.HasValue &&
+                            tableQuery.TakeCount.Value < tableEntities.Count)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
 
-                                  return ExecuteQuerySegmentedImplAsync(
-                                      cloudTable, tableEntities, tableQuery, continuation, cancellationToken);
-                              }
+                            return ExecuteQuerySegmentedImplAsync(
+                                cloudTable, tableEntities, tableQuery, continuation, cancellationToken);
+                        }
 
-                              return TaskHelpers.FromResult(tableEntities);
-                          });
+                        return TaskHelpers.FromResult(tableEntities);
+                    });
         }
 
         /// <summary>
@@ -327,6 +327,79 @@ namespace WindowsAzure.Table.Extensions
                     {
                         registration.Dispose();
                         return cloudTable.EndExecuteQuerySegmented<TElement, TR>(result);
+                    });
+        }
+
+        /// <summary>
+        ///     Checks whether the table exists asynchronously.
+        /// </summary>
+        /// <param name="cloudTable">Cloud table.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>
+        ///     <c>true</c> if table exists; otherwise, <c>false</c>.
+        /// </returns>
+        public static Task<bool> ExistsAsync(
+            this CloudTable cloudTable,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            ICancellableAsyncResult asyncResult = cloudTable.BeginExists(null, null);
+            CancellationTokenRegistration registration = cancellationToken.Register(p => asyncResult.Cancel(), null);
+
+            return Task<bool>.Factory.FromAsync(
+                asyncResult,
+                result =>
+                    {
+                        registration.Dispose();
+                        return cloudTable.EndExists(result);
+                    });
+        }
+
+        /// <summary>
+        ///     Gets the permissions settings for the table asynchronously.
+        /// </summary>
+        /// <param name="cloudTable">Cloud table.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>
+        ///     The table's permissions.
+        /// </returns>
+        public static Task<TablePermissions> GetPermissionsAsync(
+            this CloudTable cloudTable,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            ICancellableAsyncResult asyncResult = cloudTable.BeginGetPermissions(null, null);
+            CancellationTokenRegistration registration = cancellationToken.Register(p => asyncResult.Cancel(), null);
+
+            return Task<TablePermissions>.Factory.FromAsync(
+                asyncResult,
+                result =>
+                    {
+                        registration.Dispose();
+                        return cloudTable.EndGetPermissions(result);
+                    });
+        }
+
+        /// <summary>
+        ///     Sets the permissions settings for the table asynchronously.
+        /// </summary>
+        /// <param name="cloudTable">Cloud table.</param>
+        /// <param name="tablePermissions">
+        ///     A <see cref="T:Microsoft.WindowsAzure.Storage.Table.TablePermissions" /> object that represents the permissions to set.
+        /// </param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public static Task SetPermissionsAsync(
+            this CloudTable cloudTable,
+            TablePermissions tablePermissions,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            ICancellableAsyncResult asyncResult = cloudTable.BeginSetPermissions(tablePermissions, null, null);
+            CancellationTokenRegistration registration = cancellationToken.Register(p => asyncResult.Cancel(), null);
+
+            return Task.Factory.FromAsync(
+                asyncResult,
+                result =>
+                    {
+                        registration.Dispose();
+                        cloudTable.EndSetPermissions(result);
                     });
         }
     }

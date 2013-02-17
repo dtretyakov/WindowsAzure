@@ -84,6 +84,7 @@
     <Compile Include="Table\Extensions\AsyncQueryExtensions.cs" />
     <Compile Include="Table\Extensions\CloudTableExtensions.cs" />
     <Compile Include="Table\Attributes\PartitionKeyAttribute.cs" />
+    <Compile Include="Table\ITableSet.cs" />
     <Compile Include="Table\Queryable\Expressions\IQueryTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\TakeTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SelectTranslator.cs" />
