@@ -1,30 +1,31 @@
 # Windows Azure Storage Extensions
 
-*Windows Azure Storage Extensions* is a .NET framework aimed for managing and querying entities from [Windows Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
-It's built on top of the **[Windows Azure Storage Client Library 2.0](https://github.com/WindowsAzure/azure-sdk-for-net)**, uses **LINQ** expressions for queries, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and allow usage of abstract **POCO** entities.
+*Windows Azure Storage Extensions* is a .NET library aimed for managing and querying entities from [Windows Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
+It's built on top of the **[Windows Azure Storage Client Library 2.0](https://github.com/WindowsAzure/azure-sdk-for-net)**, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and **LINQ to Azure Table** queries via `TableSet` context by using **POCO** entities.
 
 ## Features
 
 **Using POCO entities**
 
-Classes can use `PartitionKey` and `RowKey` attributes for defining composite table key. See code samples below.
+Entity members should be marked by one or both of `PartitionKey` and `RowKey` attributes for defining composite table key. Also can be used `Timestamp`, `ETag`, `Property` and `Ignore` attributes.
 
 **Table entities management**
 
-Generic `TableSet<TEntity>` context provides a synchronous & asynchronous ([TAP](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) methods for managing entities:
+Generic `TableSet` context provides a synchronous & asynchronous ([TAP](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) methods for managing entities:
 
-  * *Synchronous*: Add(), Update() and Remove().
-  * *Asynchronous*: AddAsync(), UpdateAsync() and RemoveAsync().
+  * *Synchronous*: Add(), AddOrUpdate(), Update() and Remove().
+  * *Asynchronous*: AddAsync(), AddOrUpdateAsync(), UpdateAsync() and RemoveAsync().
 
 **Table queries**
 
-Table context implements `IQueryable<>` interface for using [LINQ Expressions](http://msdn.microsoft.com/en-us/library/vstudio/bb397926.aspx). Query provider implements next methods:
+`TableSet` context implements `IQueryable` interface for using [LINQ Expressions](http://msdn.microsoft.com/en-us/library/vstudio/bb397926.aspx). Provider supports next synchronous LINQ methods:
 * Where()
 * Take()
 
-For creating a custom queries you should take a look at [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
+For creating a custom queries you should take a look at next article [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
 
-In addition to you can use **asynchronous query** processing powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx). Available methods:
+In addition `TableSet` can be used for **asynchronous queries** powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx).
+Available methods:
 * ToListAsync()
 * TakeAsync()
 * FirstAsync()
@@ -32,9 +33,24 @@ In addition to you can use **asynchronous query** processing powered by LINQ ext
 * SingleAsync()
 * SingleOrDefaultAsync()
 
+**TAP-based extensions**
+
+Library contains TAP-based extensions for a next Azure Storage Library classes:
+* CloudBlobClient;
+* CloudBlobContainer;
+* CloudTableClient;
+* CloudTable.
+
+To use it just add _Async_ postfix to synchronous method name like that:
+
+```csharp
+var blobs = cloudBlobContainer.ListBlobs();
+var blobs = await cloudBlobContainer.ListBlobsAsync();
+```
+
 **Task Cancellation**
 
-All of TAP based methods accepts a `CancellationToken` parameter for using a [Task Cancellation](http://msdn.microsoft.com/en-us/library/dd997396.aspx).
+All of TAP-based methods accepts optional `CancellationToken` parameter for [Task Cancellation](http://msdn.microsoft.com/en-us/library/dd997396.aspx).
 
 ## Download
 
@@ -83,31 +99,31 @@ var countryTable = new TableSet<Country>(tableClient);
 * Adding a new entity:
 
 ```csharp
-var resultSync = tableSet.Add(country);
-var resultAsync = await tableSet.AddAsync(country);
+var resultSync = countryTable.Add(country);
+var resultAsync = await countryTable.AddAsync(country);
 ```
 
 * Updating an entity:
 
 ```csharp
 resultSync.Area += 333333;
-resultSync = tableSet.Update(resultSync);
+resultSync = countryTable.Update(resultSync);
 
 resultAsync.Population *= 2;
-resultAsync = await tableSet.UpdateAsync(resultAsync);
+resultAsync = await countryTable.UpdateAsync(resultAsync);
 ```
 
 * Removing entities:
 
 ```csharp
-tableSet.Remove(resultSync);
-await tableSet.RemoveAsync(resultAsync);
+countryTable.Remove(resultSync);
+await countryTable.RemoveAsync(resultAsync);
 ```
 
 * Querying entities:
 
 ```csharp
-var query = tableSet.Where(
+var query = countryTable.Where(
         p => p.Formed > new DateTime(1950, 1, 1) &&
              (p.PresidentsCount < 10 ||
               p.Population < 10000000 && p.PresidentsCount > 10 && p.IsExists));
