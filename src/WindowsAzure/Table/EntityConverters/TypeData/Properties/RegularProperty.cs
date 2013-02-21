@@ -19,28 +19,41 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
         public RegularProperty(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
-            _accessor = accessor;
-            _memberName = memberInfo.Name;
             _nameChanges = new Dictionary<string, string>();
 
-            var attribute = Attribute.GetCustomAttribute(memberInfo, typeof (PropertyAttribute)) as PropertyAttribute;
-            if (attribute == null)
+            // Skip entity members with a IgnoreAttribute
+            if (Attribute.GetCustomAttribute(memberInfo, typeof (IgnoreAttribute)) != null)
             {
                 return;
             }
 
-            if (string.IsNullOrEmpty(attribute.Name))
+            _accessor = accessor;
+            _memberName = memberInfo.Name;
+
+            // Try to get PropertyAttribute
+            var propertyAttribute = Attribute.GetCustomAttribute(memberInfo, typeof (PropertyAttribute)) as PropertyAttribute;
+            if (propertyAttribute == null)
             {
                 return;
             }
 
-            _nameChanges.Add(_memberName, attribute.Name);
-            _memberName = attribute.Name;
+            if (string.IsNullOrEmpty(propertyAttribute.Name))
+            {
+                return;
+            }
+
+            _nameChanges.Add(_memberName, propertyAttribute.Name);
+            _memberName = propertyAttribute.Name;
         }
 
         public IDictionary<string, string> NameChanges
         {
             get { return _nameChanges; }
+        }
+
+        public bool HasAccessor
+        {
+            get { return _accessor != null; }
         }
 
         public void FillEntity(DynamicTableEntity tableEntity, T entity)

@@ -15,6 +15,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         IDictionary<string, string> NameChanges { get; }
 
         /// <summary>
+        ///     Gets a value indication whether property has accessor.
+        /// </summary>
+        bool HasAccessor { get; }
+
+        /// <summary>
         ///     Writes a table entity data to POCO entity.
         /// </summary>
         /// <param name="tableEntity">Table entity.</param>

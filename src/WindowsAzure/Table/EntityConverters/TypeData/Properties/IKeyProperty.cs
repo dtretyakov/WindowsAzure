@@ -10,11 +10,6 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     internal interface IKeyProperty<T> : IProperty<T>
     {
         /// <summary>
-        ///     Gets a value indication whether property has accessor.
-        /// </summary>
-        bool HasAccessor { get; }
-
-        /// <summary>
         ///     Checks whether memberInfo contains an specific criteria.
         /// </summary>
         /// <param name="memberInfo">Member info.</param>

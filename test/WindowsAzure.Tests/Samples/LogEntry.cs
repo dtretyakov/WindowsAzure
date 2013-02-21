@@ -13,5 +13,8 @@ namespace WindowsAzure.Tests.Samples
 
         [ETag]
         public string ETag { get; set; }
+
+        [Ignore]
+        public byte[] PrivateData;
     }
 }

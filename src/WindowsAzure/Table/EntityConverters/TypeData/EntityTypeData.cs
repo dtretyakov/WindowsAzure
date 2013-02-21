@@ -16,8 +16,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
-        private readonly List<IProperty<T>> _properties;
         private readonly IDictionary<string, string> _nameChanges;
+        private readonly List<IProperty<T>> _properties;
 
         /// <summary>
         ///     Constructor.
@@ -27,7 +27,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             _nameChanges = new Dictionary<string, string>();
             _properties = new List<IProperty<T>>();
 
-            Type entityType = typeof(T);
+            Type entityType = typeof (T);
             var typeMembers = new List<MemberInfo>(entityType.GetProperties(Flags));
             typeMembers.AddRange(entityType.GetFields(Flags));
 
@@ -94,12 +94,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             // List of available key properties
             var keyProperties = new List<IKeyProperty<T>>
-                                 {
-                                     new PartitionKeyAccessor<T>(),
-                                     new RowKeyAccessor<T>(),
-                                     new TimestampAccessor<T>(),
-                                     new ETagAccessor<T>()
-                                 };
+                {
+                    new PartitionKeyAccessor<T>(),
+                    new RowKeyAccessor<T>(),
+                    new TimestampAccessor<T>(),
+                    new ETagAccessor<T>()
+                };
 
             // Create accessors for entity members
             foreach (MemberInfo memberInfo in memberInfos)
@@ -112,14 +112,18 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 }
 
                 // Keep as a regular property
-                _properties.Add(new RegularProperty<T>(memberInfo, valueAccessor));
+                var property = new RegularProperty<T>(memberInfo, valueAccessor);
+                if (property.HasAccessor)
+                {
+                    _properties.Add(property);
+                }
             }
 
             // At least one key property should be defined
-            if (keyProperties.Count(p => (p is PartitionKeyAccessor<T> || p is RowKeyAccessor<T>) && p.HasAccessor) == 0)
+            if (keyProperties.Count(p => p.HasAccessor && (p is PartitionKeyAccessor<T> || p is RowKeyAccessor<T>)) == 0)
             {
                 throw new ArgumentException(
-                    string.Format("PartitionKey or RowKey attribute should be defined for type '{0}'.", typeof(T)));
+                    string.Format("PartitionKey or RowKey attribute should be defined for type '{0}'.", typeof (T)));
             }
 
             // Merge properties

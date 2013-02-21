@@ -117,7 +117,8 @@ namespace WindowsAzure.Tests.Table.EntityConverters
                                 Id = Guid.NewGuid().ToString("N"),
                                 ETag = "MyETag",
                                 Timestamp = DateTime.UtcNow,
-                                Message = "My message"
+                                Message = "My message",
+                                PrivateData = new byte[] {0xaa, 0xbb, 0xcc}
                             };
 
             var context = new OperationContext();
@@ -133,10 +134,11 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(tableEntity.Timestamp, default(DateTimeOffset));
 
             Assert.Equal(properties["OldMessage"].StringValue, entry.Message);
+            Assert.DoesNotContain("PrivateData", properties.Keys);
         }
 
         [Fact]
-        public void TableEntityConverterConvertToTableEntityWithMappingsTest()
+        public void TableEntityConverterConvertToTableEntityWithNameMappingTest()
         {
             // Arrange
             var converter = new TableEntityConverter<LogEntry>();
@@ -161,7 +163,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void TableEntityConverterConvertToEntityWithMappingsTest()
+        public void TableEntityConverterConvertToEntityWithNameMappingTest()
         {
             // Arrange
             var converter = new TableEntityConverter<LogEntry>();
