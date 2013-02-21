@@ -166,7 +166,7 @@ namespace WindowsAzure.Table.Extensions
             List<DynamicTableEntity> tableEntities,
             TableQuery tableQuery,
             TableContinuationToken continuationToken,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default (CancellationToken))
         {
             return cloudTable
                 .ExecuteQuerySegmentedAsync(tableQuery, continuationToken, cancellationToken)
@@ -176,14 +176,13 @@ namespace WindowsAzure.Table.Extensions
 
                         TableContinuationToken continuation = result.ContinuationToken;
 
-                        // Checks whether enumeration has completed
+                        // Checks whether enumeration has been completed
                         if (continuation != null && tableQuery.TakeCount.HasValue &&
                             tableQuery.TakeCount.Value < tableEntities.Count)
                         {
                             cancellationToken.ThrowIfCancellationRequested();
 
-                            return ExecuteQuerySegmentedImplAsync(
-                                cloudTable, tableEntities, tableQuery, continuation, cancellationToken);
+                            return ExecuteQuerySegmentedImplAsync(cloudTable, tableEntities, tableQuery, continuation, cancellationToken);
                         }
 
                         return TaskHelpers.FromResult(tableEntities);

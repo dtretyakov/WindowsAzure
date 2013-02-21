@@ -24,7 +24,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task CloudTableCreateAsyncTest()
+        public async Task CloudTableExtensionsTest()
         {
             // Arrange
             var permissions = new TablePermissions();

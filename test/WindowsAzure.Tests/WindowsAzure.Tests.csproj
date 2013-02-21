@@ -81,6 +81,7 @@
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\UpdateEntitiesTests.cs" />
     <Compile Include="Table\Extensions\CloudTableExtensionsTests.cs" />
+    <Compile Include="Table\Extensions\CloudTableClientExtensionsTests.cs" />
     <Compile Include="Table\LogEntryTableSetBase.cs" />
     <Compile Include="Table\EntityConverters\TypeData\FieldValueAccessorTests.cs" />
     <Compile Include="Table\EntityConverters\TypeData\PropertyValueAccessorTests.cs" />
