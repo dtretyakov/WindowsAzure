@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Blob\Extensions\CloudBlobClientExtensions.cs" />
     <Compile Include="Blob\Extensions\CloudBlobContainerExtensions.cs" />
+    <Compile Include="Blob\Extensions\CloudBlobExtensions.cs" />
     <Compile Include="Common\TaskHelpers.cs" />
     <Compile Include="Common\TaskHelpersExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
