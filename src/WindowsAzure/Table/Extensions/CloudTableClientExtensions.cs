@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -185,17 +186,20 @@ namespace WindowsAzure.Table.Extensions
                 .ListTablesSegmentedAsync(prefix, maxResults, continuationToken, cancellationToken)
                 .Then(result =>
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         cloudTables.AddRange(result.Results);
 
-                        TableContinuationToken continuation = result.ContinuationToken;
+                        // Checks whether maxresults entities has been received
+                        if (maxResults.HasValue && cloudTables.Count >= maxResults.Value)
+                        {
+                            return TaskHelpers.FromResult(cloudTables.Take(maxResults.Value).ToList());
+                        }
 
                         // Checks whether enumeration has been completed
-                        if (continuation != null && maxResults.HasValue &&
-                            maxResults.Value < cloudTables.Count)
+                        if (result.ContinuationToken != null)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            return ListTablesImplAsync(tableClient, cloudTables, prefix, maxResults, continuationToken, cancellationToken);
+                            return ListTablesImplAsync(tableClient, cloudTables, prefix, maxResults, result.ContinuationToken, cancellationToken);
                         }
 
                         return TaskHelpers.FromResult(cloudTables);

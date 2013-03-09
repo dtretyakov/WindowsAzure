@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -177,17 +178,20 @@ namespace WindowsAzure.Blob.Extensions
                 .ListBlobsSegmentedAsync(prefix, useFlatBlobListing, blobListingDetails, maxResults, continuationToken, cancellationToken)
                 .Then(result =>
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         cloudBlobs.AddRange(result.Results);
 
-                        BlobContinuationToken continuation = result.ContinuationToken;
+                        // Checks whether maxresults entities has been received
+                        if (maxResults.HasValue && cloudBlobs.Count >= maxResults.Value)
+                        {
+                            TaskHelpers.FromResult(cloudBlobs.Take(maxResults.Value).ToList());
+                        }
 
                         // Checks whether enumeration has been completed
-                        if (continuation != null && maxResults.HasValue &&
-                            maxResults.Value < cloudBlobs.Count)
+                        if (result.ContinuationToken != null)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            return ListBlobsImplAsync(blobClient, cloudBlobs, prefix, useFlatBlobListing, blobListingDetails, maxResults, continuationToken, cancellationToken);
+                            return ListBlobsImplAsync(blobClient, cloudBlobs, prefix, useFlatBlobListing, blobListingDetails, maxResults, result.ContinuationToken, cancellationToken);
                         }
 
                         return TaskHelpers.FromResult(cloudBlobs);
@@ -339,17 +343,20 @@ namespace WindowsAzure.Blob.Extensions
                 .ListContainersSegmentedAsync(prefix, detailsIncluded, maxResults, continuationToken, cancellationToken)
                 .Then(result =>
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         cloudContainers.AddRange(result.Results);
 
-                        BlobContinuationToken continuation = result.ContinuationToken;
+                        // Checks whether maxresults entities has been received
+                        if (maxResults.HasValue && cloudContainers.Count >= maxResults.Value)
+                        {
+                            return TaskHelpers.FromResult(cloudContainers.Take(maxResults.Value).ToList());
+                        }
 
                         // Checks whether enumeration has been completed
-                        if (continuation != null && maxResults.HasValue &&
-                            maxResults.Value < cloudContainers.Count)
+                        if (result.ContinuationToken != null)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            return ListContainersImplAsync(blobClient, cloudContainers, prefix, detailsIncluded, maxResults, continuationToken, cancellationToken);
+                            return ListContainersImplAsync(blobClient, cloudContainers, prefix, detailsIncluded, maxResults, result.ContinuationToken, cancellationToken);
                         }
 
                         return TaskHelpers.FromResult(cloudContainers);
