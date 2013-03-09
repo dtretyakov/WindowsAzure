@@ -63,6 +63,8 @@
     <Compile Include="Blob\Extensions\CloudBlobContainerExtensions.cs" />
     <Compile Include="Blob\Extensions\CloudBlobDirectoryExtensions.cs" />
     <Compile Include="Blob\Extensions\CloudBlobExtensions.cs" />
+    <Compile Include="Blob\Extensions\CloudBlockBlobExtensions.cs" />
+    <Compile Include="Blob\Extensions\CloudPageBlobExtensions.cs" />
     <Compile Include="Common\TaskHelpers.cs" />
     <Compile Include="Common\TaskHelpersExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
