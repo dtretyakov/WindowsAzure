@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -389,16 +390,19 @@ namespace WindowsAzure.Blob.Extensions
                 .ListBlobsSegmentedAsync(prefix, useFlatBlobListing, blobListingDetails, maxResults, continuationToken, cancellationToken)
                 .Then(result =>
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         cloudBlobs.AddRange(result.Results);
 
-                        BlobContinuationToken continuation = result.ContinuationToken;
+                        // Checks whether maxresults entities has been received
+                        if (maxResults.HasValue && cloudBlobs.Count >= maxResults.Value)
+                        {
+                            return TaskHelpers.FromResult(cloudBlobs.Take(maxResults.Value).ToList());
+                        }
 
                         // Checks whether enumeration has been completed
-                        if (continuation != null && maxResults.HasValue &&
-                            maxResults.Value < cloudBlobs.Count)
+                        if (result.ContinuationToken != null)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
                             return ListBlobsImplAsync(blobContainer, cloudBlobs, prefix, useFlatBlobListing, blobListingDetails, maxResults, continuationToken, cancellationToken);
                         }
 
