@@ -167,7 +167,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 _filter.Append("(");
             }
 
-            Visit(binary.Left);
+            VisitBinaryLeft(binary);
 
             if (!_logicalOperators.ContainsKey(binary.NodeType))
             {
@@ -177,7 +177,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             _filter.AppendFormat(" {0} ", _logicalOperators[binary.NodeType]);
 
-            Visit(binary.Right);
+            VisitBinaryRight(binary);
 
             if (paranthesesRequired)
             {
@@ -185,6 +185,62 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             }
 
             return binary;
+        }
+
+        protected virtual void VisitBinaryLeft(BinaryExpression binary)
+        {
+            if (binary.Left.NodeType == ExpressionType.Call)
+            {
+                var method = (MethodCallExpression) binary.Left;
+                
+                switch (method.Method.Name)
+                {
+                    case "CompareTo":
+                        if (method.Object != null && method.Object.Type == typeof (String))
+                        {
+                            Visit(method.Object);
+                            return;
+                        }
+                        break;
+
+                    case "Compare":
+                    case "CompareOrdinal":
+                        if (method.Arguments.Count >= 2)
+                        {
+                            Visit(method.Arguments[0]);
+                            return;
+                        }
+                        break;
+                }
+
+                throw new InvalidOperationException(String.Format("Unable to call method {0}", method.Method.Name));
+            }
+
+            Visit(binary.Left);
+        }
+
+        protected virtual void VisitBinaryRight(BinaryExpression binary)
+        {
+            if (binary.Left.NodeType == ExpressionType.Call)
+            {
+                var method = (MethodCallExpression)binary.Left;
+
+                switch (method.Method.Name)
+                {
+                    case "CompareTo":
+                        Visit(method.Arguments[0]);
+                        return;
+
+                    case "Compare":
+                    case "CompareOrdinal":
+                        Visit(method.Arguments[1]);
+                        return;
+                }
+
+                throw new InvalidOperationException(String.Format("Unable to call method {0}", method.Method.Name));
+            }
+
+            Visit(binary.Right);
         }
 
         protected override Expression VisitConstant(ConstantExpression constant)
