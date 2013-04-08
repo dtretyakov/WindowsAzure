@@ -255,11 +255,12 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
                 if (!_serialization.ContainsKey(constantType))
                 {
-                    throw new NotSupportedException(
-                        String.Format("The constant for '{0}' is not supported", constant.Value));
+                    _filter.Append(_serialization[typeof(String)](constant.Value.ToString()));
                 }
-
-                _filter.Append(_serialization[constantType](constant.Value));
+                else
+                {
+                    _filter.Append(_serialization[constantType](constant.Value));
+                }
             }
 
             return constant;

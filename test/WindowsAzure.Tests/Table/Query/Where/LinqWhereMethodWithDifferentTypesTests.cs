@@ -153,6 +153,21 @@ namespace WindowsAzure.Tests.Table.Query.Where
         }
 
         [Fact]
+        public void UseEnumValueInWhereOnRowKeyTest()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            List<Country> entities = tableSet.Where(p => p.Name == Countries.Germany.ToString()).ToList();
+
+            // Assert
+            Assert.NotNull(entities);
+            Assert.Equal(entities.Count, 1);
+            Assert.Equal(entities[0].Name, Germany);
+        }
+
+        [Fact]
         public void UseWhereOnDoubleTest()
         {
             // Arrange
