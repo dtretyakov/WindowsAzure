@@ -212,6 +212,21 @@ namespace WindowsAzure.Blob.Extensions
         }
 
         /// <summary>
+        ///     Deletes the container if it already exists asynchronously.
+        /// </summary>
+        /// <param name="blobContainer">Cloud blob container.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>
+        ///     <c>true</c> if the container did not already exist and was created; otherwise <c>false</c>.
+        /// </returns>
+        public static Task<bool> DeleteIfExistsAsync(
+            this CloudBlobContainer blobContainer,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            return DeleteIfExistsAsync(blobContainer, null, cancellationToken);
+        }
+
+        /// <summary>
         ///     Checks existence of the container asynchronously.
         /// </summary>
         /// <param name="blobContainer">Cloud blob container.</param>

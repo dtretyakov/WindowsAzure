@@ -58,6 +58,47 @@ namespace WindowsAzure.Blob.Extensions
         }
 
         /// <summary>
+        ///     Creates a page blob asynchronously.
+        /// </summary>
+        /// <param name="pageBlob">Cloud page blob.</param>
+        /// <param name="size">The maximum size of the page blob, in bytes.</param>
+        /// <param name="accessCondition">
+        ///     An <see cref="T:Microsoft.WindowsAzure.Storage.AccessCondition" /> object that represents the access conditions for the blob. If <c>null</c>, no condition is used.
+        /// </param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public static Task CreateAsync(
+            this CloudPageBlob pageBlob,
+            long size,
+            AccessCondition accessCondition = null,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            ICancellableAsyncResult asyncResult = pageBlob.BeginCreate(size, accessCondition, null, null, null, null);
+            CancellationTokenRegistration registration = cancellationToken.Register(p => asyncResult.Cancel(), null);
+
+            return Task.Factory.FromAsync(
+                asyncResult,
+                result =>
+                    {
+                        registration.Dispose();
+                        pageBlob.EndCreate(result);
+                    });
+        }
+
+        /// <summary>
+        ///     Creates a page blob asynchronously.
+        /// </summary>
+        /// <param name="pageBlob">Cloud page blob.</param>
+        /// <param name="size">The maximum size of the page blob, in bytes.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public static Task CreateAsync(
+            this CloudPageBlob pageBlob,
+            long size,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            return CreateAsync(pageBlob, size, null, cancellationToken);
+        }
+
+        /// <summary>
         ///     Creates a snapshot of the blob asynchronously.
         /// </summary>
         /// <param name="pageBlob">Cloud page blob.</param>
