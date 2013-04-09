@@ -22,6 +22,8 @@ Generic `TableSet` context provides a synchronous & asynchronous ([TAP](http://m
 * Where()
 * Take()
 
+To utilize [filtering capabilities of string properties](http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx) it supports [Compare](http://msdn.microsoft.com/en-us/library/84787k22.aspx), [CompareTo](http://msdn.microsoft.com/en-us/library/fkw3h78a.aspx) and [CompareOrdinal](http://msdn.microsoft.com/en-us/library/af26w0wa.aspx) methods.
+
 For creating a custom queries you should take a look at next article [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
 
 In addition `TableSet` can be used for **asynchronous queries** powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx).
