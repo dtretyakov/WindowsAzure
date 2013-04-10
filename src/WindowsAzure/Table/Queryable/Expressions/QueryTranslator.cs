@@ -21,11 +21,11 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// <param name="nameChanges">Entity name mappings.</param>
         public QueryTranslator(IDictionary<String, String> nameChanges)
             : this(nameChanges, new List<IMethodTranslator>
-                                     {
-                                         new SelectTranslator(),
-                                         new TakeTranslator(),
-                                         new WhereTranslator()
-                                     })
+                {
+                    new SelectTranslator(),
+                    new TakeTranslator(),
+                    new WhereTranslator()
+                })
         {
         }
 
@@ -34,8 +34,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// </summary>
         /// <param name="nameChanges">Entity name mappings.</param>
         /// <param name="methodTranslators">LINQ Expression methods translators.</param>
-        public QueryTranslator(IDictionary<String, String> nameChanges,
-                               IList<IMethodTranslator> methodTranslators)
+        public QueryTranslator(IDictionary<String, String> nameChanges, IList<IMethodTranslator> methodTranslators)
         {
             _nameChanges = nameChanges;
             _methodTranslators = methodTranslators;
@@ -56,15 +55,15 @@ namespace WindowsAzure.Table.Queryable.Expressions
             return _result;
         }
 
-        protected override Expression VisitMethodCall(MethodCallExpression m)
+        protected override Expression VisitMethodCall(MethodCallExpression methodCall)
         {
-            if (m.Method.DeclaringType == typeof (System.Linq.Queryable))
+            if (methodCall.Method.DeclaringType == typeof (System.Linq.Queryable))
             {
-                string methodName = m.Method.Name;
+                string methodName = methodCall.Method.Name;
 
                 // Select method translator
                 IMethodTranslator translator = _methodTranslators.FirstOrDefault(
-                    p => p.AcceptedMethods.Contains(methodName));
+                    methodTranslator => methodTranslator.AcceptedMethods.Contains(methodName));
 
                 if (translator == null)
                 {
@@ -73,15 +72,15 @@ namespace WindowsAzure.Table.Queryable.Expressions
                 }
 
                 // Merge translation results
-                foreach (var result in translator.Translate(m, _nameChanges))
+                foreach (var result in translator.Translate(methodCall, _nameChanges))
                 {
                     _result.Add(result.Key, result.Value);
                 }
 
-                Visit(m.Arguments[0]);
+                Visit(methodCall.Arguments[0]);
             }
 
-            return m;
+            return methodCall;
         }
     }
 }

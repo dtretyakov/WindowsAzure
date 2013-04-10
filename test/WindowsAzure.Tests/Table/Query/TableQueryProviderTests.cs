@@ -6,6 +6,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable;
+using WindowsAzure.Table.Queryable.Expressions;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
@@ -83,10 +84,16 @@ namespace WindowsAzure.Tests.Table.Query
         /// <returns>TableQueryProvider.</returns>
         private TableQueryProvider<Country> GetTableQueryProvider()
         {
+            var tableEntityConverter = new TableEntityConverter<Country>();
+            CloudTableClient tableClient = GenerateCloudTableClient();
+
             return new TableQueryProvider<Country>(
-                GenerateCloudTableClient(),
-                TableName,
-                new TableEntityConverter<Country>());
+                tableClient.GetTableReference(TableName),
+                new TableSetConfiguration<Country>
+                    {
+                        EntityConverter = tableEntityConverter,
+                        QueryTranslator = new QueryTranslator(tableEntityConverter.NameChanges)
+                    });
         }
 
         [Fact]

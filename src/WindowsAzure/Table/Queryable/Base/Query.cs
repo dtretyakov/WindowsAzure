@@ -9,20 +9,13 @@ namespace WindowsAzure.Table.Queryable.Base
     public class Query<T> : IOrderedQueryable<T>
     {
         private readonly Expression _expression;
-        private readonly IQueryProvider _provider;
 
-        public Query(IQueryProvider provider)
+        protected Query()
         {
-            if (provider == null)
-            {
-                throw new ArgumentNullException("provider");
-            }
-
-            _provider = provider;
             _expression = Expression.Constant(this);
         }
 
-        public Query(QueryProviderBase provider, Expression expression)
+        public Query(IQueryProvider provider, Expression expression)
         {
             if (provider == null)
             {
@@ -39,7 +32,8 @@ namespace WindowsAzure.Table.Queryable.Base
                 throw new ArgumentOutOfRangeException("expression");
             }
 
-            _provider = provider;
+            Provider = provider;
+
             _expression = expression;
         }
 
@@ -53,19 +47,16 @@ namespace WindowsAzure.Table.Queryable.Base
             get { return typeof (T); }
         }
 
-        IQueryProvider IQueryable.Provider
-        {
-            get { return _provider; }
-        }
+        public IQueryProvider Provider { get; protected set; }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<T>) _provider.Execute(_expression)).GetEnumerator();
+            return ((IEnumerable<T>) Provider.Execute(_expression)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable) _provider.Execute(_expression)).GetEnumerator();
+            return ((IEnumerable) Provider.Execute(_expression)).GetEnumerator();
         }
     }
 }

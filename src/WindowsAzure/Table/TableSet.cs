@@ -8,6 +8,7 @@ using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Extensions;
 using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
+using WindowsAzure.Table.Queryable.Expressions;
 
 namespace WindowsAzure.Table
 {
@@ -18,14 +19,13 @@ namespace WindowsAzure.Table
     public sealed class TableSet<TEntity> : Query<TEntity>, ITableSet<TEntity> where TEntity : class, new()
     {
         private readonly CloudTable _cloudTable;
-        private readonly ITableEntityConverter<TEntity> _converter;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         /// <param name="cloudTableClient">Cloud table client.</param>
         public TableSet(CloudTableClient cloudTableClient)
-            : this(cloudTableClient, new TableEntityConverter<TEntity>())
+            : this(cloudTableClient, typeof (TEntity).Name)
         {
         }
 
@@ -35,40 +35,6 @@ namespace WindowsAzure.Table
         /// <param name="cloudTableClient">Cloud table client.</param>
         /// <param name="tableName">Table name.</param>
         public TableSet(CloudTableClient cloudTableClient, string tableName)
-            : this(cloudTableClient, tableName, new TableEntityConverter<TEntity>())
-        {
-        }
-
-        /// <summary>
-        ///     Constructor.
-        /// </summary>
-        /// <param name="cloudTableClient">Cloud table client.</param>
-        /// <param name="converter">Entities converter.</param>
-        public TableSet(CloudTableClient cloudTableClient, ITableEntityConverter<TEntity> converter)
-            : this(cloudTableClient, typeof (TEntity).Name, converter)
-        {
-        }
-
-        /// <summary>
-        ///     Constructor.
-        /// </summary>
-        /// <param name="cloudTableClient">Cloud table client.</param>
-        /// <param name="tableName">Table name.</param>
-        /// <param name="converter">Entities converter.</param>
-        public TableSet(CloudTableClient cloudTableClient, string tableName, ITableEntityConverter<TEntity> converter)
-            : this(cloudTableClient, tableName, converter, new TableQueryProvider<TEntity>(cloudTableClient, tableName, converter))
-        {
-        }
-
-        /// <summary>
-        ///     Constructor.
-        /// </summary>
-        /// <param name="cloudTableClient">Cloud table client.</param>
-        /// <param name="tableName">Table name.</param>
-        /// <param name="converter">Entities converter.</param>
-        /// <param name="queryProvider">Query provider.</param>
-        public TableSet(CloudTableClient cloudTableClient, string tableName, ITableEntityConverter<TEntity> converter, IQueryProvider queryProvider)
-            : base(queryProvider)
         {
             if (cloudTableClient == null)
             {
@@ -80,19 +46,23 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("tableName");
             }
 
-            if (converter == null)
-            {
-                throw new ArgumentNullException("converter");
-            }
-
-            if (queryProvider == null)
-            {
-                throw new ArgumentNullException("queryProvider");
-            }
-
-            _converter = converter;
             _cloudTable = cloudTableClient.GetTableReference(tableName);
+
+            var tableEntityConverter = new TableEntityConverter<TEntity>();
+
+            Configuration = new TableSetConfiguration<TEntity>
+                {
+                    EntityConverter = tableEntityConverter,
+                    QueryTranslator = new QueryTranslator(tableEntityConverter.NameChanges)
+                };
+
+            Provider = new TableQueryProvider<TEntity>(_cloudTable, Configuration);
         }
+
+        /// <summary>
+        ///     Gets an <see cref="TableSet{TEntity}" /> configuration.
+        /// </summary>
+        public TableSetConfiguration<TEntity> Configuration { get; private set; }
 
         /// <summary>
         ///     Inserts a new entity asynchronously.
@@ -102,13 +72,14 @@ namespace WindowsAzure.Table
         /// <returns>Inserted entity.</returns>
         public Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
-            return _cloudTable.ExecuteAsync(TableOperation.Insert(tableEntity), cancellationToken)
+            return _cloudTable.ExecuteAsync(
+                TableOperation.Insert(tableEntity), cancellationToken)
                               .Then(result =>
                                   {
                                       var value = (DynamicTableEntity) result.Result;
-                                      return _converter.GetEntity(value);
+                                      return Configuration.EntityConverter.GetEntity(value);
                                   }, cancellationToken);
         }
 
@@ -119,11 +90,11 @@ namespace WindowsAzure.Table
         /// <returns>Inserted entity.</returns>
         public TEntity Add(TEntity entity)
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
             TableResult result = _cloudTable.Execute(TableOperation.Insert(tableEntity));
 
-            return _converter.GetEntity((DynamicTableEntity) result.Result);
+            return Configuration.EntityConverter.GetEntity((DynamicTableEntity) result.Result);
         }
 
         /// <summary>
@@ -143,7 +114,7 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.Insert(tableEntity));
             }
 
@@ -152,7 +123,7 @@ namespace WindowsAzure.Table
                 .Then(result => result.Select(p =>
                     {
                         var value = (DynamicTableEntity) p.Result;
-                        return _converter.GetEntity(value);
+                        return Configuration.EntityConverter.GetEntity(value);
                     }), cancellationToken);
         }
 
@@ -172,13 +143,13 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.Insert(tableEntity));
             }
 
             IList<TableResult> result = _cloudTable.ExecuteBatch(tableBatchOperation);
 
-            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
+            return result.Select(p => Configuration.EntityConverter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
         }
 
         /// <summary>
@@ -189,13 +160,13 @@ namespace WindowsAzure.Table
         /// <returns>Inserted entity.</returns>
         public Task<TEntity> AddOrUpdateAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
             return _cloudTable.ExecuteAsync(TableOperation.InsertOrReplace(tableEntity), cancellationToken)
                               .Then(result =>
                                   {
                                       var value = (DynamicTableEntity) result.Result;
-                                      return _converter.GetEntity(value);
+                                      return Configuration.EntityConverter.GetEntity(value);
                                   }, cancellationToken);
         }
 
@@ -206,11 +177,11 @@ namespace WindowsAzure.Table
         /// <returns>Inserted entity.</returns>
         public TEntity AddOrUpdate(TEntity entity)
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
             TableResult result = _cloudTable.Execute(TableOperation.InsertOrReplace(tableEntity));
 
-            return _converter.GetEntity((DynamicTableEntity) result.Result);
+            return Configuration.EntityConverter.GetEntity((DynamicTableEntity) result.Result);
         }
 
         /// <summary>
@@ -230,7 +201,7 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.InsertOrReplace(tableEntity));
             }
 
@@ -239,7 +210,7 @@ namespace WindowsAzure.Table
                 .Then(result => result.Select(p =>
                     {
                         var value = (DynamicTableEntity) p.Result;
-                        return _converter.GetEntity(value);
+                        return Configuration.EntityConverter.GetEntity(value);
                     }), cancellationToken);
         }
 
@@ -259,13 +230,13 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.InsertOrReplace(tableEntity));
             }
 
             IList<TableResult> result = _cloudTable.ExecuteBatch(tableBatchOperation);
 
-            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
+            return result.Select(p => Configuration.EntityConverter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
         }
 
         /// <summary>
@@ -276,13 +247,13 @@ namespace WindowsAzure.Table
         /// <returns>Updated entity.</returns>
         public Task<TEntity> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default(CancellationToken))
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
             return _cloudTable.ExecuteAsync(TableOperation.Replace(tableEntity), cancellationToken)
                               .Then(result =>
                                   {
                                       var value = (DynamicTableEntity) result.Result;
-                                      return _converter.GetEntity(value);
+                                      return Configuration.EntityConverter.GetEntity(value);
                                   }, cancellationToken);
         }
 
@@ -293,11 +264,11 @@ namespace WindowsAzure.Table
         /// <returns>Updated entity.</returns>
         public TEntity Update(TEntity entity)
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
             TableResult result = _cloudTable.Execute(TableOperation.Replace(tableEntity));
 
-            return _converter.GetEntity((DynamicTableEntity) result.Result);
+            return Configuration.EntityConverter.GetEntity((DynamicTableEntity) result.Result);
         }
 
         /// <summary>
@@ -317,7 +288,7 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.Replace(tableEntity));
             }
 
@@ -326,7 +297,7 @@ namespace WindowsAzure.Table
                                   p =>
                                       {
                                           var value = (DynamicTableEntity) p.Result;
-                                          return _converter.GetEntity(value);
+                                          return Configuration.EntityConverter.GetEntity(value);
                                       }), cancellationToken);
         }
 
@@ -346,13 +317,13 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.Replace(tableEntity));
             }
 
             IList<TableResult> result = _cloudTable.ExecuteBatch(tableBatchOperation);
 
-            return result.Select(p => _converter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
+            return result.Select(p => Configuration.EntityConverter.GetEntity((DynamicTableEntity) p.Result)).AsEnumerable();
         }
 
         /// <summary>
@@ -363,7 +334,7 @@ namespace WindowsAzure.Table
         /// <returns>Result.</returns>
         public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
             return _cloudTable.ExecuteAsync(TableOperation.Delete(tableEntity), cancellationToken);
         }
@@ -375,7 +346,7 @@ namespace WindowsAzure.Table
         /// <returns>Result.</returns>
         public void Remove(TEntity entity)
         {
-            ITableEntity tableEntity = _converter.GetEntity(entity);
+            ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
 
             _cloudTable.Execute(TableOperation.Delete(tableEntity));
         }
@@ -397,7 +368,7 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.Delete(tableEntity));
             }
 
@@ -420,7 +391,7 @@ namespace WindowsAzure.Table
 
             foreach (TEntity entity in entities)
             {
-                ITableEntity tableEntity = _converter.GetEntity(entity);
+                ITableEntity tableEntity = Configuration.EntityConverter.GetEntity(entity);
                 tableBatchOperation.Add(TableOperation.Delete(tableEntity));
             }
 

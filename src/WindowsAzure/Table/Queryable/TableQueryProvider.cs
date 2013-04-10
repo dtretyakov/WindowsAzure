@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
-using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Extensions;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.Queryable.Expressions;
@@ -20,55 +19,27 @@ namespace WindowsAzure.Table.Queryable
     public class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider where TEntity : new()
     {
         private readonly CloudTable _cloudTable;
-        private readonly ITableEntityConverter<TEntity> _converter;
-        private readonly IQueryTranslator _queryTranslator;
-
-        /// <summary>
-        ///     Contructor.
-        /// </summary>
-        /// <param name="cloudTableClient">Cloud table client.</param>
-        /// <param name="tableName">Table name.</param>
-        /// <param name="converter">Entities converter.</param>
-        public TableQueryProvider(CloudTableClient cloudTableClient, string tableName,
-                                  ITableEntityConverter<TEntity> converter)
-            : this(cloudTableClient, tableName, converter, new QueryTranslator(converter.NameChanges))
-        {
-        }
+        private readonly TableSetConfiguration<TEntity> _configuration;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        /// <param name="cloudTableClient">Cloud table client.</param>
-        /// <param name="tableName">Table name.</param>
-        /// <param name="converter">Entities converter.</param>
-        /// <param name="queryTranslator">LINQ Expression translator.</param>
-        public TableQueryProvider(CloudTableClient cloudTableClient, string tableName,
-                                  ITableEntityConverter<TEntity> converter,
-                                  IQueryTranslator queryTranslator)
+        /// <param name="cloudTable">Cloud table.</param>
+        /// <param name="configuration">LINQ Expression translator.</param>
+        public TableQueryProvider(CloudTable cloudTable, TableSetConfiguration<TEntity> configuration)
         {
-            if (cloudTableClient == null)
+            if (cloudTable == null)
             {
-                throw new ArgumentNullException("cloudTableClient");
+                throw new ArgumentNullException("cloudTable");
             }
 
-            if (string.IsNullOrEmpty(tableName))
+            if (configuration == null)
             {
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException("configuration");
             }
 
-            if (converter == null)
-            {
-                throw new ArgumentNullException("converter");
-            }
-
-            if (queryTranslator == null)
-            {
-                throw new ArgumentNullException("queryTranslator");
-            }
-
-            _converter = converter;
-            _queryTranslator = queryTranslator;
-            _cloudTable = cloudTableClient.GetTableReference(tableName);
+            _cloudTable = cloudTable;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -94,7 +65,7 @@ namespace WindowsAzure.Table.Queryable
                 entities = entities.Take(query.TakeCount.Value);
             }
 
-            return entities.Select(p => _converter.GetEntity(p));
+            return entities.Select(p => _configuration.EntityConverter.GetEntity(p));
         }
 
         /// <summary>
@@ -103,8 +74,9 @@ namespace WindowsAzure.Table.Queryable
         /// <param name="expression"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task<object> ExecuteAsync(Expression expression,
-                                         CancellationToken cancellationToken = default(CancellationToken))
+        public Task<object> ExecuteAsync(
+            Expression expression,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             if (expression == null)
             {
@@ -115,7 +87,7 @@ namespace WindowsAzure.Table.Queryable
 
             return _cloudTable
                 .ExecuteQueryAsync(query)
-                .Then(entities => (object) entities.Select(p => _converter.GetEntity(p)), cancellationToken);
+                .Then(entities => (object) entities.Select(p => _configuration.EntityConverter.GetEntity(p)), cancellationToken);
         }
 
         /// <summary>
@@ -130,7 +102,9 @@ namespace WindowsAzure.Table.Queryable
                 throw new ArgumentNullException("expression");
             }
 
-            IDictionary<QuerySegment, string> queryResult = _queryTranslator.Translate(expression);
+            var queryTranslator = new QueryTranslator(_configuration.EntityConverter.NameChanges);
+
+            IDictionary<QuerySegment, string> queryResult = queryTranslator.Translate(expression);
 
             var query = new TableQuery();
 
