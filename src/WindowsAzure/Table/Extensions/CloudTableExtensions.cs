@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -172,17 +173,20 @@ namespace WindowsAzure.Table.Extensions
                 .ExecuteQuerySegmentedAsync(tableQuery, continuationToken, cancellationToken)
                 .Then(result =>
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         tableEntities.AddRange(result.Results);
 
-                        TableContinuationToken continuation = result.ContinuationToken;
+                        // Checks whether TakeCount entities has been received
+                        if (tableQuery.TakeCount.HasValue && tableEntities.Count >= tableQuery.TakeCount.Value)
+                        {
+                            return TaskHelpers.FromResult(tableEntities.Take(tableQuery.TakeCount.Value).ToList());
+                        }
 
                         // Checks whether enumeration has been completed
-                        if (continuation != null && tableQuery.TakeCount.HasValue &&
-                            tableQuery.TakeCount.Value < tableEntities.Count)
+                        if (result.ContinuationToken != null)
                         {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            return ExecuteQuerySegmentedImplAsync(cloudTable, tableEntities, tableQuery, continuation, cancellationToken);
+                            return ExecuteQuerySegmentedImplAsync(cloudTable, tableEntities, tableQuery, result.ContinuationToken, cancellationToken);
                         }
 
                         return TaskHelpers.FromResult(tableEntities);

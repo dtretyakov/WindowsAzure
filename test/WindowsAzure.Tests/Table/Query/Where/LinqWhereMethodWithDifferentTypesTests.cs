@@ -105,6 +105,69 @@ namespace WindowsAzure.Tests.Table.Query.Where
         }
 
         [Fact]
+        public void UseCompareToInWhereOnRowKeyTest()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            List<Country> entities = tableSet.Where(p => p.Name.CompareTo("F") >= 0 && p.Name.CompareTo("G") <= 0).ToList();
+
+            // Assert
+            Assert.NotNull(entities);
+            Assert.Equal(entities.Count, 2);
+            Assert.Equal(entities[0].Name, Finland);
+            Assert.Equal(entities[1].Name, France);
+        }
+
+        [Fact]
+        public void UseCompareInWhereOnRowKeyTest()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            List<Country> entities = tableSet.Where(p => String.Compare(p.Name, "F", StringComparison.Ordinal) >= 0 && String.Compare(p.Name, "G", StringComparison.Ordinal) <= 0).ToList();
+
+            // Assert
+            Assert.NotNull(entities);
+            Assert.Equal(entities.Count, 2);
+            Assert.Equal(entities[0].Name, Finland);
+            Assert.Equal(entities[1].Name, France);
+        }
+
+        [Fact]
+        public void UseCompareOrdinalInWhereOnRowKeyTest()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            List<Country> entities = tableSet.Where(p => String.CompareOrdinal(p.Name, "F") >= 0 && String.CompareOrdinal(p.Name, "G") <= 0).ToList();
+
+            // Assert
+            Assert.NotNull(entities);
+            Assert.Equal(entities.Count, 2);
+            Assert.Equal(entities[0].Name, Finland);
+            Assert.Equal(entities[1].Name, France);
+        }
+
+        [Fact]
+        public void UseEnumValueInWhereOnRowKeyTest()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            List<Country> entities = tableSet.Where(p => p.Name == Countries.Germany.ToString()).ToList();
+
+            // Assert
+            Assert.NotNull(entities);
+            Assert.Equal(entities.Count, 1);
+            Assert.Equal(entities[0].Name, Germany);
+        }
+
+        [Fact]
         public void UseWhereOnDoubleTest()
         {
             // Arrange
