@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace WindowsAzure.Table.Queryable.Base
 {
+    /// <summary>
+    ///     Provides base functionality of the query provider interface.
+    /// </summary>
     public abstract class QueryProviderBase : IQueryProvider
     {
         IQueryable<TS> IQueryProvider.CreateQuery<TS>(Expression expression)
@@ -37,6 +40,11 @@ namespace WindowsAzure.Table.Queryable.Base
             return Execute(expression);
         }
 
+        /// <summary>
+        ///     Executes an expression processing.
+        /// </summary>
+        /// <param name="expression">Expression value.</param>
+        /// <returns>Result.</returns>
         public abstract object Execute(Expression expression);
     }
 }

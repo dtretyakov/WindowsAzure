@@ -10,6 +10,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     /// <typeparam name="T">Entity type.</typeparam>
     public sealed class PropertyValueAccessor<T> : ExpressionValueAccesorBase<T>
     {
+        /// <summary>
+        ///     Creates a property value accessor.
+        /// </summary>
+        /// <param name="propertyInfo">Property info.</param>
         public PropertyValueAccessor(PropertyInfo propertyInfo)
         {
             if (propertyInfo == null)

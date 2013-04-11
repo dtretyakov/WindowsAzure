@@ -17,17 +17,20 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         private readonly List<Type> _timestampTypes;
         private IValueAccessor<T> _accessor;
 
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
         public TimestampAccessor()
         {
             _timestampAttributeType = typeof (TimestampAttribute);
 
             _timestampTypes = new List<Type>
-                                  {
-                                      typeof (DateTime),
-                                      typeof (DateTime?),
-                                      typeof (DateTimeOffset),
-                                      typeof (DateTimeOffset?)
-                                  };
+                {
+                    typeof (DateTime),
+                    typeof (DateTime?),
+                    typeof (DateTimeOffset),
+                    typeof (DateTimeOffset?)
+                };
 
             NameChanges = new Dictionary<string, string>();
         }

@@ -17,6 +17,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         private readonly string _memberName;
         private readonly Dictionary<string, string> _nameChanges;
 
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
+        /// <param name="memberInfo">Member info.</param>
+        /// <param name="accessor">Value accessor.</param>
         public RegularProperty(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
             _nameChanges = new Dictionary<string, string>();

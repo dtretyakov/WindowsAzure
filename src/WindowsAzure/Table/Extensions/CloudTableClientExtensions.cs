@@ -8,6 +8,9 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.Extensions
 {
+    /// <summary>
+    ///     Cloud table client extensions.
+    /// </summary>
     public static class CloudTableClientExtensions
     {
         /// <summary>

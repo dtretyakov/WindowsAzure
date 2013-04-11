@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\WindowsAzure.StorageExtensions.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,6 +47,7 @@
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=1.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager.1.8.0.0\lib\net35-full\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\WindowsAzure.Storage.2.0.5.1\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
@@ -58,6 +60,7 @@
     <Reference Include="System.Spatial, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\System.Spatial.5.2.0\lib\net40\System.Spatial.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -98,11 +101,12 @@
     <Compile Include="Table\Attributes\PartitionKeyAttribute.cs" />
     <Compile Include="Table\ITableSet.cs" />
     <Compile Include="Table\Queryable\Expressions\IQueryTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\ConstantEvaluator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\ConstrantSerializer.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\TakeTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SelectTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\IMethodTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\WhereTranslator.cs" />
-    <Compile Include="Table\Queryable\Expressions\Evaluator.cs" />
     <Compile Include="Table\Queryable\IAsyncQueryProvider.cs" />
     <Compile Include="Table\Queryable\QuerySegment.cs" />
     <Compile Include="Table\Queryable\TableQueryProvider.cs" />

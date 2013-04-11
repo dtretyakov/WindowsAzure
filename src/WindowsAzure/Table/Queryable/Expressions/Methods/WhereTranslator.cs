@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Data;
 using System.Linq.Expressions;
 using System.Text;
-using System.Xml;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
@@ -14,6 +13,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     public class WhereTranslator : ExpressionVisitor, IMethodTranslator
     {
         private readonly List<String> _acceptedMethods;
+        private readonly ConstantEvaluator _constantEvaluator;
+        private readonly ConstrantSerializer _constrantSerializer;
 
         /// <summary>
         ///     Collection of supported logical operands.
@@ -32,52 +33,18 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                     {ExpressionType.LessThanOrEqual, QueryComparisons.LessThanOrEqual}
                 };
 
-        /// <summary>
-        ///     Collection of supported constant types.
-        /// </summary>
-        private readonly Dictionary<Type, Func<object, String>> _serialization =
-            new Dictionary<Type, Func<object, String>>
-                {
-                    {typeof (String), o => string.Format("'{0}'", o)},
-                    {
-                        typeof (DateTime), o => string.Format(
-                            "datetime'{0}'",
-                            XmlConvert.ToString((DateTime) o, XmlDateTimeSerializationMode.RoundtripKind))
-                    },
-                    {
-                        typeof (DateTimeOffset), o => string.Format(
-                            "datetime'{0}'",
-                            XmlConvert.ToString(((DateTimeOffset) o).DateTime,
-                                                XmlDateTimeSerializationMode.RoundtripKind))
-                    },
-                    {typeof (Boolean), o => o.ToString().ToLowerInvariant()},
-                    {typeof (Int32), o => string.Format(CultureInfo.InvariantCulture, "{0}", o)},
-                    {typeof (Int64), o => string.Format(CultureInfo.InvariantCulture, "{0}L", o)},
-                    {typeof (Single), o => string.Format(CultureInfo.InvariantCulture, "{0:#.0#}", o)},
-                    {typeof (Double), o => string.Format(CultureInfo.InvariantCulture, "{0:#.0#}", o)},
-                    {typeof (Guid), o => string.Format(CultureInfo.InvariantCulture, "guid'{0}'", o)},
-                    {
-                        typeof (Byte[]), o =>
-                            {
-                                var stringBuilder = new StringBuilder("X'");
-
-                                foreach (byte num in (Byte[]) o)
-                                {
-                                    stringBuilder.AppendFormat("{0:x2}", num);
-                                }
-
-                                stringBuilder.Append("'");
-
-                                return stringBuilder.ToString();
-                            }
-                    }
-                };
 
         private StringBuilder _filter;
         private IDictionary<String, String> _nameMappings;
 
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
         public WhereTranslator()
         {
+            _constantEvaluator = new ConstantEvaluator();
+            _constrantSerializer = new ConstrantSerializer();
+
             _acceptedMethods = new List<string>
                 {
                     "Where",
@@ -88,14 +55,15 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 };
         }
 
+        /// <summary>
+        ///     Gets a query segment name.
+        /// </summary>
         public QuerySegment QuerySegment
         {
             get { return QuerySegment.Filter; }
         }
 
-        public IDictionary<QuerySegment, String> Translate(
-            MethodCallExpression method,
-            IDictionary<string, string> nameChanges)
+        public IDictionary<QuerySegment, String> Translate(MethodCallExpression method, IDictionary<string, string> nameChanges)
         {
             _nameMappings = nameChanges;
 
@@ -131,14 +99,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             return filter;
         }
 
-        private static Expression StripQuotes(Expression e)
+        private static Expression StripQuotes(Expression expression)
         {
-            while (e.NodeType == ExpressionType.Quote)
+            while (expression.NodeType == ExpressionType.Quote)
             {
-                e = ((UnaryExpression) e).Operand;
+                expression = ((UnaryExpression) expression).Operand;
             }
 
-            return e;
+            return expression;
         }
 
         protected override Expression VisitUnary(UnaryExpression unary)
@@ -171,8 +139,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             if (!_logicalOperators.ContainsKey(binary.NodeType))
             {
-                throw new NotSupportedException(
-                    String.Format("The binary operator '{0}' is not supported", binary.NodeType));
+                string message = String.Format("The binary operator '{0}' is not supported", binary.NodeType);
+                throw new NotSupportedException(message);
             }
 
             _filter.AppendFormat(" {0} ", _logicalOperators[binary.NodeType]);
@@ -192,13 +160,13 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             if (binary.Left.NodeType == ExpressionType.Call)
             {
                 var method = (MethodCallExpression) binary.Left;
-                
+
                 switch (method.Method.Name)
                 {
                     case "CompareTo":
                         if (method.Object != null && method.Object.Type == typeof (String))
                         {
-                            Visit(method.Object);
+                            AppendConstrant(_constantEvaluator.Evaluate(method.Object));
                             return;
                         }
                         break;
@@ -207,78 +175,97 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                     case "CompareOrdinal":
                         if (method.Arguments.Count >= 2)
                         {
-                            Visit(method.Arguments[0]);
+                            AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
                             return;
                         }
                         break;
                 }
 
-                throw new InvalidOperationException(String.Format("Unable to call method {0}", method.Method.Name));
+                AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
-            Visit(binary.Left);
+            if (_logicalOperators.ContainsKey(binary.Left.NodeType))
+            {
+                Visit(binary.Left);
+                return;
+            }
+
+            AppendConstrant(_constantEvaluator.Evaluate(binary.Left));
         }
 
         protected virtual void VisitBinaryRight(BinaryExpression binary)
         {
             if (binary.Left.NodeType == ExpressionType.Call)
             {
-                var method = (MethodCallExpression)binary.Left;
+                var method = (MethodCallExpression) binary.Left;
 
                 switch (method.Method.Name)
                 {
                     case "CompareTo":
-                        Visit(method.Arguments[0]);
+                        AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
                         return;
 
                     case "Compare":
                     case "CompareOrdinal":
-                        Visit(method.Arguments[1]);
+                        AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[1]));
                         return;
                 }
 
-                throw new InvalidOperationException(String.Format("Unable to call method {0}", method.Method.Name));
+                AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
-            Visit(binary.Right);
+            if (_logicalOperators.ContainsKey(binary.Right.NodeType))
+            {
+                Visit(binary.Right);
+                return;
+            }
+
+            AppendConstrant(_constantEvaluator.Evaluate(binary.Right));
         }
 
-        protected override Expression VisitConstant(ConstantExpression constant)
+        protected override Expression VisitMember(MemberExpression node)
         {
-            if (constant.Value == null)
-            {
-                _filter.Append("null");
-            }
-            else
-            {
-                Type constantType = constant.Value.GetType();
+            AppendConstrant(node);
 
-                if (!_serialization.ContainsKey(constantType))
-                {
-                    _filter.Append(_serialization[typeof(String)](constant.Value.ToString()));
-                }
-                else
-                {
-                    _filter.Append(_serialization[constantType](constant.Value));
-                }
-            }
-
-            return constant;
+            return base.VisitMember(node);
         }
 
-        protected override Expression VisitMember(MemberExpression member)
+        private void AppendConstrant(Expression node)
         {
-            if (member.Expression != null && member.Expression.NodeType == ExpressionType.Parameter)
+            if (node.NodeType == ExpressionType.MemberAccess)
             {
-                _filter.Append(_nameMappings.ContainsKey(member.Member.Name)
-                                   ? _nameMappings[member.Member.Name]
-                                   : member.Member.Name);
+                var member = (MemberExpression) node;
 
-                return member;
+                if (member.Expression == null || member.Expression.NodeType != ExpressionType.Parameter)
+                {
+                    node = _constantEvaluator.Evaluate(member);
+                }
             }
 
-            throw new NotSupportedException(
-                String.Format("The member '{0}' is not supported", member.Member.Name));
+            if (node.NodeType == ExpressionType.MemberAccess)
+            {
+                var member = (MemberExpression) node;
+
+                if (member.Expression != null && member.Expression.NodeType == ExpressionType.Parameter)
+                {
+                    _filter.Append(_nameMappings.ContainsKey(member.Member.Name)
+                                       ? _nameMappings[member.Member.Name]
+                                       : member.Member.Name);
+
+                    return;
+                }
+
+                string message = String.Format("The member '{0}' is not supported", member.Member.Name);
+                throw new NotSupportedException(message);
+            }
+
+            if (node.NodeType != ExpressionType.Constant)
+            {
+                string message = String.Format("Unable to evaluate expression: {0}", node);
+                throw new InvalidExpressionException(message);
+            }
+
+            _filter.Append(_constrantSerializer.Serialize((ConstantExpression) node));
         }
     }
 }

@@ -6,6 +6,10 @@ using System.Linq.Expressions;
 
 namespace WindowsAzure.Table.Queryable.Base
 {
+    /// <summary>
+    ///     Provides a base implementation of the queryable.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Query<T> : IOrderedQueryable<T>
     {
         private readonly Expression _expression;
@@ -15,6 +19,11 @@ namespace WindowsAzure.Table.Queryable.Base
             _expression = Expression.Constant(this);
         }
 
+        /// <summary>
+        ///     Creates a query.
+        /// </summary>
+        /// <param name="provider">Query provider.</param>
+        /// <param name="expression">Expression.</param>
         public Query(IQueryProvider provider, Expression expression)
         {
             if (provider == null)

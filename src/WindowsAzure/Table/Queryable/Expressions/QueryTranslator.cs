@@ -48,7 +48,6 @@ namespace WindowsAzure.Table.Queryable.Expressions
         public IDictionary<QuerySegment, string> Translate(Expression expression)
         {
             _result = new Dictionary<QuerySegment, string>();
-            expression = Evaluator.PartialEval(expression);
 
             Visit(expression);
 

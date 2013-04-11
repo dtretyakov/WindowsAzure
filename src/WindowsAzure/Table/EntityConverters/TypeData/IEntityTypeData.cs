@@ -3,6 +3,10 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
+    /// <summary>
+    ///     Defines base interface for an entity type data converter.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IEntityTypeData<T>
     {
         /// <summary>

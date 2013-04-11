@@ -17,6 +17,9 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         private readonly Type _stringType;
         private IValueAccessor<T> _accessor;
 
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
         public ETagAccessor()
         {
             _eTagAttributeType = typeof (ETagAttribute);
