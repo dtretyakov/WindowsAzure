@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq.Expressions;
 using WindowsAzure.Table.Queryable.Expressions.Methods;
 using WindowsAzure.Tests.Samples;
@@ -81,6 +83,53 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
         // ReSharper restore ConvertToConstant.Local
 
+        public void ClosureOnVariableWithPropertyTest()
+        {
+            // Arrange
+            var evaluator = new ExpressionEvaluator();
+            var country = new Country {Continent = "abc"};
+            Expression<Func<string>> lambda = () => country.Continent;
+
+            // Act
+            Expression result = evaluator.Evaluate(lambda.Body);
+
+            // Assert
+            Assert.IsType<ConstantExpression>(result);
+            Assert.Equal(((ConstantExpression) result).Value, country.Continent);
+        }
+
+        [Fact]
+        public void ClosureOnVariableWithNotAutoPropertyTest()
+        {
+            // Arrange
+            var evaluator = new ExpressionEvaluator();
+            var user = new User();
+            Expression<Func<byte[]>> lambda = () => user.NotAutoProperty;
+
+            // Act
+            Expression result = evaluator.Evaluate(lambda.Body);
+
+            // Assert
+            Assert.IsType<ConstantExpression>(result);
+            Assert.Equal(((ConstantExpression) result).Value, user.NotAutoProperty);
+        }
+
+        [Fact]
+        public void ClosureOnVariableWithFieldTest()
+        {
+            // Arrange
+            var evaluator = new ExpressionEvaluator();
+            var user = new User {PublicField = 123};
+            Expression<Func<int>> lambda = () => user.PublicField;
+
+            // Act
+            Expression result = evaluator.Evaluate(lambda.Body);
+
+            // Assert
+            Assert.IsType<ConstantExpression>(result);
+            Assert.Equal(((ConstantExpression) result).Value, user.PublicField);
+        }
+
         [Fact]
         public void ClosureOnLocalConstantTest()
         {
@@ -144,6 +193,26 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
         private string GetTestString()
         {
             return "Test string";
+        }
+
+        [Fact(Skip = "Only for performance measurement")]
+        public void MeasureEvaluationTime()
+        {
+            // Arrange
+            var evaluator = new ExpressionEvaluator();
+            var country = new Country {Continent = "abc"};
+            Expression<Func<string>> lambda = () => country.Continent;
+            var stopwatch = new Stopwatch();
+
+            // Act
+            evaluator.Evaluate(lambda.Body);
+            stopwatch.Start();
+            for (int i = 0; i < 60000000; i++)
+            {
+                country.Continent = i.ToString(CultureInfo.InvariantCulture);
+                evaluator.Evaluate(lambda.Body);
+            }
+            stopwatch.Stop();
         }
     }
 }

@@ -9,13 +9,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// </summary>
     public class SelectTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private static readonly List<String> SupportedMethods;
+        private static readonly List<String> SupportedMethods = new List<string> { "Select" };
         private readonly List<String> _columns;
-
-        static SelectTranslator()
-        {
-            SupportedMethods = new List<string> {"Select"};
-        }
 
         /// <summary>
         ///     Constructor.

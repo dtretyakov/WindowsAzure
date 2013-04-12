@@ -29,8 +29,9 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             _properties = new List<IProperty<T>>();
 
             Type entityType = typeof (T);
-            var typeMembers = new List<MemberInfo>(entityType.GetProperties(Flags));
-            typeMembers.AddRange(entityType.GetFields(Flags));
+
+            var typeMembers = new List<MemberInfo>(entityType.GetFields(Flags));
+            typeMembers.AddRange(entityType.GetProperties(Flags).Where(p => p.CanRead && p.CanWrite));
 
             ProcessMembers(typeMembers);
         }
@@ -123,7 +124,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             // At least one key property should be defined
             if (keyProperties.Count(p => p.HasAccessor && (p is PartitionKeyAccessor<T> || p is RowKeyAccessor<T>)) == 0)
             {
-                var message = string.Format(Resources.EntityTypeDataMissingKey, typeof (T));
+                string message = string.Format(Resources.EntityTypeDataMissingKey, typeof (T));
                 throw new ArgumentException(message);
             }
 

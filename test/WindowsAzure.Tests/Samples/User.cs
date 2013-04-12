@@ -25,6 +25,11 @@ namespace WindowsAzure.Tests.Samples
 
         internal Int64 InternalProperty { get; set; }
 
+        public byte[] NotAutoProperty
+        {
+            get { return new byte[] {0x11, 0x22, 0x33}; }
+        }
+
         public string PublicMethod()
         {
             return string.Empty;

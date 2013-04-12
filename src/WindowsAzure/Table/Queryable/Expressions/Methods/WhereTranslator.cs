@@ -13,22 +13,18 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// </summary>
     public class WhereTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private static readonly List<String> SupportedMethods;
+        private static readonly List<String> SupportedMethods = new List<string>
+            {
+                "Where",
+                "First",
+                "FirstOrDefault",
+                "Single",
+                "SingleOrDefault"
+            };
+
         private readonly ExpressionEvaluator _constantEvaluator;
         private StringBuilder _filter;
         private IDictionary<String, String> _nameMappings;
-
-        static WhereTranslator()
-        {
-            SupportedMethods = new List<string>
-                {
-                    "Where",
-                    "First",
-                    "FirstOrDefault",
-                    "Single",
-                    "SingleOrDefault"
-                };
-        }
 
         /// <summary>
         ///     Constructor.
@@ -147,7 +143,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                     case "CompareTo":
                         if (method.Object != null && method.Object.Type == typeof (String))
                         {
-                            AppendConstrant(_constantEvaluator.Evaluate(method.Object));
+                            AppendConstant(_constantEvaluator.Evaluate(method.Object));
                             return;
                         }
                         break;
@@ -156,13 +152,13 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                     case "CompareOrdinal":
                         if (method.Arguments.Count >= 2)
                         {
-                            AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
+                            AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
                             return;
                         }
                         break;
                 }
 
-                AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
+                AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
             if (binary.Left.NodeType.IsSupported())
@@ -171,7 +167,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 return;
             }
 
-            AppendConstrant(_constantEvaluator.Evaluate(binary.Left));
+            AppendConstant(_constantEvaluator.Evaluate(binary.Left));
         }
 
         protected virtual void VisitBinaryRight(BinaryExpression binary)
@@ -183,16 +179,16 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 switch (method.Method.Name)
                 {
                     case "CompareTo":
-                        AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
+                        AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
                         return;
 
                     case "Compare":
                     case "CompareOrdinal":
-                        AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[1]));
+                        AppendConstant(_constantEvaluator.Evaluate(method.Arguments[1]));
                         return;
                 }
 
-                AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
+                AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
             if (binary.Right.NodeType.IsSupported())
@@ -201,17 +197,17 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 return;
             }
 
-            AppendConstrant(_constantEvaluator.Evaluate(binary.Right));
+            AppendConstant(_constantEvaluator.Evaluate(binary.Right));
         }
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            AppendConstrant(node);
+            AppendConstant(node);
 
             return base.VisitMember(node);
         }
 
-        private void AppendConstrant(Expression node)
+        private void AppendConstant(Expression node)
         {
             if (node.NodeType == ExpressionType.MemberAccess)
             {

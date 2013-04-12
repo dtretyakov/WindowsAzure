@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using System.Reflection;
 using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
@@ -10,13 +10,6 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// </summary>
     public sealed class ExpressionEvaluator : ExpressionVisitor
     {
-        private static readonly ConcurrentDictionary<Expression, Func<object>> CachedMembers;
-
-        static ExpressionEvaluator()
-        {
-            CachedMembers = new ConcurrentDictionary<Expression, Func<object>>();
-        }
-
         /// <summary>
         ///     Evaluates an expression.
         /// </summary>
@@ -85,10 +78,28 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             switch (node.Expression.NodeType)
             {
                 case ExpressionType.MemberAccess:
+                    {
+                        object value;
+
+                        if (node.Member.MemberType == MemberTypes.Field)
+                        {
+                            value = GetFieldValue(node);
+                        }
+                        else if (node.Member.MemberType == MemberTypes.Property)
+                        {
+                            value = GetPropertyValue(node);
+                        }
+                        else
+                        {
+                            throw new NotSupportedException(string.Format("Invalid member type: {0}", node.Member.MemberType));
+                        }
+
+                        return Expression.Constant(value, node.Type);
+                    }
+
                 case ExpressionType.Constant:
                     {
-                        Func<object> valueAccessor = CachedMembers.GetOrAdd(node, GetValueAccessor);
-                        return Expression.Constant(valueAccessor(), node.Type);
+                        return Expression.Constant(GetFieldValue(node), node.Type);
                     }
 
                 default:
@@ -98,10 +109,26 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             }
         }
 
-        private static Func<object> GetValueAccessor(Expression node)
+        private object GetFieldValue(MemberExpression node)
         {
-            UnaryExpression objectMember = Expression.Convert(node, typeof (object));
-            return Expression.Lambda<Func<object>>(objectMember).Compile();
+            MemberExpression outerMember = node;
+            var innerField = (FieldInfo) outerMember.Member;
+            var ce = (ConstantExpression) Evaluate(outerMember.Expression);
+            object innerObj = ce.Value;
+            return innerField.GetValue(innerObj);
+        }
+
+        private object GetPropertyValue(MemberExpression node)
+        {
+            MemberExpression outerMember = node;
+            var outerProp = (PropertyInfo) outerMember.Member;
+            var innerMember = (MemberExpression) outerMember.Expression;
+            var innerField = (FieldInfo) innerMember.Member;
+            var ce = (ConstantExpression) Evaluate(innerMember.Expression);
+            object innerObj = ce.Value;
+            object outerObj = innerField.GetValue(innerObj);
+
+            return outerProp.GetValue(outerObj, null);
         }
     }
 }

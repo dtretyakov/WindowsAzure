@@ -9,13 +9,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// </summary>
     public class TakeTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private static readonly List<String> SupportedMethods;
+        private static readonly List<String> SupportedMethods = new List<string> {"Take"};
         private String _takeCount;
-
-        static TakeTranslator()
-        {
-            SupportedMethods = new List<string> {"Take"};
-        }
 
         /// <summary>
         ///     Gets a query segment name.

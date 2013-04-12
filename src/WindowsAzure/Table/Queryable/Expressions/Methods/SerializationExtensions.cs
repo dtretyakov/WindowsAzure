@@ -18,65 +18,58 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         ///     Collection of supported constant types.
         ///     http://www.odata.org/documentation/overview/#6_Primitive_Data_Types
         /// </summary>
-        private static readonly Dictionary<Type, Func<object, String>> Serialization;
+        private static readonly Dictionary<Type, Func<object, String>> Serialization = new Dictionary<Type, Func<object, String>>
+            {
+                {typeof (String), o => string.Format("'{0}'", o)},
+                {typeof (Boolean), o => o.ToString().ToLowerInvariant()},
+                {typeof (Int32), o => string.Format(CultureInfo.InvariantCulture, "{0}", o)},
+                {typeof (Int64), o => string.Format(CultureInfo.InvariantCulture, "{0}L", o)},
+                {typeof (Single), o => string.Format(CultureInfo.InvariantCulture, "{0:#.0#}", o)},
+                {typeof (Double), o => string.Format(CultureInfo.InvariantCulture, "{0:#.0#}", o)},
+                {typeof (Guid), o => string.Format(CultureInfo.InvariantCulture, "guid'{0}'", o)},
+                {
+                    typeof (DateTime), o => string.Format(
+                        "datetime'{0}'",
+                        XmlConvert.ToString((DateTime) o, XmlDateTimeSerializationMode.RoundtripKind))
+                },
+                {
+                    typeof (DateTimeOffset), o => string.Format(
+                        "datetime'{0}'",
+                        XmlConvert.ToString(((DateTimeOffset) o).DateTime, XmlDateTimeSerializationMode.RoundtripKind))
+                },
+                {
+                    typeof (Byte[]), o =>
+                        {
+                            var stringBuilder = new StringBuilder("X'");
+
+                            foreach (byte num in (Byte[]) o)
+                            {
+                                stringBuilder.AppendFormat("{0:x2}", num);
+                            }
+
+                            stringBuilder.Append("'");
+
+                            return stringBuilder.ToString();
+                        }
+                }
+            };
 
         /// <summary>
         ///     Collection of supported logical operands.
         ///     http://www.odata.org/documentation/uri-conventions/#45_Filter_System_Query_Option_filter
         /// </summary>
-        private static readonly Dictionary<ExpressionType, String> LogicalOperators;
-
-        static SerializationExtensions()
-        {
-            LogicalOperators = new Dictionary<ExpressionType, String>
-                {
-                    {ExpressionType.AndAlso, "and"},
-                    {ExpressionType.OrElse, "or"},
-                    {ExpressionType.Not, "not"},
-                    {ExpressionType.Equal, QueryComparisons.Equal},
-                    {ExpressionType.NotEqual, QueryComparisons.NotEqual},
-                    {ExpressionType.GreaterThan, QueryComparisons.GreaterThan},
-                    {ExpressionType.GreaterThanOrEqual, QueryComparisons.GreaterThanOrEqual},
-                    {ExpressionType.LessThan, QueryComparisons.LessThan},
-                    {ExpressionType.LessThanOrEqual, QueryComparisons.LessThanOrEqual}
-                };
-
-            Serialization = new Dictionary<Type, Func<object, String>>
-                {
-                    {typeof (String), o => string.Format("'{0}'", o)},
-                    {typeof (Boolean), o => o.ToString().ToLowerInvariant()},
-                    {typeof (Int32), o => string.Format(CultureInfo.InvariantCulture, "{0}", o)},
-                    {typeof (Int64), o => string.Format(CultureInfo.InvariantCulture, "{0}L", o)},
-                    {typeof (Single), o => string.Format(CultureInfo.InvariantCulture, "{0:#.0#}", o)},
-                    {typeof (Double), o => string.Format(CultureInfo.InvariantCulture, "{0:#.0#}", o)},
-                    {typeof (Guid), o => string.Format(CultureInfo.InvariantCulture, "guid'{0}'", o)},
-                    {
-                        typeof (DateTime), o => string.Format(
-                            "datetime'{0}'",
-                            XmlConvert.ToString((DateTime) o, XmlDateTimeSerializationMode.RoundtripKind))
-                    },
-                    {
-                        typeof (DateTimeOffset), o => string.Format(
-                            "datetime'{0}'",
-                            XmlConvert.ToString(((DateTimeOffset) o).DateTime, XmlDateTimeSerializationMode.RoundtripKind))
-                    },
-                    {
-                        typeof (Byte[]), o =>
-                            {
-                                var stringBuilder = new StringBuilder("X'");
-
-                                foreach (byte num in (Byte[]) o)
-                                {
-                                    stringBuilder.AppendFormat("{0:x2}", num);
-                                }
-
-                                stringBuilder.Append("'");
-
-                                return stringBuilder.ToString();
-                            }
-                    }
-                };
-        }
+        private static readonly Dictionary<ExpressionType, String> LogicalOperators = new Dictionary<ExpressionType, String>
+            {
+                {ExpressionType.AndAlso, "and"},
+                {ExpressionType.OrElse, "or"},
+                {ExpressionType.Not, "not"},
+                {ExpressionType.Equal, QueryComparisons.Equal},
+                {ExpressionType.NotEqual, QueryComparisons.NotEqual},
+                {ExpressionType.GreaterThan, QueryComparisons.GreaterThan},
+                {ExpressionType.GreaterThanOrEqual, QueryComparisons.GreaterThanOrEqual},
+                {ExpressionType.LessThan, QueryComparisons.LessThan},
+                {ExpressionType.LessThanOrEqual, QueryComparisons.LessThanOrEqual}
+            };
 
         /// <summary>
         ///     Serializes constant value.
