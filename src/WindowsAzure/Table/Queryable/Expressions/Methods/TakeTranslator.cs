@@ -9,15 +9,12 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// </summary>
     public class TakeTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private readonly List<String> _acceptedMethods;
+        private static readonly List<String> SupportedMethods;
         private String _takeCount;
 
-        /// <summary>
-        ///     Constructor.
-        /// </summary>
-        public TakeTranslator()
+        static TakeTranslator()
         {
-            _acceptedMethods = new List<string> {"Take"};
+            SupportedMethods = new List<string> {"Take"};
         }
 
         /// <summary>
@@ -40,7 +37,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         public IList<string> AcceptedMethods
         {
-            get { return _acceptedMethods; }
+            get { return SupportedMethods; }
         }
 
         protected override Expression VisitConstant(ConstantExpression node)

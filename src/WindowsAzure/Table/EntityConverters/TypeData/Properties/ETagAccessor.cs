@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
@@ -42,12 +43,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
             if (_accessor != null)
             {
-                throw new ArgumentException("ETag attribute duplication.");
+                throw new ArgumentException(Resources.ETagAttributeDuplicate);
             }
 
             if (accessor.Type != _stringType)
             {
-                throw new ArgumentException("ETag must have a String type.");
+                throw new ArgumentException(Resources.ETagInvalidType);
             }
 
             _accessor = accessor;

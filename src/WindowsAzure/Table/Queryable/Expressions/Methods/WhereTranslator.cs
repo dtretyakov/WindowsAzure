@@ -3,49 +3,24 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
 using System.Text;
-using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
     /// <summary>
     ///     Where expression translator.
+    ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
     public class WhereTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private readonly List<String> _acceptedMethods;
-        private readonly ConstantEvaluator _constantEvaluator;
-        private readonly ConstrantSerializer _constrantSerializer;
-
-        /// <summary>
-        ///     Collection of supported logical operands.
-        /// </summary>
-        private readonly Dictionary<ExpressionType, String> _logicalOperators =
-            new Dictionary<ExpressionType, String>
-                {
-                    {ExpressionType.AndAlso, "and"},
-                    {ExpressionType.OrElse, "or"},
-                    {ExpressionType.Not, "not"},
-                    {ExpressionType.Equal, QueryComparisons.Equal},
-                    {ExpressionType.NotEqual, QueryComparisons.NotEqual},
-                    {ExpressionType.GreaterThan, QueryComparisons.GreaterThan},
-                    {ExpressionType.GreaterThanOrEqual, QueryComparisons.GreaterThanOrEqual},
-                    {ExpressionType.LessThan, QueryComparisons.LessThan},
-                    {ExpressionType.LessThanOrEqual, QueryComparisons.LessThanOrEqual}
-                };
-
-
+        private static readonly List<String> SupportedMethods;
+        private readonly ExpressionEvaluator _constantEvaluator;
         private StringBuilder _filter;
         private IDictionary<String, String> _nameMappings;
 
-        /// <summary>
-        ///     Constructor.
-        /// </summary>
-        public WhereTranslator()
+        static WhereTranslator()
         {
-            _constantEvaluator = new ConstantEvaluator();
-            _constrantSerializer = new ConstrantSerializer();
-
-            _acceptedMethods = new List<string>
+            SupportedMethods = new List<string>
                 {
                     "Where",
                     "First",
@@ -53,6 +28,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                     "Single",
                     "SingleOrDefault"
                 };
+        }
+
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
+        public WhereTranslator()
+        {
+            _constantEvaluator = new ExpressionEvaluator();
         }
 
         /// <summary>
@@ -81,19 +64,19 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         public IList<string> AcceptedMethods
         {
-            get { return _acceptedMethods; }
+            get { return SupportedMethods; }
         }
 
         private static String RemoveParentheses(string filter)
         {
-            if (filter.Length < 2)
+            if (filter == null)
             {
-                throw new ArgumentOutOfRangeException("filter");
+                throw new ArgumentNullException("filter");
             }
 
-            if (filter[0] == '(' && filter[filter.Length - 1] == ')')
+            while (filter.Length > 2 && filter[0] == '(' && filter[filter.Length - 1] == ')')
             {
-                return RemoveParentheses(filter.Substring(1, filter.Length - 2));
+                filter = filter.Substring(1, filter.Length - 2);
             }
 
             return filter;
@@ -111,13 +94,13 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         protected override Expression VisitUnary(UnaryExpression unary)
         {
-            if (!_logicalOperators.ContainsKey(unary.NodeType))
+            if (!unary.NodeType.IsSupported())
             {
-                throw new NotSupportedException(
-                    String.Format("The binary operator '{0}' is not supported", unary.NodeType));
+                string message = String.Format(Resources.WhereTranslatorOperatorNotSupported, unary.NodeType);
+                throw new NotSupportedException(message);
             }
 
-            _filter.AppendFormat(" {0} ", _logicalOperators[unary.NodeType]);
+            _filter.AppendFormat(" {0} ", unary.NodeType.Serialize());
 
             Visit(unary.Operand);
 
@@ -126,9 +109,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         protected override Expression VisitBinary(BinaryExpression binary)
         {
-            bool paranthesesRequired = _logicalOperators.ContainsKey(binary.NodeType) &&
-                                       (_logicalOperators.ContainsKey(binary.Left.NodeType) ||
-                                        _logicalOperators.ContainsKey(binary.Right.NodeType));
+            bool paranthesesRequired = binary.NodeType.IsSupported() && (binary.Left.NodeType.IsSupported() || binary.Right.NodeType.IsSupported());
 
             if (paranthesesRequired)
             {
@@ -137,13 +118,13 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             VisitBinaryLeft(binary);
 
-            if (!_logicalOperators.ContainsKey(binary.NodeType))
+            if (!binary.NodeType.IsSupported())
             {
-                string message = String.Format("The binary operator '{0}' is not supported", binary.NodeType);
+                string message = String.Format(Resources.WhereTranslatorOperatorNotSupported, binary.NodeType);
                 throw new NotSupportedException(message);
             }
 
-            _filter.AppendFormat(" {0} ", _logicalOperators[binary.NodeType]);
+            _filter.AppendFormat(" {0} ", binary.NodeType.Serialize());
 
             VisitBinaryRight(binary);
 
@@ -184,7 +165,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
-            if (_logicalOperators.ContainsKey(binary.Left.NodeType))
+            if (binary.Left.NodeType.IsSupported())
             {
                 Visit(binary.Left);
                 return;
@@ -214,7 +195,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 AppendConstrant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
-            if (_logicalOperators.ContainsKey(binary.Right.NodeType))
+            if (binary.Right.NodeType.IsSupported())
             {
                 Visit(binary.Right);
                 return;
@@ -255,17 +236,18 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                     return;
                 }
 
-                string message = String.Format("The member '{0}' is not supported", member.Member.Name);
+                string message = String.Format(Resources.WhereTranslatorMemberNotSupported, member.Member.Name);
                 throw new NotSupportedException(message);
             }
 
             if (node.NodeType != ExpressionType.Constant)
             {
-                string message = String.Format("Unable to evaluate expression: {0}", node);
+                string message = String.Format(Resources.WhereTranslatorUnableToEvaluateExpression, node);
                 throw new InvalidExpressionException(message);
             }
 
-            _filter.Append(_constrantSerializer.Serialize((ConstantExpression) node));
+            var constant = (ConstantExpression) node;
+            _filter.Append(constant.Serialize());
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
@@ -49,12 +50,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
             if (_accessor != null)
             {
-                throw new ArgumentException("Timestamp attribute duplication.");
+                throw new ArgumentException(Resources.TimestampAttributeDuplicate);
             }
 
             if (!_timestampTypes.Contains(accessor.Type))
             {
-                throw new ArgumentException("Timestamp should be a DateTimeOffset type.");
+                throw new ArgumentException(Resources.TimestampInvalidType);
             }
 
             _accessor = accessor;

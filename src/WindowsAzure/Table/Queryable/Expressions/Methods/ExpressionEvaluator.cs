@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
     /// <summary>
     ///     Performs evaluation of the LINQ Expression.
     /// </summary>
-    public sealed class ConstantEvaluator : ExpressionVisitor
+    public sealed class ExpressionEvaluator : ExpressionVisitor
     {
         private static readonly ConcurrentDictionary<Expression, Func<object>> CachedMembers;
 
-        static ConstantEvaluator()
+        static ExpressionEvaluator()
         {
             CachedMembers = new ConcurrentDictionary<Expression, Func<object>>();
         }
 
         /// <summary>
-        ///     Evaluates expression.
+        ///     Evaluates an expression.
         /// </summary>
         /// <param name="expression">Source expression.</param>
         /// <returns>Evaluated expression.</returns>
@@ -32,7 +33,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             for (int i = 0; i < node.Arguments.Count; i++)
             {
-                var result = (ConstantExpression) Visit(node.Arguments[i]);
+                var result = (ConstantExpression) Evaluate(node.Arguments[i]);
                 arguments[i] = result.Value;
             }
 
@@ -43,7 +44,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         {
             if (node.Type != typeof (Byte[]))
             {
-                string message = String.Format("Type {0} is not supported.", node.Type);
+                String message = String.Format(Resources.ExpressionEvaluatorTypeNotSupported, node.Type);
                 throw new NotSupportedException(message);
             }
 
@@ -51,7 +52,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             for (int i = 0; i < node.Expressions.Count; i++)
             {
-                var result = (ConstantExpression) Visit(node.Expressions[i]);
+                var result = (ConstantExpression) Evaluate(node.Expressions[i]);
                 array[i] = (Byte) result.Value;
             }
 
@@ -64,11 +65,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             for (int i = 0; i < node.Arguments.Count; i++)
             {
-                var result = (ConstantExpression) Visit(node.Arguments[i]);
+                var result = (ConstantExpression) Evaluate(node.Arguments[i]);
                 arguments[i] = result.Value;
             }
 
-            return Expression.Constant(node.Method.Invoke(node.Object, arguments), node.Type);
+            var constantObject = (ConstantExpression) Evaluate(node.Object);
+            object value = node.Method.Invoke(constantObject.Value, arguments);
+
+            return Expression.Constant(value, node.Type);
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -83,18 +87,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 case ExpressionType.MemberAccess:
                 case ExpressionType.Constant:
                     {
-                        Func<object> accessor = CachedMembers.GetOrAdd(node.Expression, () =>
-                            {
-                                UnaryExpression objectMember = Expression.Convert(node, typeof (object));
-
-                                Expression<Func<object>> getterLambda = Expression.Lambda<Func<object>>(objectMember);
-
-                                Func<object> getter = getterLambda.Compile();
-
-                                return getter();
-                            });
-
-                        return Expression.Constant(accessor(), node.Type);
+                        Func<object> valueAccessor = CachedMembers.GetOrAdd(node, GetValueAccessor);
+                        return Expression.Constant(valueAccessor(), node.Type);
                     }
 
                 default:
@@ -102,6 +96,12 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                         return base.VisitMember(node);
                     }
             }
+        }
+
+        private static Func<object> GetValueAccessor(Expression node)
+        {
+            UnaryExpression objectMember = Expression.Convert(node, typeof (object));
+            return Expression.Lambda<Func<object>>(objectMember).Compile();
         }
     }
 }

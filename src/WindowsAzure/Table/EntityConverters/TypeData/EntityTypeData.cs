@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
@@ -122,8 +123,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             // At least one key property should be defined
             if (keyProperties.Count(p => p.HasAccessor && (p is PartitionKeyAccessor<T> || p is RowKeyAccessor<T>)) == 0)
             {
-                throw new ArgumentException(
-                    string.Format("PartitionKey or RowKey attribute should be defined for type '{0}'.", typeof (T)));
+                var message = string.Format(Resources.EntityTypeDataMissingKey, typeof (T));
+                throw new ArgumentException(message);
             }
 
             // Merge properties

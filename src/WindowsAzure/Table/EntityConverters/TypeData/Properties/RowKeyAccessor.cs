@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
@@ -43,12 +44,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
             if (_accessor != null)
             {
-                throw new ArgumentException("RowKey attribute duplication.");
+                throw new ArgumentException(Resources.RowKeyAttributeDuplicate);
             }
 
             if (accessor.Type != _stringType)
             {
-                throw new ArgumentException("RowKey must have a string type.");
+                throw new ArgumentException(Resources.RowKeyInvalidType);
             }
 
             _accessor = accessor;

@@ -12,7 +12,7 @@ using WindowsAzure.Table.Queryable.Expressions;
 namespace WindowsAzure.Table.Queryable
 {
     /// <summary>
-    ///     Windows Azure Table Linq query provider.
+    ///     LINQ to Windows Azure Storage Table query provider.
     ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
@@ -57,13 +57,6 @@ namespace WindowsAzure.Table.Queryable
             TableQuery query = GetTableQuery(expression);
 
             IEnumerable<DynamicTableEntity> entities = _cloudTable.ExecuteQuery(query);
-
-            // NOTE: Waiting for fixing
-            // https://github.com/WindowsAzure/azure-sdk-for-net/issues/144
-            if (query.TakeCount.HasValue)
-            {
-                entities = entities.Take(query.TakeCount.Value);
-            }
 
             return entities.Select(p => _configuration.EntityConverter.GetEntity(p));
         }

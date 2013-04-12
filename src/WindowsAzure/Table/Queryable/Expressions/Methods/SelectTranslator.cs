@@ -9,15 +9,19 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// </summary>
     public class SelectTranslator : ExpressionVisitor, IMethodTranslator
     {
-        private readonly List<String> _acceptedMethods;
+        private static readonly List<String> SupportedMethods;
         private readonly List<String> _columns;
+
+        static SelectTranslator()
+        {
+            SupportedMethods = new List<string> {"Select"};
+        }
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         public SelectTranslator()
         {
-            _acceptedMethods = new List<string> {"Select"};
             _columns = new List<string>();
         }
 
@@ -41,7 +45,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         public IList<string> AcceptedMethods
         {
-            get { return _acceptedMethods; }
+            get { return SupportedMethods; }
         }
 
         protected override Expression VisitMember(MemberExpression member)

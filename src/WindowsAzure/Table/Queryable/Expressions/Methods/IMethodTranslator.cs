@@ -20,8 +20,6 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         /// <param name="method">Expression method.</param>
         /// <param name="nameChanges">Property name changes.</param>
         /// <returns>Result.</returns>
-        IDictionary<QuerySegment, String> Translate(
-            MethodCallExpression method,
-            IDictionary<String, String> nameChanges);
+        IDictionary<QuerySegment, String> Translate(MethodCallExpression method, IDictionary<String, String> nameChanges);
     }
 }

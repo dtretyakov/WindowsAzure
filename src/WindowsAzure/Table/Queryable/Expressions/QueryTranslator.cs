@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using WindowsAzure.Properties;
 using WindowsAzure.Table.Queryable.Expressions.Methods;
 
 namespace WindowsAzure.Table.Queryable.Expressions
@@ -66,8 +67,8 @@ namespace WindowsAzure.Table.Queryable.Expressions
 
                 if (translator == null)
                 {
-                    throw new NotSupportedException(
-                        string.Format("The method '{0}' is not supported", methodName));
+                    string message = String.Format(Resources.QueryTranslatorMethodNotSupported, methodName);
+                    throw new NotSupportedException(message);
                 }
 
                 // Merge translation results

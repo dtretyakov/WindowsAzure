@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
 {
@@ -66,9 +67,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
                 typeof(EntityPropertyFactory).GetMethod("Create", new[] { Type }),
                 MemberExpression);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new ArgumentException(string.Format("Invalid entity member type: {0}", Type));
+                var message = String.Format(Resources.ExpressionValueAccessorInvalidMemberType, Type);
+                throw new ArgumentException(message, e);
             }
 
             Expression entityPropertyValue;

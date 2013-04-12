@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
 {
@@ -26,7 +27,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
                 return new PropertyValueAccessor<T>((PropertyInfo) memberInfo);
             }
 
-            throw new NotSupportedException(string.Format("Member type '{0}' does not supported.", memberInfo.MemberType));
+            var message = string.Format(Resources.ValueAccessorFactoryNotSupportedType, memberInfo.MemberType);
+            throw new NotSupportedException(message);
         }
     }
 }
