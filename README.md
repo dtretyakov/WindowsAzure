@@ -68,7 +68,7 @@ cd ./WindowsAzure
 To install library by using [Nuget package](https://nuget.org/packages/WindowsAzure.StorageExtensions/) manager execute next command:
 
 ```
-Install-Package WindowsAzure.StorageExtensions -Pre
+Install-Package WindowsAzure.StorageExtensions
 ```
 
 ## Dependencies
