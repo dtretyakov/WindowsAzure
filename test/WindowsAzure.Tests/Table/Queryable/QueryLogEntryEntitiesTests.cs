@@ -5,7 +5,7 @@ using WindowsAzure.Table.Extensions;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Query
+namespace WindowsAzure.Tests.Table.Queryable
 {
     public sealed class QueryLogEntryEntitiesTests : LogEntryTableSetBase
     {
