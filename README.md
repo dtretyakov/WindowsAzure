@@ -133,3 +133,5 @@ var query = countryTable.Where(
 var resultsSync = query.ToList();
 var resultsAsync = await query.ToListAsync();
 ```
+## Sponsors
+* [JetBrains](http://www.jetbrains.com/) (ReSharper)
