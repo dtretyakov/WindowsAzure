@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Windows Azure Storage Extensions")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Windows Azure Storage Extensions is a .NET library aimed for managing and querying entities from Windows Azure Storage.\nIt's built on top of Windows Azure Storage Client Library 2.0, provides LINQ to Azure Tables queries and async interfaces.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Dmitry Tretyakov")]
 [assembly: AssemblyProduct("Windows Azure Storage Extensions")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
@@ -32,6 +32,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.7.0.0")]
-[assembly: AssemblyFileVersion("0.7.0.0")]
+[assembly: AssemblyVersion("0.7.1")]
+[assembly: AssemblyFileVersion("0.7.1")]
+[assembly: AssemblyInformationalVersion("0.7.1")]
 [assembly: InternalsVisibleTo("WindowsAzure.StorageExtensions.Tests")]
