@@ -132,7 +132,25 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             return binary;
         }
 
-        protected virtual void VisitBinaryLeft(BinaryExpression binary)
+        private void AppendBinaryPart(Expression expression)
+        {
+            if (expression.NodeType == ExpressionType.Invoke)
+            {
+                var invocation = (InvocationExpression) expression;
+                Visit(invocation.Expression);
+                return;
+            }
+
+            if (expression.NodeType.IsSupported())
+            {
+                Visit(expression);
+                return;
+            }
+
+            AppendConstant(_constantEvaluator.Evaluate(expression));
+        }
+
+        private void VisitBinaryLeft(BinaryExpression binary)
         {
             if (binary.Left.NodeType == ExpressionType.Call)
             {
@@ -161,16 +179,10 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
-            if (binary.Left.NodeType.IsSupported())
-            {
-                Visit(binary.Left);
-                return;
-            }
-
-            AppendConstant(_constantEvaluator.Evaluate(binary.Left));
+            AppendBinaryPart(binary.Left);
         }
 
-        protected virtual void VisitBinaryRight(BinaryExpression binary)
+        private void VisitBinaryRight(BinaryExpression binary)
         {
             if (binary.Left.NodeType == ExpressionType.Call)
             {
@@ -191,13 +203,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
             }
 
-            if (binary.Right.NodeType.IsSupported())
-            {
-                Visit(binary.Right);
-                return;
-            }
-
-            AppendConstant(_constantEvaluator.Evaluate(binary.Right));
+            AppendBinaryPart(binary.Right);
         }
 
         protected override Expression VisitMember(MemberExpression node)

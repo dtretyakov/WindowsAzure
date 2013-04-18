@@ -90,6 +90,7 @@
     <Compile Include="Table\Extensions\AsyncQueryExtensionsTests.cs" />
     <Compile Include="Table\Queryable\Expressions\SerializationExtensionsTests.cs" />
     <Compile Include="Table\Queryable\Expressions\ConstrantEvaluatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\QueryTranslatorTests.cs" />
     <Compile Include="Table\Queryable\QueryLogEntryEntitiesTests.cs" />
     <Compile Include="Table\Queryable\Methods\Take\LinqTakeMethodTests.cs" />
     <Compile Include="Table\Queryable\Methods\Where\LinqWhereMethodWithDifferentTypesTests.cs" />
