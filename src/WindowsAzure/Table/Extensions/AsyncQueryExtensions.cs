@@ -36,6 +36,30 @@ namespace WindowsAzure.Table.Extensions
         }
 
         /// <summary>
+        ///     Executes a query ToList method asynchronously.
+        /// </summary>
+        /// <typeparam name="T">The entity type of the query.</typeparam>
+        /// <param name="source">Query.</param>
+        /// <param name="predicate">Predicate.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>List of entities.</returns>
+        public static Task<List<T>> ToListAsync<T>(
+            this IQueryable<T> source,
+            Expression<Func<T, bool>> predicate,
+            CancellationToken cancellationToken = default (CancellationToken))
+        {
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
+
+            if (tableQueryProvider == null)
+            {
+                return TaskHelpers.FromResult(source.ToList());
+            }
+
+            return tableQueryProvider.ExecuteAsync(predicate, cancellationToken)
+                                     .Then(result => ((IEnumerable<T>)result).ToList(), cancellationToken);
+        }
+
+        /// <summary>
         ///     Executes a query Take method asynchronously.
         /// </summary>
         /// <typeparam name="T">The entity type of the query.</typeparam>

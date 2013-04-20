@@ -15,6 +15,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         private const string Spain = "Spain";
         private const string Finland = "Finland";
         private const string France = "France";
+        private const string Europe = "Europe";
 
         public AsyncQueryExtensionsTests()
         {
@@ -23,7 +24,7 @@ namespace WindowsAzure.Tests.Table.Extensions
                 new Country
                     {
                         Area = 357021,
-                        Continent = "Europe",
+                        Continent = Europe,
                         TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
                         Formed = new DateTime(1871, 1, 18),
                         Id = Guid.NewGuid(),
@@ -36,7 +37,7 @@ namespace WindowsAzure.Tests.Table.Extensions
                 new Country
                     {
                         Area = 505992,
-                        Continent = "Europe",
+                        Continent = Europe,
                         TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
                         Formed = new DateTime(1812, 1, 1),
                         Id = Guid.NewGuid(),
@@ -49,7 +50,7 @@ namespace WindowsAzure.Tests.Table.Extensions
                 new Country
                     {
                         Area = 674843,
-                        Continent = "Europe",
+                        Continent = Europe,
                         TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
                         Formed = new DateTime(1792, 1, 1),
                         Id = Guid.NewGuid(),
@@ -62,7 +63,7 @@ namespace WindowsAzure.Tests.Table.Extensions
                 new Country
                     {
                         Area = 338424,
-                        Continent = "Europe",
+                        Continent = Europe,
                         TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
                         Formed = new DateTime(1809, 3, 29),
                         Id = Guid.NewGuid(),
@@ -74,7 +75,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithToListAsyncTest()
+        public async Task ToListAsync()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -94,7 +95,27 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithTakeAsyncTest()
+        public async Task ToListAsyncWithPredicate()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            List<Country> entities = await tableSet.ToListAsync(p => p.Continent == Europe);
+
+            // Assert
+            Assert.NotNull(entities);
+            Assert.Equal(entities.Count, 4);
+
+            List<string> names = entities.Select(p => p.Name).ToList();
+            Assert.Contains(Germany, names);
+            Assert.Contains(Spain, names);
+            Assert.Contains(France, names);
+            Assert.Contains(Finland, names);
+        }
+
+        [Fact]
+        public async Task TakeAsync()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -109,7 +130,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithFirstAsyncTest()
+        public async Task FirstAsync()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -123,7 +144,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithFirstAsyncAndPredicateTest()
+        public async Task FirstAsyncWithPredicate()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -137,7 +158,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithFirstOrDefaultAsyncTest()
+        public async Task FirstOrDefaultAsync()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -151,7 +172,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithFirstOrDefaultAsyncAndPredicateTest()
+        public async Task FirstOrDefaultAsyncWithPredicate()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -165,7 +186,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithFirstOrDefaultAsyncAndPredicateWithInvalidNameTest()
+        public async Task FirstOrDefaultAsyncWithPredicateWithoutResult()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -178,7 +199,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithSingleAsyncTest()
+        public async Task SingleAsync()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -192,7 +213,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithSingleAsyncWithMultipleResultsTest()
+        public async Task SingleAsyncWithMultipleResults()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -214,7 +235,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithSingleAsyncAndPredicateTest()
+        public async Task SingleAsyncWithPredicate()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -228,7 +249,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithSingleOrDefaultAsyncTest()
+        public async Task SingleOrDefaultAsync()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -242,7 +263,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithSingleOrDefaultAsyncWithMultipleResultsTest()
+        public async Task SingleOrDefaultAsyncWithMultipleResults()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -257,14 +278,14 @@ namespace WindowsAzure.Tests.Table.Extensions
             {
                 exception = e;
             }
-            
+
             // Assert
             Assert.NotNull(exception);
             Assert.IsType<InvalidOperationException>(exception);
         }
 
         [Fact]
-        public async Task RetreiveWithSingleOrDefaultAsyncAndPredicateTest()
+        public async Task SingleOrDefaultAsyncWithPredicate()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
@@ -278,7 +299,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         [Fact]
-        public async Task RetreiveWithSingleOrDefaultAsyncAndPredicateWithInvalidNameTest()
+        public async Task SingleOrDefaultAsyncWithPredicateWithoutResult()
         {
             // Arrange
             TableSet<Country> tableSet = GetTableSet();
