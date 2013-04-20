@@ -13,46 +13,46 @@ namespace WindowsAzure.Table.Queryable.Expressions
     public class QueryTranslator : ExpressionVisitor, IQueryTranslator
     {
         private readonly IList<IMethodTranslator> _methodTranslators;
-        private readonly IDictionary<string, string> _nameChanges;
-        private Dictionary<QuerySegment, string> _result;
+        private ITranslationResult _result;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        /// <param name="nameChanges">Entity name mappings.</param>
-        public QueryTranslator(IDictionary<String, String> nameChanges)
-            : this(nameChanges, new List<IMethodTranslator>
-                {
-                    new SelectTranslator(),
-                    new TakeTranslator(),
-                    new WhereTranslator()
-                })
+        public QueryTranslator(IDictionary<string, string> nameChanges)
+            : this(GetTranslators(nameChanges))
         {
         }
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        /// <param name="nameChanges">Entity name mappings.</param>
         /// <param name="methodTranslators">LINQ Expression methods translators.</param>
-        public QueryTranslator(IDictionary<String, String> nameChanges, IList<IMethodTranslator> methodTranslators)
+        public QueryTranslator(IList<IMethodTranslator> methodTranslators)
         {
-            _nameChanges = nameChanges;
             _methodTranslators = methodTranslators;
         }
 
         /// <summary>
-        ///     Translates an LINQ expression into collection of query segments.
+        ///     Translates a LINQ expression into collection of query segments.
         /// </summary>
+        /// <param name="result">Translation result.</param>
         /// <param name="expression">LINQ expression.</param>
         /// <returns>Collection of query segments.</returns>
-        public IDictionary<QuerySegment, string> Translate(Expression expression)
+        public void Translate(ITranslationResult result, Expression expression)
         {
-            _result = new Dictionary<QuerySegment, string>();
+            _result = result;
 
             Visit(expression);
+        }
 
-            return _result;
+        private static IList<IMethodTranslator> GetTranslators(IDictionary<string, string> nameChanges)
+        {
+            return new List<IMethodTranslator>
+                {
+                    new ODataFilterTranslator(nameChanges),
+                    new ODataSelectTranslator(nameChanges),
+                    new ODataTopTranslator()
+                };
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression methodCall)
@@ -71,16 +71,12 @@ namespace WindowsAzure.Table.Queryable.Expressions
                     throw new NotSupportedException(message);
                 }
 
-                // Merge translation results
-                foreach (var result in translator.Translate(methodCall, _nameChanges))
-                {
-                    _result.Add(result.Key, result.Value);
-                }
+                translator.Translate(_result, methodCall);
 
                 Visit(methodCall.Arguments[0]);
             }
 
-            return methodCall;
+            return base.VisitMethodCall(methodCall);
         }
     }
 }

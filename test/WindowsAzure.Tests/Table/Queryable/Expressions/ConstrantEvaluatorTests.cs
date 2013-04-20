@@ -14,7 +14,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
         // ReSharper disable ConvertToConstant.Local
 
         [Fact]
-        public void ClosureOnLocalVariableTest()
+        public void ClosureOnLocalVariable()
         {
             // Arrange
             string value = "String value";
@@ -26,11 +26,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, value);
+            Assert.Equal(value, ((ConstantExpression) result).Value);
         }
 
         [Fact]
-        public void ClosureOnSubstringOfLocalVariableTest()
+        public void ClosureOnSubstringOfLocalVariable()
         {
             // Arrange
             string value = "String value";
@@ -43,11 +43,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, value.Substring(substringIndex));
+            Assert.Equal(value.Substring(substringIndex), ((ConstantExpression) result).Value);
         }
 
         [Fact]
-        public void ClosureOnEnumValueTest()
+        public void ClosureOnEnumValue()
         {
             // Arrange
             var country = Countries.Finland;
@@ -59,11 +59,26 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, country.ToString());
+            Assert.Equal(country.ToString(), ((ConstantExpression) result).Value);
         }
 
         [Fact]
-        public void ClosureOnLocalVariableTwiceTest()
+        public void ClosureOnClassConstant()
+        {
+            // Arrange
+            var evaluator = new ExpressionEvaluator();
+            Expression<Func<string>> lambda = () => string.Empty;
+
+            // Act
+            Expression result = evaluator.Evaluate(lambda.Body);
+
+            // Assert
+            Assert.IsType<ConstantExpression>(result);
+            Assert.Equal(string.Empty, ((ConstantExpression) result).Value);
+        }
+
+        [Fact]
+        public void ClosureOnLocalVariableTwice()
         {
             // Arrange
             string value = "String value";
@@ -77,13 +92,13 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
             // Assert
             Assert.IsType<ConstantExpression>(result1);
             Assert.IsType<ConstantExpression>(result2);
-            Assert.Equal(((ConstantExpression) result1).Value, value);
-            Assert.Equal(((ConstantExpression) result2).Value, value);
+            Assert.Equal(value, ((ConstantExpression) result1).Value);
+            Assert.Equal(value, ((ConstantExpression) result2).Value);
         }
 
         // ReSharper restore ConvertToConstant.Local
 
-        public void ClosureOnVariableWithPropertyTest()
+        public void ClosureOnVariableWithProperty()
         {
             // Arrange
             var evaluator = new ExpressionEvaluator();
@@ -95,15 +110,15 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, country.Continent);
+            Assert.Equal(country.Continent, ((ConstantExpression) result).Value);
         }
 
         [Fact]
-        public void ClosureOnVariableWithNotAutoPropertyTest()
+        public void ClosureOnVariableWithNotAutoProperty()
         {
             // Arrange
             var evaluator = new ExpressionEvaluator();
-            var user = new User();
+            var user = new Entity();
             Expression<Func<byte[]>> lambda = () => user.NotAutoProperty;
 
             // Act
@@ -111,15 +126,15 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, user.NotAutoProperty);
+            Assert.Equal(user.NotAutoProperty, ((ConstantExpression) result).Value);
         }
 
         [Fact]
-        public void ClosureOnVariableWithFieldTest()
+        public void ClosureOnVariableWithField()
         {
             // Arrange
             var evaluator = new ExpressionEvaluator();
-            var user = new User {PublicField = 123};
+            var user = new Entity {PublicField = 123};
             Expression<Func<int>> lambda = () => user.PublicField;
 
             // Act
@@ -127,11 +142,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, user.PublicField);
+            Assert.Equal(user.PublicField, ((ConstantExpression) result).Value);
         }
 
         [Fact]
-        public void ClosureOnLocalConstantTest()
+        public void ClosureOnLocalConstant()
         {
             // Arrange
             const long value = 0xfefefe;
@@ -143,11 +158,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, value);
+            Assert.Equal(value, ((ConstantExpression) result).Value);
         }
 
         [Fact]
-        public void ClosureOnForeachLoopValueTest()
+        public void ClosureOnForeachLoopValue()
         {
             // Arrange
             var evaluator = new ExpressionEvaluator();
@@ -158,7 +173,6 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
             // ReSharper disable AccessToForEachVariableInClosure
             // ReSharper disable LoopCanBeConvertedToQuery
             foreach (byte value in data)
-
             {
                 Expression<Func<byte>> lambda = () => value;
                 var result = (ConstantExpression) evaluator.Evaluate(lambda.Body);
@@ -168,7 +182,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
             // ReSharper restore AccessToForEachVariableInClosure
 
             // Assert
-            Assert.Equal(values.Count, data.Length);
+            Assert.Equal(data.Length, values.Count);
             foreach (byte value in data)
             {
                 Assert.Contains(value, values);
@@ -176,7 +190,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
         }
 
         [Fact]
-        public void ClosureOnFunctionValueTest()
+        public void ClosureOnFunctionValue()
         {
             // Arrange
             var evaluator = new ExpressionEvaluator();
@@ -187,7 +201,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
 
             // Assert
             Assert.IsType<ConstantExpression>(result);
-            Assert.Equal(((ConstantExpression) result).Value, GetTestString());
+            Assert.Equal(GetTestString(), ((ConstantExpression) result).Value);
         }
 
         private string GetTestString()

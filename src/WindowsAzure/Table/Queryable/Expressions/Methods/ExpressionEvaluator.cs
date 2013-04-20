@@ -72,29 +72,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         {
             if (node.Expression == null)
             {
-                return base.VisitMember(node);
+                return GetMemberConstant(node);
             }
 
             switch (node.Expression.NodeType)
             {
                 case ExpressionType.MemberAccess:
                     {
-                        object value;
-
-                        if (node.Member.MemberType == MemberTypes.Field)
-                        {
-                            value = GetFieldValue(node);
-                        }
-                        else if (node.Member.MemberType == MemberTypes.Property)
-                        {
-                            value = GetPropertyValue(node);
-                        }
-                        else
-                        {
-                            throw new NotSupportedException(string.Format("Invalid member type: {0}", node.Member.MemberType));
-                        }
-
-                        return Expression.Constant(value, node.Type);
+                        return GetMemberConstant(node);
                     }
 
                 case ExpressionType.Constant:
@@ -109,20 +94,44 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             }
         }
 
+        private ConstantExpression GetMemberConstant(MemberExpression node)
+        {
+            object value;
+
+            if (node.Member.MemberType == MemberTypes.Field)
+            {
+                value = GetFieldValue(node);
+            }
+            else if (node.Member.MemberType == MemberTypes.Property)
+            {
+                value = GetPropertyValue(node);
+            }
+            else
+            {
+                throw new NotSupportedException(string.Format("Invalid member type: {0}", node.Member.MemberType));
+            }
+
+            return Expression.Constant(value, node.Type);
+        }
+
         private object GetFieldValue(MemberExpression node)
         {
-            MemberExpression outerMember = node;
-            var innerField = (FieldInfo) outerMember.Member;
-            var ce = (ConstantExpression) Evaluate(outerMember.Expression);
-            object innerObj = ce.Value;
+            var innerField = (FieldInfo) node.Member;
+            object innerObj = null;
+
+            if (node.Expression != null)
+            {
+                var ce = (ConstantExpression) Evaluate(node.Expression);
+                innerObj = ce.Value;
+            }
+
             return innerField.GetValue(innerObj);
         }
 
         private object GetPropertyValue(MemberExpression node)
         {
-            MemberExpression outerMember = node;
-            var outerProp = (PropertyInfo) outerMember.Member;
-            var innerMember = (MemberExpression) outerMember.Expression;
+            var outerProp = (PropertyInfo) node.Member;
+            var innerMember = (MemberExpression) node.Expression;
             var innerField = (FieldInfo) innerMember.Member;
             var ce = (ConstantExpression) Evaluate(innerMember.Expression);
             object innerObj = ce.Value;

@@ -1,18 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace WindowsAzure.Table.Queryable.Expressions
 {
     /// <summary>
-    ///     Declares interface of LINQ Exression translator.
+    ///     Defines interface of LINQ Exression translator.
     /// </summary>
     public interface IQueryTranslator
     {
         /// <summary>
         ///     Translates an expression into collection of query segments.
         /// </summary>
+        /// <param name="result">Translaion result.</param>
         /// <param name="expression">Expression.</param>
-        /// <returns>Collection of query segments.</returns>
-        IDictionary<QuerySegment, string> Translate(Expression expression);
+        /// <returns>Table query.</returns>
+        void Translate(ITranslationResult result, Expression expression);
     }
 }

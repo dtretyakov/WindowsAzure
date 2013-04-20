@@ -121,5 +121,155 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Finland, results.Select(p => p.Name));
             Assert.Contains(Spain, results.Select(p => p.Name));
         }
+
+        [Fact]
+        public void QueryWithSelectClause()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var query = from country in tableSet
+                        where country.Area > 400000
+                        select new {country.Continent, country.Name};
+
+            var values = query.ToList();
+
+            // Assert
+            Assert.Equal(values.Count, 2);
+            Assert.Contains(France, values.Select(p => p.Name));
+            Assert.Contains(Spain, values.Select(p => p.Name));
+        }
+
+        [Fact]
+        public async Task QueryWithSelectClauseAsync()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var query = from country in tableSet
+                        where country.Area > 400000
+                        select new { country.Continent, country.Name };
+
+            var values = await query.ToListAsync();
+
+            // Assert
+            Assert.Equal(values.Count, 2);
+            Assert.Contains(France, values.Select(p => p.Name));
+            Assert.Contains(Spain, values.Select(p => p.Name));
+        }
+
+        [Fact]
+        public void QueryWithFirstClause()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var result = tableSet.First(p => p.Name == Finland);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(Finland, result.Name);
+        }
+
+        [Fact]
+        public void QueryWithFirstClauseWithoutResult()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+            Country result = null;
+
+            // Act
+            Assert.Throws<InvalidOperationException>(() =>
+                {
+                    result = tableSet.First(p => p.Name == string.Empty);
+                });
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void QueryWithFirstOrDefaultClause()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var result = tableSet.FirstOrDefault(p => p.Name == Finland);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(Finland, result.Name);
+        }
+
+        [Fact]
+        public void QueryWithFirstOrDefaultClauseWithoutResult()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var result = tableSet.FirstOrDefault(p => p.Name == string.Empty);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void QueryWithSingleClause()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var result = tableSet.Single(p => p.Name == Finland);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(Finland, result.Name);
+        }
+
+        [Fact]
+        public void QueryWithSingleClauseWithoutResult()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+            Country result = null;
+
+            // Act
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                result = tableSet.Single(p => p.Name == string.Empty);
+            });
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void QueryWithSingleOrDefaultClause()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var result = tableSet.SingleOrDefault(p => p.Name == Finland);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(Finland, result.Name);
+        }
+
+        [Fact]
+        public void QueryWithSingleOrDefaultClauseWithoutResult()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var result = tableSet.SingleOrDefault(p => p.Name == string.Empty);
+
+            // Assert
+            Assert.Null(result);
+        }
     }
 }

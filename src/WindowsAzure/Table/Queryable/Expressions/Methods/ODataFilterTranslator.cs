@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using WindowsAzure.Properties;
 
@@ -11,7 +13,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     ///     Where expression translator.
     ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
-    public class WhereTranslator : ExpressionVisitor, IMethodTranslator
+    public sealed class ODataFilterTranslator : ExpressionVisitor, IMethodTranslator
     {
         private static readonly List<String> SupportedMethods = new List<string>
             {
@@ -23,44 +25,66 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             };
 
         private readonly ExpressionEvaluator _constantEvaluator;
+        private readonly IDictionary<string, string> _nameChanges;
         private StringBuilder _filter;
-        private IDictionary<String, String> _nameMappings;
+        private ITranslationResult _result;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public WhereTranslator()
+        /// <param name="nameChanges"></param>
+        public ODataFilterTranslator(IDictionary<string, string> nameChanges)
         {
+            _nameChanges = nameChanges;
             _constantEvaluator = new ExpressionEvaluator();
         }
 
-        /// <summary>
-        ///     Gets a query segment name.
-        /// </summary>
-        public QuerySegment QuerySegment
+        public void Translate(ITranslationResult result, MethodCallExpression method)
         {
-            get { return QuerySegment.Filter; }
-        }
-
-        public IDictionary<QuerySegment, String> Translate(MethodCallExpression method, IDictionary<string, string> nameChanges)
-        {
-            _nameMappings = nameChanges;
-
+            _result = result;
             _filter = new StringBuilder();
 
             var lambda = (LambdaExpression) StripQuotes(method.Arguments[1]);
 
             Visit(lambda.Body);
 
-            return new Dictionary<QuerySegment, String>
-                {
-                    {QuerySegment.Filter, RemoveParentheses(_filter.ToString())}
-                };
+            AddFilter();
+            AddPostProcessing(method);
         }
 
         public IList<string> AcceptedMethods
         {
             get { return SupportedMethods; }
+        }
+
+        private void AddPostProcessing(MethodCallExpression method)
+        {
+            switch (method.Method.Name)
+            {
+                case "First":
+                case "FirstOrDefault":
+                case "Single":
+                case "SingleOrDefault":
+                    {
+                        Type type = method.Arguments[0].Type.GetGenericArguments()[0];
+                        Type genericType = typeof (IQueryable<>).MakeGenericType(type);
+
+                        ParameterExpression parameter = Expression.Parameter(genericType, null);
+                        MethodInfo methodInfo = typeof(System.Linq.Queryable).GetMethods()
+                            .Single(p => p.Name == method.Method.Name && p.GetParameters().Length == 1)
+                            .MakeGenericMethod(type);
+                        MethodCallExpression call = Expression.Call(methodInfo, parameter);
+
+                        _result.AddPostProcesing(Expression.Lambda(call, parameter));
+                    }
+                    break;
+            }
+        }
+
+        private void AddFilter()
+        {
+            string filter = RemoveParentheses(_filter.ToString().Trim());
+            _result.AddFilter(filter);
         }
 
         private static String RemoveParentheses(string filter)
@@ -231,9 +255,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
                 if (member.Expression != null && member.Expression.NodeType == ExpressionType.Parameter)
                 {
-                    _filter.Append(_nameMappings.ContainsKey(member.Member.Name)
-                                       ? _nameMappings[member.Member.Name]
-                                       : member.Member.Name);
+                    string name = member.Member.Name;
+                    _filter.Append(_nameChanges.ContainsKey(name) ? _nameChanges[name] : name);
 
                     return;
                 }

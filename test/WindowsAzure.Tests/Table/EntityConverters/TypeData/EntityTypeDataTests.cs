@@ -29,7 +29,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         public void CreateEntityTypeDataWithDifferentAccessorsTest()
         {
             // Arrange & Act
-            var entityTypeData = new EntityTypeData<User>();
+            var entityTypeData = new EntityTypeData<Entity>();
 
             // Assert
             Assert.NotNull(entityTypeData);

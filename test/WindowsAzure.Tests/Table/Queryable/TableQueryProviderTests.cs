@@ -6,7 +6,6 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable;
-using WindowsAzure.Table.Queryable.Expressions;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
@@ -89,11 +88,7 @@ namespace WindowsAzure.Tests.Table.Queryable
 
             return new TableQueryProvider<Country>(
                 tableClient.GetTableReference(TableName),
-                new TableSetConfiguration<Country>
-                    {
-                        EntityConverter = tableEntityConverter,
-                        QueryTranslator = new QueryTranslator(tableEntityConverter.NameChanges)
-                    });
+                tableEntityConverter);
         }
 
         [Fact]
@@ -138,27 +133,6 @@ namespace WindowsAzure.Tests.Table.Queryable
             List<Country> typedResult = ((IEnumerable<Country>) result).ToList();
             Assert.Equal(typedResult.Count, 1);
             Assert.Equal(typedResult[0].Name, Spain);
-        }
-
-        [Fact]
-        public void CallGetTableQueryMethodOfQueryProviderTest()
-        {
-            // Arrange
-            TableSet<Country> tableSet = GetTableSet();
-            TableQueryProvider<Country> queryProvider = GetTableQueryProvider();
-            IQueryable<Country> query = tableSet.Where(p => p.IsExists).Take(2);
-
-            // Act
-            TableQuery result = queryProvider.GetTableQuery(query.Expression);
-
-            //Assert
-            Assert.NotNull(result);
-            Assert.Equal(result.FilterString, "IsExists");
-            Assert.Equal(result.SelectColumns, null);
-            Assert.True(result.TakeCount.HasValue);
-// ReSharper disable PossibleInvalidOperationException
-            Assert.Equal(result.TakeCount.Value, 2);
-// ReSharper restore PossibleInvalidOperationException
         }
     }
 }

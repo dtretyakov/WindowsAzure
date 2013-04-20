@@ -23,9 +23,8 @@ namespace WindowsAzure.Table.Extensions
         public static Task<List<T>> ToListAsync<T>(
             this IQueryable<T> source,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -48,9 +47,8 @@ namespace WindowsAzure.Table.Extensions
             this IQueryable<T> source,
             int count,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -71,9 +69,8 @@ namespace WindowsAzure.Table.Extensions
         public static Task<T> FirstAsync<T>(
             this IQueryable<T> source,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -96,9 +93,8 @@ namespace WindowsAzure.Table.Extensions
             this IQueryable<T> source,
             Expression<Func<T,bool>> predicate,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -119,9 +115,8 @@ namespace WindowsAzure.Table.Extensions
         public static Task<T> FirstOrDefaultAsync<T>(
             this IQueryable<T> source,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -144,9 +139,8 @@ namespace WindowsAzure.Table.Extensions
             this IQueryable<T> source,
             Expression<Func<T, bool>> predicate,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -167,9 +161,8 @@ namespace WindowsAzure.Table.Extensions
         public static Task<T> SingleAsync<T>(
             this IQueryable<T> source,
             CancellationToken cancellationToken = default(CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -192,9 +185,8 @@ namespace WindowsAzure.Table.Extensions
             this IQueryable<T> source,
             Expression<Func<T, bool>> predicate,
             CancellationToken cancellationToken = default(CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -215,9 +207,8 @@ namespace WindowsAzure.Table.Extensions
         public static Task<T> SingleOrDefaultAsync<T>(
             this IQueryable<T> source,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {
@@ -240,9 +231,8 @@ namespace WindowsAzure.Table.Extensions
             this IQueryable<T> source,
             Expression<Func<T, bool>> predicate,
             CancellationToken cancellationToken = default (CancellationToken))
-            where T : new()
         {
-            var tableQueryProvider = source.Provider as TableQueryProvider<T>;
+            var tableQueryProvider = source.Provider as IAsyncQueryProvider;
 
             if (tableQueryProvider == null)
             {

@@ -12,10 +12,10 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         public void ValueAccessorFactoryCreatePropertyAccessor()
         {
             // Arrange
-            PropertyInfo propertyInfo = typeof (User).GetProperty("PublicProperty");
+            PropertyInfo propertyInfo = typeof (Entity).GetProperty("PublicProperty");
 
             // Act
-            IValueAccessor<User> valueAccessor = ValueAccessorFactory.Create<User>(propertyInfo);
+            IValueAccessor<Entity> valueAccessor = ValueAccessorFactory.Create<Entity>(propertyInfo);
 
             // Assert
             Assert.NotNull(valueAccessor);
@@ -27,10 +27,10 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         public void ValueAccessorFactoryCreateFieldAccessor()
         {
             // Arrange
-            FieldInfo fieldInfo = typeof (User).GetField("PublicField");
+            FieldInfo fieldInfo = typeof (Entity).GetField("PublicField");
 
             // Act
-            IValueAccessor<User> valueAccessor = ValueAccessorFactory.Create<User>(fieldInfo);
+            IValueAccessor<Entity> valueAccessor = ValueAccessorFactory.Create<Entity>(fieldInfo);
 
             // Assert
             Assert.NotNull(valueAccessor);
@@ -42,10 +42,10 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         public void ValueAccessorFactoryCreateWithInvalidMember()
         {
             // Arrange
-            MethodInfo methodInfo = typeof (User).GetMethod("PublicMethod");
+            MethodInfo methodInfo = typeof (Entity).GetMethod("PublicMethod");
 
             // Act && Assert
-            Assert.Throws<NotSupportedException>(() => ValueAccessorFactory.Create<User>(methodInfo));
+            Assert.Throws<NotSupportedException>(() => ValueAccessorFactory.Create<Entity>(methodInfo));
         }
     }
 }

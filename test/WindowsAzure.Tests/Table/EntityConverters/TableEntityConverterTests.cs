@@ -11,7 +11,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
     public sealed class TableEntityConverterTests
     {
         [Fact]
-        public void TableEntityConverterCreateTest()
+        public void CreateConverter()
         {
             // Arrange & Act
             var converter = new TableEntityConverter<Country>();
@@ -24,7 +24,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void TableEntityConverterConvertToTableEntityTest()
+        public void ConvertToTableEntity()
         {
             // Arrange
             var converter = new TableEntityConverter<Country>();
@@ -65,7 +65,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void TableEntityConverterConvertToEntityTest()
+        public void ConvertToEntity()
         {
             // Arrange
             var converter = new TableEntityConverter<Country>();
@@ -108,7 +108,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void TableEntityConverterConvertToTableEntityWithFewKeysTest()
+        public void ConvertToTableEntityWithFewKeys()
         {
             // Arrange
             var converter = new TableEntityConverter<LogEntry>();
@@ -138,7 +138,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void TableEntityConverterConvertToTableEntityWithNameMappingTest()
+        public void ConvertToTableEntityWithNameMapping()
         {
             // Arrange
             var converter = new TableEntityConverter<LogEntry>();
@@ -163,7 +163,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void TableEntityConverterConvertToEntityWithNameMappingTest()
+        public void ConvertToEntityWithNameMapping()
         {
             // Arrange
             var converter = new TableEntityConverter<LogEntry>();

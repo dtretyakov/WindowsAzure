@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Extensions;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.Queryable.Expressions;
@@ -19,27 +21,27 @@ namespace WindowsAzure.Table.Queryable
     public class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider where TEntity : new()
     {
         private readonly CloudTable _cloudTable;
-        private readonly TableSetConfiguration<TEntity> _configuration;
+        private readonly ITableEntityConverter<TEntity> _entityConverter;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
-        /// <param name="configuration">LINQ Expression translator.</param>
-        public TableQueryProvider(CloudTable cloudTable, TableSetConfiguration<TEntity> configuration)
+        /// <param name="entityConverter"></param>
+        public TableQueryProvider(CloudTable cloudTable, ITableEntityConverter<TEntity> entityConverter)
         {
             if (cloudTable == null)
             {
                 throw new ArgumentNullException("cloudTable");
             }
 
-            if (configuration == null)
+            if (entityConverter == null)
             {
-                throw new ArgumentNullException("configuration");
+                throw new ArgumentNullException("entityConverter");
             }
 
             _cloudTable = cloudTable;
-            _configuration = configuration;
+            _entityConverter = entityConverter;
         }
 
         /// <summary>
@@ -54,11 +56,14 @@ namespace WindowsAzure.Table.Queryable
                 throw new ArgumentNullException("expression");
             }
 
-            TableQuery query = GetTableQuery(expression);
+            var translator = new QueryTranslator(_entityConverter.NameChanges);
+            var result = new TranslationResult();
 
-            IEnumerable<DynamicTableEntity> entities = _cloudTable.ExecuteQuery(query);
+            translator.Translate(result, expression);
 
-            return entities.Select(p => _configuration.EntityConverter.GetEntity(p));
+            IEnumerable<DynamicTableEntity> tableEntities = _cloudTable.ExecuteQuery(result.TableQuery);
+
+            return GetProcessedResult(tableEntities, result);
         }
 
         /// <summary>
@@ -76,55 +81,43 @@ namespace WindowsAzure.Table.Queryable
                 throw new ArgumentNullException("expression");
             }
 
-            TableQuery query = GetTableQuery(expression);
+            var translator = new QueryTranslator(_entityConverter.NameChanges);
+            var result = new TranslationResult();
+
+            translator.Translate(result, expression);
 
             return _cloudTable
-                .ExecuteQueryAsync(query)
-                .Then(entities => (object) entities.Select(p => _configuration.EntityConverter.GetEntity(p)), cancellationToken);
+                .ExecuteQueryAsync(result.TableQuery)
+                .Then(p =>
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        return GetProcessedResult(p, result);
+                    }, cancellationToken);
         }
 
         /// <summary>
-        ///     Creates a table query by expression.
+        ///     Executes post processing of retrieved entities.
         /// </summary>
-        /// <param name="expression">Query expression.</param>
-        /// <returns>Table query.</returns>
-        public TableQuery GetTableQuery(Expression expression)
+        /// <param name="tableEntities">Table entities.</param>
+        /// <param name="translation">translation result.</param>
+        /// <returns>Collection of entities.</returns>
+        private object GetProcessedResult(IEnumerable<DynamicTableEntity> tableEntities, TranslationResult translation)
         {
-            if (expression == null)
+            IEnumerable<TEntity> result = tableEntities.Select(q => _entityConverter.GetEntity(q));
+
+            if (translation.PostProcessing == null)
             {
-                throw new ArgumentNullException("expression");
+                return result;
             }
 
-            var queryTranslator = new QueryTranslator(_configuration.EntityConverter.NameChanges);
-
-            IDictionary<QuerySegment, string> queryResult = queryTranslator.Translate(expression);
-
-            var query = new TableQuery();
-
-            // Select
-            if (queryResult.ContainsKey(QuerySegment.Select))
+            try
             {
-                query.Select(queryResult[QuerySegment.Select].Split(','));
+                return translation.PostProcessing.DynamicInvoke(result.AsQueryable());
             }
-
-            // Filter
-            if (queryResult.ContainsKey(QuerySegment.Filter))
+            catch (TargetInvocationException e)
             {
-                query.FilterString = queryResult[QuerySegment.Filter];
+                throw e.InnerException;
             }
-
-            // Top
-            if (queryResult.ContainsKey(QuerySegment.Top))
-            {
-                int takeCount;
-
-                if (int.TryParse(queryResult[QuerySegment.Top], out takeCount))
-                {
-                    query.TakeCount = takeCount;
-                }
-            }
-
-            return query;
         }
     }
 }

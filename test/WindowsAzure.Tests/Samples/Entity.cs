@@ -3,7 +3,7 @@ using WindowsAzure.Table.Attributes;
 
 namespace WindowsAzure.Tests.Samples
 {
-    public sealed class User
+    public sealed class Entity
     {
         internal double InternalField;
         public int PublicField;
