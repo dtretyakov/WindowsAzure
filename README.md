@@ -1,6 +1,7 @@
 # Windows Azure Storage Extensions
 
 *Windows Azure Storage Extensions* is a .NET library aimed for managing and querying entities from [Windows Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
+
 It's built on top of the **[Windows Azure Storage Client Library 2.0](https://github.com/WindowsAzure/azure-sdk-for-net)**, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and **LINQ to Azure Table** queries via `TableSet` context by using **POCO** entities.
 
 ## Features
@@ -9,45 +10,59 @@ It's built on top of the **[Windows Azure Storage Client Library 2.0](https://gi
 
 Entity members should be marked by one or both of `PartitionKey` and `RowKey` attributes for defining composite table key. Also can be used `Timestamp`, `ETag`, `Property` and `Ignore` attributes.
 
-**Table entities management**
+**Entities Management**
 
 Generic `TableSet` context provides a synchronous & asynchronous ([TAP](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) methods for managing entities:
 
-  * *Synchronous*: Add(), AddOrUpdate(), Update() and Remove().
-  * *Asynchronous*: AddAsync(), AddOrUpdateAsync(), UpdateAsync() and RemoveAsync().
+  * *Synchronous*: Add, AddOrUpdate, Update and Remove.
+  * *Asynchronous*: AddAsync, AddOrUpdateAsync, UpdateAsync and RemoveAsync.
 
-**Table queries**
+**LINQ Queries**
 
 `TableSet` context implements `IQueryable` interface for using [LINQ Expressions](http://msdn.microsoft.com/en-us/library/vstudio/bb397926.aspx). Provider supports next synchronous LINQ methods:
-* Where()
-* Take()
+* First
+* FirstOrDefault
+* Single
+* SingleOrDefault
+* Take
+* Where
 
-To utilize [filtering capabilities of string properties](http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx) it supports [Compare](http://msdn.microsoft.com/en-us/library/84787k22.aspx), [CompareTo](http://msdn.microsoft.com/en-us/library/fkw3h78a.aspx) and [CompareOrdinal](http://msdn.microsoft.com/en-us/library/af26w0wa.aspx) methods.
+To utilize [filtering capabilities of string properties](http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx) it supports:
+* [Compare](http://msdn.microsoft.com/en-us/library/84787k22.aspx)
+* [CompareTo](http://msdn.microsoft.com/en-us/library/fkw3h78a.aspx)
+* [CompareOrdinal](http://msdn.microsoft.com/en-us/library/af26w0wa.aspx).
 
-For creating a custom queries you should take a look at next article [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
+**NOTE**: For creating a custom queries you should take a look at next article [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
+
+**Asynchronous LINQ Queries**
 
 In addition `TableSet` can be used for **asynchronous queries** powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx).
+
 Available methods:
-* ToListAsync()
-* TakeAsync()
-* FirstAsync()
-* FirstOrDefaultAsync()
-* SingleAsync()
-* SingleOrDefaultAsync()
+* FirstAsync
+* FirstOrDefaultAsync
+* SingleAsync
+* SingleOrDefaultAsync
+* TakeAsync
+* ToListAsync
 
-**TAP-based extensions**
+**LINQ Projections**
 
-Library contains TAP-based extensions for a next Azure Storage Library classes:
+LINQ Projections supported with a limitation - projection class should be reference type.
+
+**TAP-based Extensions**
+
+Library contains TAP-based extensions for following Azure Storage Library classes:
 * CloudBlobClient;
 * CloudBlobContainer;
 * CloudTableClient;
 * CloudTable.
 
-To use it just add _Async_ postfix to synchronous method name like that:
+To use it just add _Async_ postfix to synchronous method name for instance:
 
 ```csharp
-var blobs = cloudBlobContainer.ListBlobs();
-var blobs = await cloudBlobContainer.ListBlobsAsync();
+blobs = cloudBlobContainer.ListBlobs();
+blobs = await cloudBlobContainer.ListBlobsAsync();
 ```
 
 **Task Cancellation**
@@ -55,6 +70,13 @@ var blobs = await cloudBlobContainer.ListBlobsAsync();
 All of TAP-based methods accepts optional `CancellationToken` parameter for [Task Cancellation](http://msdn.microsoft.com/en-us/library/dd997396.aspx).
 
 ## Download
+
+### Via NuGet
+To install library by using [Nuget package](https://nuget.org/packages/WindowsAzure.StorageExtensions/) execute next command:
+
+```
+Install-Package WindowsAzure.StorageExtensions
+```
 
 ### Via Git
 To get the source code of the library via git just type:
@@ -64,15 +86,8 @@ git clone git://github.com/dtretyakov/WindowsAzure.git
 cd ./WindowsAzure
 ```
 
-### Via NuGet
-To install library by using [Nuget package](https://nuget.org/packages/WindowsAzure.StorageExtensions/) manager execute next command:
-
-```
-Install-Package WindowsAzure.StorageExtensions
-```
-
 ## Dependencies
-Storage Extensions requires .NET Framework 4.0 and [WindowsAzure.Storage](https://nuget.org/packages/WindowsAzure.Storage) nuget package.
+Storage Extensions requires .NET Framework 4.0 or higher and [WindowsAzure.Storage](https://nuget.org/packages/WindowsAzure.Storage) nuget package.
 
 ## Code Samples
 
@@ -130,8 +145,20 @@ var query = countryTable.Where(
              (p.PresidentsCount < 10 ||
               p.Population < 10000000 && p.PresidentsCount > 10 && p.IsExists));
 
-var resultsSync = query.ToList();
-var resultsAsync = await query.ToListAsync();
+resultsSync = query.ToList();
+resultsAsync = await query.ToListAsync();
 ```
+
+* Using LINQ projections
+
+```csharp
+var projection = from country in countryTable
+                 where country.Area > 400000
+                 select new { country.Continent, country.Name };
+
+resultsSync = query.ToList();
+resultsAsync = await query.ToListAsync();
+```
+
 ## Sponsors
 * [JetBrains](http://www.jetbrains.com/) (ReSharper)
