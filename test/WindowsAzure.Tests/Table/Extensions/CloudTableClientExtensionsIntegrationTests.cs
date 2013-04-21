@@ -4,17 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Extensions;
+using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Common;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Extensions
 {
-    public sealed class CloudTableClientExtensionsTests : TestBase, IDisposable
+    public sealed class CloudTableClientExtensionsIntegrationTests : TestBase, IDisposable
     {
         private readonly CloudTableClient _tableClient;
         private readonly List<string> _tableNames;
 
-        public CloudTableClientExtensionsTests()
+        public CloudTableClientExtensionsIntegrationTests()
         {
             _tableClient = GenerateCloudTableClient();
             _tableNames = new List<string>();
@@ -39,7 +40,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         }
 
         // Only for real Azure Storage
-        //[Fact]
+        //[IntegrationalFact]
         //public async Task CloudTableClientChangeServiceVersionTest()
         //{
         //    // Arrange
@@ -56,7 +57,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         //    Assert.Equal(properties.DefaultServiceVersion, serviceVersion);
         //}
 
-        [Fact]
+        [IntegrationalFact]
         public async Task CloudTableClientGetAllTablesTest()
         {
             // Act
@@ -67,7 +68,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.True(_tableNames.All(allTables.Select(p => p.Name).Contains));
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task CloudTableClientGetTablesWithTPrefixTest()
         {
             // Arrange
@@ -81,7 +82,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.True(_tableNames.All(p => p.StartsWith(prefix)));
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task CloudTableClientGetTwoTablesWithTPrefixTest()
         {
             // Arrange

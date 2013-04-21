@@ -1,92 +1,98 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
+using Moq;
 using WindowsAzure.Table;
+using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Context
 {
-    public sealed class DeleteEntitiesTests : CountryTableSetBase
+    public sealed class DeleteEntitiesTests
     {
         [Fact]
-        public void DeleteEntitiesSyncTest()
+        public void RemoveEntities()
         {
-            //Arrange
-            var countries = new List<Country>
-                                {
-                                    new Country
-                                        {
-                                            Area = 674843,
-                                            Continent = "Europe",
-                                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                            Formed = new DateTime(1792, 1, 1),
-                                            Id = Guid.NewGuid(),
-                                            IsExists = true,
-                                            Name = "France",
-                                            Population = 65350000,
-                                            PresidentsCount = 24
-                                        },
-                                    new Country
-                                        {
-                                            Area = 6748432,
-                                            Continent = "Europe",
-                                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                            Formed = new DateTime(1793, 1, 1),
-                                            Id = Guid.NewGuid(),
-                                            IsExists = false,
-                                            Name = "France2",
-                                            Population = 653500002,
-                                            PresidentsCount = 242
-                                        }
-                                };
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
 
-            TableSet<Country> tableSet = GetTableSet();
-
-            tableSet.Add(countries);
+            IList<Country> countries = ObjectsFactory.GetCountries();
 
             // Act
-            tableSet.Remove(countries);
+            context.Remove(countries);
+
+            // Assert
+            mock.Verify(executor => executor.ExecuteBatches(countries, TableOperation.Delete), Times.Once());
         }
 
         [Fact]
-        public async Task DeleteEntitiesAsyncTest()
+        public void RemoveEntitiesWithNullParameter()
         {
-            //Arrange
-            var countries = new List<Country>
-                                {
-                                    new Country
-                                        {
-                                            Area = 338424,
-                                            Continent = "Europe",
-                                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                            Formed = new DateTime(1809, 3, 29),
-                                            Id = Guid.NewGuid(),
-                                            IsExists = true,
-                                            Name = "Finland",
-                                            Population = 5421827,
-                                            PresidentsCount = 12
-                                        },
-                                    new Country
-                                        {
-                                            Area = 3384242,
-                                            Continent = "Europe",
-                                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                            Formed = new DateTime(1810, 3, 29),
-                                            Id = Guid.NewGuid(),
-                                            IsExists = false,
-                                            Name = "Finland2",
-                                            Population = 54218272,
-                                            PresidentsCount = 122
-                                        }
-                                };
-
-            TableSet<Country> tableSet = GetTableSet();
-
-            await tableSet.AddAsync(countries);
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
 
             // Act
-            await tableSet.RemoveAsync(countries);
+            Assert.Throws<ArgumentNullException>(() => context.Remove((IList<Country>) null));
+
+            // Assert
+            mock.Verify(executor => executor.ExecuteBatches(It.IsAny<IList<Country>>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
+        }
+
+        [Fact]
+        public async Task RemoveEntitiesAsync()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
+
+            IList<Country> countries = ObjectsFactory.GetCountries();
+
+            // Act
+            await context.RemoveAsync(countries);
+
+            // Assert
+            mock.Verify(executor => executor.ExecuteBatchesAsync(countries, TableOperation.Delete, It.IsAny<CancellationToken>()));
+        }
+
+        [Fact]
+        public async Task RemoveEntitiesWithNullParameterAsync()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
+
+            // Act
+            try
+            {
+                await context.RemoveAsync((IList<Country>) null, CancellationToken.None);
+            }
+            catch (ArgumentNullException)
+            {
+            }
+
+            // Assert
+            mock.Verify(executor => executor.ExecuteBatches(It.IsAny<IList<Country>>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
         }
     }
 }

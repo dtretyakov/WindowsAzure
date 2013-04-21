@@ -5,5 +5,9 @@
     /// </summary>
     public sealed class TableSetConfiguration
     {
+        /// <summary>
+        ///     Batch partitioning mode.
+        /// </summary>
+        public PartitioningMode PartitioningMode;
     }
 }

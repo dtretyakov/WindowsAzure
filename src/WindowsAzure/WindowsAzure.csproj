@@ -83,6 +83,9 @@
     <Compile Include="Table\Attributes\IgnoreAttribute.cs" />
     <Compile Include="Table\Attributes\ETagAttribute.cs" />
     <Compile Include="Table\Attributes\PropertyAttribute.cs" />
+    <Compile Include="Table\ITableQueryExecutor.cs" />
+    <Compile Include="Table\TableBatchPartitioner.cs" />
+    <Compile Include="Table\PartitioningMode.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\ETagAccessor.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\IKeyProperty.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\PartitionKeyAccessor.cs" />
@@ -121,6 +124,7 @@
     <Compile Include="Table\Queryable\Expressions\QueryTranslator.cs" />
     <Compile Include="Table\Queryable\Base\TypeSystem.cs" />
     <Compile Include="Table\Attributes\RowKeyAttribute.cs" />
+    <Compile Include="Table\TableQueryExecutor.cs" />
     <Compile Include="Table\TableSet.cs" />
     <Compile Include="Table\EntityConverters\TableEntityConverter.cs" />
     <Compile Include="Table\Attributes\TimestampAttribute.cs" />

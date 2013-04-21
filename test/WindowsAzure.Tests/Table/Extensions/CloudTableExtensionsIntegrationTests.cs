@@ -2,16 +2,17 @@
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Extensions;
+using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Common;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Extensions
 {
-    public sealed class CloudTableExtensionsTests : TestBase, IDisposable
+    public sealed class CloudTableExtensionsIntegrationTests : TestBase, IDisposable
     {
         private readonly CloudTable _cloudTable;
 
-        public CloudTableExtensionsTests()
+        public CloudTableExtensionsIntegrationTests()
         {
             string tableName = "T" + Guid.NewGuid().ToString("N");
             CloudTableClient tableClient = GenerateCloudTableClient();
@@ -23,7 +24,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             _cloudTable.DeleteIfExists();
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task CloudTableExtensionsTest()
         {
             // Arrange

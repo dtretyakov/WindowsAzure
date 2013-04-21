@@ -168,4 +168,10 @@
   <data name="SerializationExtensionsNotSupportedType" xml:space="preserve">
     <value>Unable to serialize type: '{0}'.</value>
   </data>
+  <data name="TableBatchPartitionerNoEntities" xml:space="preserve">
+    <value>Empty entities collection.</value>
+  </data>
+  <data name="TableQueryExecutorInvalidPartitioningMode" xml:space="preserve">
+    <value>Invalid partitioning mode '{0}'.</value>
+  </data>
 </root>

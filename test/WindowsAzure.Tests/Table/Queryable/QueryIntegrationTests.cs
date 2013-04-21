@@ -4,19 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using WindowsAzure.Table;
 using WindowsAzure.Table.Extensions;
+using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable
 {
-    public sealed class ComplexQueryTests : CountryTableSetBase
+    public sealed class QueryIntegrationTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";
         private const string Finland = "Finland";
         private const string France = "France";
 
-        public ComplexQueryTests()
+        public QueryIntegrationTests()
         {
             TableSet<Country> tableSet = GetTableSet();
             tableSet.Add(
@@ -73,7 +74,7 @@ namespace WindowsAzure.Tests.Table.Queryable
                     });
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task QueryWithMultipleScopesTest()
         {
             // Arrange
@@ -95,7 +96,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task QueryTableSetTwiceTest()
         {
             // Arrange
@@ -122,7 +123,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, results.Select(p => p.Name));
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithSelectClause()
         {
             // Arrange
@@ -141,7 +142,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task QueryWithSelectClauseAsync()
         {
             // Arrange
@@ -160,7 +161,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithFirstClause()
         {
             // Arrange
@@ -174,7 +175,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithFirstClauseWithoutResult()
         {
             // Arrange
@@ -189,7 +190,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Null(result);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithFirstOrDefaultClause()
         {
             // Arrange
@@ -203,7 +204,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithFirstOrDefaultClauseWithoutResult()
         {
             // Arrange
@@ -216,7 +217,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Null(result);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithSingleClause()
         {
             // Arrange
@@ -230,7 +231,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithSingleClauseWithoutResult()
         {
             // Arrange
@@ -245,7 +246,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Null(result);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithSingleOrDefaultClause()
         {
             // Arrange
@@ -259,7 +260,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void QueryWithSingleOrDefaultClauseWithoutResult()
         {
             // Arrange

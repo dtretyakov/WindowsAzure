@@ -6,12 +6,13 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable;
+using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable
 {
-    public sealed class TableQueryProviderTests : CountryTableSetBase
+    public sealed class TableQueryProviderIntegrationTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";
@@ -19,7 +20,7 @@ namespace WindowsAzure.Tests.Table.Queryable
         private const string France = "France";
 
 
-        public TableQueryProviderTests()
+        public TableQueryProviderIntegrationTests()
         {
             TableSet<Country> tableSet = GetTableSet();
             tableSet.Add(
@@ -91,7 +92,7 @@ namespace WindowsAzure.Tests.Table.Queryable
                 tableEntityConverter);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public void CallExecuteMethodOfQueryProviderTest()
         {
             // Arrange
@@ -115,7 +116,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Finland, names);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task CallExecuteAsyncMethodOfQueryProviderTest()
         {
             // Arrange

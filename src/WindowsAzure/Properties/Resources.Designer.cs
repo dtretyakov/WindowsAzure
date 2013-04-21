@@ -160,6 +160,24 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Empty entities collection..
+        /// </summary>
+        internal static string TableBatchPartitionerNoEntities {
+            get {
+                return ResourceManager.GetString("TableBatchPartitionerNoEntities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid partitioning mode &apos;{0}&apos;..
+        /// </summary>
+        internal static string TableQueryExecutorInvalidPartitioningMode {
+            get {
+                return ResourceManager.GetString("TableQueryExecutorInvalidPartitioningMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Timestamp attribute duplication..
         /// </summary>
         internal static string TimestampAttributeDuplicate {

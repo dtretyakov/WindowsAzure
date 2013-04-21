@@ -1,81 +1,107 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
+using Moq;
 using WindowsAzure.Table;
+using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Context
 {
-    public sealed class AddEntityTests : CountryTableSetBase
+    public sealed class AddEntityTests
     {
         [Fact]
-        public void AddEntitySyncTest()
+        public void AddEntity()
         {
             // Arrange
-            var country = new Country
-                              {
-                                  Area = 505992,
-                                  Continent = "Europe",
-                                  TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                  Formed = new DateTime(1812, 1, 1),
-                                  Id = Guid.NewGuid(),
-                                  IsExists = true,
-                                  Name = "Spain",
-                                  Population = 47190493,
-                                  PresidentsCount = 8
-                              };
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
 
-            TableSet<Country> tableSet = GetTableSet();
+            Country country = ObjectsFactory.GetCountry();
 
             // Act
-            Country result = tableSet.Add(country);
+            Country result = context.Add(country);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(country.Area, result.Area);
-            Assert.Equal(country.Continent, result.Continent);
-            Assert.Equal(country.TopSecretKey, result.TopSecretKey);
-            Assert.Equal(country.Formed, result.Formed);
-            Assert.Equal(country.Id, result.Id);
-            Assert.Equal(country.IsExists, result.IsExists);
-            Assert.Equal(country.Name, result.Name);
-            Assert.Equal(country.Population, result.Population);
-            Assert.Equal(country.PresidentsCount, result.PresidentsCount);
+            mock.Verify(executor => executor.Execute(country, TableOperation.Insert), Times.Once());
+            Assert.Equal(country, result);
         }
 
         [Fact]
-        public async Task AddEntityAsyncTest()
+        public void AddEntityWithNullParameter()
         {
             // Arrange
-            var country = new Country
-                              {
-                                  Area = 357021,
-                                  Continent = "Europe",
-                                  TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                  Formed = new DateTime(1871, 1, 18),
-                                  Id = Guid.NewGuid(),
-                                  IsExists = true,
-                                  Name = "Germany",
-                                  Population = 81799600,
-                                  PresidentsCount = 11
-                              };
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
 
-            TableSet<Country> tableSet = GetTableSet();
+            Country result = null;
 
             // Act
-            Country result = await tableSet.AddAsync(country);
+            Assert.Throws<ArgumentNullException>(() => { result = context.Add((Country) null); });
+
+            // Assert
+            Assert.Null(result);
+            mock.Verify(executor => executor.Execute(It.IsAny<Country>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
+        }
+
+        [Fact]
+        public async Task AddEntityAsync()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
+
+            Country country = ObjectsFactory.GetCountry();
+
+            // Act
+            Country result = await context.AddAsync(country);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(country.Area, result.Area);
-            Assert.Equal(country.Continent, result.Continent);
-            Assert.Equal(country.TopSecretKey, result.TopSecretKey);
-            Assert.Equal(country.Formed, result.Formed);
-            Assert.Equal(country.Id, result.Id);
-            Assert.Equal(country.IsExists, result.IsExists);
-            Assert.Equal(country.Name, result.Name);
-            Assert.Equal(country.Population, result.Population);
-            Assert.Equal(country.PresidentsCount, result.PresidentsCount);
+            mock.Verify(executor => executor.ExecuteAsync(country, TableOperation.Insert, It.IsAny<CancellationToken>()));
+            Assert.Equal(country, result);
+        }
+
+        [Fact]
+        public async Task AddEntityWithNullParameterAsync()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+                {
+                    QueryExecutor = mock.Object
+                };
+
+            Country result = null;
+
+            // Act
+            try
+            {
+                result = await context.AddAsync((Country) null, CancellationToken.None);
+            }
+            catch (ArgumentNullException)
+            {
+            }
+
+            // Assert
+            Assert.Null(result);
+            mock.Verify(executor => executor.Execute(It.IsAny<Country>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
         }
     }
 }

@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using WindowsAzure.Table;
 using WindowsAzure.Table.Extensions;
+using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Extensions
 {
-    public sealed class AsyncQueryExtensionsTests : CountryTableSetBase
+    public sealed class AsyncQueryExtensionsIntegrationTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";
@@ -17,7 +18,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         private const string France = "France";
         private const string Europe = "Europe";
 
-        public AsyncQueryExtensionsTests()
+        public AsyncQueryExtensionsIntegrationTests()
         {
             TableSet<Country> tableSet = GetTableSet();
             tableSet.Add(
@@ -74,7 +75,7 @@ namespace WindowsAzure.Tests.Table.Extensions
                     });
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task ToListAsync()
         {
             // Arrange
@@ -94,7 +95,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Contains(Finland, names);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task ToListAsyncWithPredicate()
         {
             // Arrange
@@ -114,7 +115,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Contains(Finland, names);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task TakeAsync()
         {
             // Arrange
@@ -129,7 +130,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entities.Count, count);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task FirstAsync()
         {
             // Arrange
@@ -143,7 +144,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, France);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task FirstAsyncWithPredicate()
         {
             // Arrange
@@ -157,7 +158,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, Spain);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task FirstOrDefaultAsync()
         {
             // Arrange
@@ -171,7 +172,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, Germany);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task FirstOrDefaultAsyncWithPredicate()
         {
             // Arrange
@@ -185,7 +186,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, Germany);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task FirstOrDefaultAsyncWithPredicateWithoutResult()
         {
             // Arrange
@@ -198,7 +199,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Null(entity);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task SingleAsync()
         {
             // Arrange
@@ -212,7 +213,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, Finland);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task SingleAsyncWithMultipleResults()
         {
             // Arrange
@@ -234,7 +235,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.IsType<InvalidOperationException>(exception);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task SingleAsyncWithPredicate()
         {
             // Arrange
@@ -248,7 +249,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, Finland);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task SingleOrDefaultAsync()
         {
             // Arrange
@@ -262,7 +263,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, France);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task SingleOrDefaultAsyncWithMultipleResults()
         {
             // Arrange
@@ -284,7 +285,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.IsType<InvalidOperationException>(exception);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task SingleOrDefaultAsyncWithPredicate()
         {
             // Arrange
@@ -298,7 +299,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.Equal(entity.Name, France);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task SingleOrDefaultAsyncWithPredicateWithoutResult()
         {
             // Arrange

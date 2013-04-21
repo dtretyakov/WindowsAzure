@@ -2,16 +2,17 @@
 using System.Threading.Tasks;
 using WindowsAzure.Table;
 using WindowsAzure.Table.Extensions;
+using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable
 {
-    public sealed class QueryLogEntryEntitiesTests : LogEntryTableSetBase
+    public sealed class QueryLogEntryEntitiesIntegrationTests : LogEntryTableSetBase
     {
         private const string MessageTemplate = "My message {0}";
 
-        public QueryLogEntryEntitiesTests()
+        public QueryLogEntryEntitiesIntegrationTests()
         {
             TableSet<LogEntry> tableSet = GetTableSet();
 
@@ -26,7 +27,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             }
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task QueryLogEntryAndUpdateTest()
         {
             // Arrange
@@ -43,7 +44,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.NotEqual(result.ETag, updatedResult.ETag);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task QueryLogEntryTwiceAndCheckETagTest()
         {
             // Arrange
@@ -58,7 +59,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(result1.ETag, result2.ETag);
         }
 
-        [Fact]
+        [IntegrationalFact]
         public async Task QueryLogEntryByMessageValueTest()
         {
             // Arrange
