@@ -77,14 +77,10 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             switch (node.Expression.NodeType)
             {
+                case ExpressionType.Constant:
                 case ExpressionType.MemberAccess:
                     {
                         return GetMemberConstant(node);
-                    }
-
-                case ExpressionType.Constant:
-                    {
-                        return Expression.Constant(GetFieldValue(node), node.Type);
                     }
 
                 default:
@@ -116,28 +112,30 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         private object GetFieldValue(MemberExpression node)
         {
-            var innerField = (FieldInfo) node.Member;
-            object innerObj = null;
+            var fieldInfo = (FieldInfo) node.Member;
+            object @object = null;
 
             if (node.Expression != null)
             {
                 var ce = (ConstantExpression) Evaluate(node.Expression);
-                innerObj = ce.Value;
+                @object = ce.Value;
             }
 
-            return innerField.GetValue(innerObj);
+            return fieldInfo.GetValue(@object);
         }
 
         private object GetPropertyValue(MemberExpression node)
         {
-            var outerProp = (PropertyInfo) node.Member;
-            var innerMember = (MemberExpression) node.Expression;
-            var innerField = (FieldInfo) innerMember.Member;
-            var ce = (ConstantExpression) Evaluate(innerMember.Expression);
-            object innerObj = ce.Value;
-            object outerObj = innerField.GetValue(innerObj);
+            var propertyInfo = (PropertyInfo) node.Member;
+            object @object = null;
 
-            return outerProp.GetValue(outerObj, null);
+            if (node.Expression != null)
+            {
+                var ce = (ConstantExpression) Evaluate(node.Expression);
+                @object = ce.Value;
+            }
+
+            return propertyInfo.GetValue(@object, null);
         }
     }
 }
