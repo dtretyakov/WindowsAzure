@@ -27,6 +27,21 @@ Generic `TableSet` context provides a synchronous & asynchronous ([TAP](http://m
   * *Synchronous*: Add, AddOrUpdate, Update and Remove.
   * *Asynchronous*: AddAsync, AddOrUpdateAsync, UpdateAsync and RemoveAsync.
 
+To avoid [restrictions of group operations](http://msdn.microsoft.com/en-us/library/windowsazure/dd894038.aspx) in Azure Storage Table we can control request executions via TableSet's `Configuration.PartitioningMode` property.
+
+<table>
+  <thead>
+    <tr><th>Mode</th><th>Partitioning</th><th>Request Execution</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Sequential</td><td>Yes</td><td>Sequential</td></tr>
+    <tr><td>Parallel</td><td>Yes</td><td>Parallel</td></tr>
+    <tr><td>None</td><td>No</td><td>Sequential</td></tr>
+  </tbody>
+</table>
+
+Default PartitioningMode is Sequential.
+
 ###LINQ Queries
 
 `TableSet` context implements `IQueryable` interface for using [LINQ Expressions](http://msdn.microsoft.com/en-us/library/vstudio/bb397926.aspx). Provider supports next synchronous LINQ methods:
