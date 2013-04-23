@@ -27,7 +27,7 @@ Generic `TableSet` context provides a synchronous & asynchronous ([TAP](http://m
   * *Synchronous*: Add, AddOrUpdate, Update and Remove.
   * *Asynchronous*: AddAsync, AddOrUpdateAsync, UpdateAsync and RemoveAsync.
 
-To avoid [restrictions of group operations](http://msdn.microsoft.com/en-us/library/windowsazure/dd894038.aspx) in Azure Storage Table we can control request executions via TableSet's `Configuration.PartitioningMode` property.
+To avoid [restrictions of group operations](http://msdn.microsoft.com/en-us/library/windowsazure/dd894038.aspx) in Azure Storage Table we can control request execution via TableSet's `Configuration.PartitioningMode` property.
 
 <table>
   <thead>
@@ -134,7 +134,9 @@ public sealed class Country
 * Creating a new table context:
 
 ```csharp
-var tableClient = CloudStorageAccount.DevelopmentStorageAccount;
+var storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
+var tableClient = storageAccount.CreateCloudTableClient();
+
 var countryTable = new TableSet<Country>(tableClient);
 ```
 
@@ -181,8 +183,8 @@ var projection = from country in countryTable
                  where country.Area > 400000
                  select new { country.Continent, country.Name };
 
-resultsSync = query.ToList();
-resultsAsync = await query.ToListAsync();
+var result = projection.ToList();
+result = await projection.ToListAsync();
 ```
 
 ## Sponsors
