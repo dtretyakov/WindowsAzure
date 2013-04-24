@@ -7,7 +7,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     ///     Value accessor.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public interface IValueAccessor<in T>
+    internal interface IValueAccessor<in T>
     {
         /// <summary>
         ///     Gets an entity property value.

@@ -8,13 +8,13 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     ///     Handles field value manipulations.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class FieldValueAccessor<T> : ExpressionValueAccesorBase<T>
+    internal sealed class FieldValueAccessor<T> : ExpressionValueAccesorBase<T>
     {
         /// <summary>
         ///     Constructor.
         /// </summary>
         /// <param name="fieldInfo">Field info.</param>
-        public FieldValueAccessor(FieldInfo fieldInfo)
+        internal FieldValueAccessor(FieldInfo fieldInfo)
         {
             if (fieldInfo == null)
             {

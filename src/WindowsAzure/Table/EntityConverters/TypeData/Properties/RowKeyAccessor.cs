@@ -12,20 +12,17 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     ///     Handles access to RowKey value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class RowKeyAccessor<T> : IKeyProperty<T>
+    internal sealed class RowKeyAccessor<T> : IKeyProperty<T>
     {
-        private readonly Type _rowKeyAttributeType;
-        private readonly Type _stringType;
+        private readonly Type _rowKeyAttributeType = typeof (RowKeyAttribute);
+        private readonly Type _stringType = typeof (String);
         private IValueAccessor<T> _accessor;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public RowKeyAccessor()
+        internal RowKeyAccessor()
         {
-            _rowKeyAttributeType = typeof (RowKeyAttribute);
-            _stringType = typeof (String);
-
             NameChanges = new Dictionary<string, string>();
         }
 

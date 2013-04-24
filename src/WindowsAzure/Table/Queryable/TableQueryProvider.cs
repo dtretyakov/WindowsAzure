@@ -18,7 +18,7 @@ namespace WindowsAzure.Table.Queryable
     ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
-    public class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider where TEntity : new()
+    internal class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider where TEntity : new()
     {
         private readonly CloudTable _cloudTable;
         private readonly ITableEntityConverter<TEntity> _entityConverter;
@@ -28,7 +28,7 @@ namespace WindowsAzure.Table.Queryable
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="entityConverter"></param>
-        public TableQueryProvider(CloudTable cloudTable, ITableEntityConverter<TEntity> entityConverter)
+        internal TableQueryProvider(CloudTable cloudTable, ITableEntityConverter<TEntity> entityConverter)
         {
             if (cloudTable == null)
             {
@@ -88,11 +88,7 @@ namespace WindowsAzure.Table.Queryable
 
             return _cloudTable
                 .ExecuteQueryAsync(result.TableQuery)
-                .Then(p =>
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        return GetProcessedResult(p, result);
-                    }, cancellationToken);
+                .Then(p => GetProcessedResult(p, result), cancellationToken);
         }
 
         /// <summary>

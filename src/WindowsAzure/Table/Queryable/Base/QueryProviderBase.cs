@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.Queryable.Base
     /// <summary>
     ///     Provides base functionality of the query provider interface.
     /// </summary>
-    public abstract class QueryProviderBase : IQueryProvider
+    internal abstract class QueryProviderBase : IQueryProvider
     {
         IQueryable<TS> IQueryProvider.CreateQuery<TS>(Expression expression)
         {

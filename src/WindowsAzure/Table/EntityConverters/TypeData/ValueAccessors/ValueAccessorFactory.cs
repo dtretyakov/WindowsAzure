@@ -7,7 +7,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     /// <summary>
     ///     Manages creation of the property value accessors.
     /// </summary>
-    public static class ValueAccessorFactory
+    internal static class ValueAccessorFactory
     {
         /// <summary>
         ///     Creates a value accessor.

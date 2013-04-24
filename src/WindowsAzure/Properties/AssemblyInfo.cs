@@ -36,3 +36,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("0.7.2")]
 [assembly: AssemblyInformationalVersion("0.7.2")]
 [assembly: InternalsVisibleTo("WindowsAzure.StorageExtensions.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

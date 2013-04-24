@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
     /// <summary>
     ///     TableQuery translation result.
     /// </summary>
-    public sealed class TranslationResult : ITranslationResult
+    internal sealed class TranslationResult : ITranslationResult
     {
         private readonly List<LambdaExpression> _expressions = new List<LambdaExpression>();
         private Delegate _postProcessing;
@@ -16,7 +16,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public TranslationResult()
+        internal TranslationResult()
         {
             TableQuery = new TableQuery();
         }

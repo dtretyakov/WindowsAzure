@@ -13,7 +13,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     ///     Where expression translator.
     ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
-    public sealed class ODataFilterTranslator : ExpressionVisitor, IMethodTranslator
+    internal sealed class ODataFilterTranslator : ExpressionVisitor, IMethodTranslator
     {
         private static readonly List<String> SupportedMethods = new List<string>
             {
@@ -33,7 +33,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         ///     Constructor.
         /// </summary>
         /// <param name="nameChanges"></param>
-        public ODataFilterTranslator(IDictionary<string, string> nameChanges)
+        internal ODataFilterTranslator(IDictionary<string, string> nameChanges)
         {
             _nameChanges = nameChanges;
             _constantEvaluator = new ExpressionEvaluator();

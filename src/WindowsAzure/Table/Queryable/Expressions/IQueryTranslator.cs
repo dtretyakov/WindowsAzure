@@ -5,7 +5,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
     /// <summary>
     ///     Defines interface of LINQ Exression translator.
     /// </summary>
-    public interface IQueryTranslator
+    internal interface IQueryTranslator
     {
         /// <summary>
         ///     Translates an expression into collection of query segments.

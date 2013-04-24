@@ -6,7 +6,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     /// <summary>
     ///     Creates entity properties.
     /// </summary>
-    public static class EntityPropertyFactory
+    internal static class EntityPropertyFactory
     {
         /// <summary>
         ///     Creates Boolean entity property.

@@ -31,7 +31,7 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Inserted entities.</returns>
-        IList<TEntity> Add(IList<TEntity> entities);
+        IEnumerable<TEntity> Add(IEnumerable<TEntity> entities);
 
         /// <summary>
         ///     Inserts a new entities asynchronously.
@@ -39,7 +39,7 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Inserted entities.</returns>
-        Task<IList<TEntity>> AddAsync(IList<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken));
+        Task<IEnumerable<TEntity>> AddAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken));
 
         /// <summary>
         ///     Inserts or updates an entity.
@@ -61,7 +61,7 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Inserted entities.</returns>
-        IList<TEntity> AddOrUpdate(IList<TEntity> entities);
+        IEnumerable<TEntity> AddOrUpdate(IEnumerable<TEntity> entities);
 
         /// <summary>
         ///     Inserts or updates an entities asynchronously.
@@ -69,7 +69,7 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Inserted entities.</returns>
-        Task<IList<TEntity>> AddOrUpdateAsync(IList<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken));
+        Task<IEnumerable<TEntity>> AddOrUpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken));
 
         /// <summary>
         ///     Updates an entity.
@@ -91,7 +91,7 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Updated entities.</returns>
-        IList<TEntity> Update(IList<TEntity> entities);
+        IEnumerable<TEntity> Update(IEnumerable<TEntity> entities);
 
         /// <summary>
         ///     Updates an entities asynchronously.
@@ -99,7 +99,7 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Updated entities.</returns>
-        Task<IList<TEntity>> UpdateAsync(IList<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
+        Task<IEnumerable<TEntity>> UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         ///     Removes an entity.
@@ -121,7 +121,7 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Result.</returns>
-        void Remove(IList<TEntity> entities);
+        void Remove(IEnumerable<TEntity> entities);
 
         /// <summary>
         ///     Removes an entities asynchronously.
@@ -129,6 +129,11 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Result.</returns>
-        Task RemoveAsync(IList<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
+        Task RemoveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///     Gets or sets a value indicating request execution mode.
+        /// </summary>
+        ExecutionMode ExecutionMode { get; set; }
     }
 }

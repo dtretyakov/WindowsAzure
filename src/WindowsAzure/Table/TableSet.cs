@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
+using WindowsAzure.Table.QueryExecutor;
 using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
 
@@ -15,8 +16,9 @@ namespace WindowsAzure.Table
     /// <typeparam name="TEntity">Entity type.</typeparam>
     public sealed class TableSet<TEntity> : Query<TEntity>, ITableSet<TEntity> where TEntity : class, new()
     {
+        internal readonly TableQueryExecutorFactory<TEntity> QueryExecutorFactory;
         internal ITableQueryExecutor<TEntity> QueryExecutor;
-        internal CloudTable CloudTable;
+        private ExecutionMode _executionMode = ExecutionMode.Sequential;
 
         /// <summary>
         ///     Constructor.
@@ -44,18 +46,13 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("tableName");
             }
 
-            CloudTable = cloudTableClient.GetTableReference(tableName);
+            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
             var entityConverter = new TableEntityConverter<TEntity>();
 
-            Configuration = new TableSetConfiguration();
-            Provider = new TableQueryProvider<TEntity>(CloudTable, entityConverter);
-            QueryExecutor = new TableQueryExecutor<TEntity>(CloudTable, entityConverter, Configuration);
+            QueryExecutorFactory = new TableQueryExecutorFactory<TEntity>(cloudTable, entityConverter);
+            Provider = new TableQueryProvider<TEntity>(cloudTable, entityConverter);
+            QueryExecutor = QueryExecutorFactory.Create(_executionMode);
         }
-
-        /// <summary>
-        ///     Gets a <see cref="TableSet{TEntity}" /> configuration.
-        /// </summary>
-        public TableSetConfiguration Configuration { get; private set; }
 
         /// <summary>
         ///     Inserts a new entity.
@@ -93,16 +90,11 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Inserted entities.</returns>
-        public IList<TEntity> Add(IList<TEntity> entities)
+        public IEnumerable<TEntity> Add(IEnumerable<TEntity> entities)
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
-            }
-
-            if (entities.Count == 0)
-            {
-                return entities;
             }
 
             return QueryExecutor.ExecuteBatches(entities, TableOperation.Insert);
@@ -114,16 +106,11 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Inserted entities.</returns>
-        public Task<IList<TEntity>> AddAsync(IList<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken))
+        public Task<IEnumerable<TEntity>> AddAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken))
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
-            }
-
-            if (entities.Count == 0)
-            {
-                return TaskHelpers.FromResult(entities);
             }
 
             return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.Insert, cancellationToken);
@@ -165,16 +152,11 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Inserted entities.</returns>
-        public IList<TEntity> AddOrUpdate(IList<TEntity> entities)
+        public IEnumerable<TEntity> AddOrUpdate(IEnumerable<TEntity> entities)
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
-            }
-
-            if (entities.Count == 0)
-            {
-                return entities;
             }
 
             return QueryExecutor.ExecuteBatches(entities, TableOperation.InsertOrReplace);
@@ -186,16 +168,11 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Inserted entities.</returns>
-        public Task<IList<TEntity>> AddOrUpdateAsync(IList<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken))
+        public Task<IEnumerable<TEntity>> AddOrUpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken))
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
-            }
-
-            if (entities.Count == 0)
-            {
-                return TaskHelpers.FromResult(entities);
             }
 
             return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.InsertOrReplace, cancellationToken);
@@ -237,16 +214,11 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Updated entities.</returns>
-        public IList<TEntity> Update(IList<TEntity> entities)
+        public IEnumerable<TEntity> Update(IEnumerable<TEntity> entities)
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
-            }
-
-            if (entities.Count == 0)
-            {
-                return entities;
             }
 
             return QueryExecutor.ExecuteBatches(entities, TableOperation.Replace);
@@ -258,16 +230,11 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Updated entities.</returns>
-        public Task<IList<TEntity>> UpdateAsync(IList<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IEnumerable<TEntity>> UpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
-            }
-
-            if (entities.Count == 0)
-            {
-                return TaskHelpers.FromResult(entities);
             }
 
             return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.Replace, cancellationToken);
@@ -310,16 +277,11 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <returns>Result.</returns>
-        public void Remove(IList<TEntity> entities)
+        public void Remove(IEnumerable<TEntity> entities)
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
-            }
-
-            if (entities.Count == 0)
-            {
-                return;
             }
 
             QueryExecutor.ExecuteBatches(entities, TableOperation.Delete);
@@ -331,19 +293,33 @@ namespace WindowsAzure.Table
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Result.</returns>
-        public Task RemoveAsync(IList<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
+        public Task RemoveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (entities == null)
             {
                 throw new ArgumentNullException("entities");
             }
 
-            if (entities.Count == 0)
-            {
-                return TaskHelpers.Completed();
-            }
-
             return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.Delete, cancellationToken);
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating request execution mode.
+        /// </summary>
+        public ExecutionMode ExecutionMode
+        {
+            get { return _executionMode; }
+            set
+            {
+                if (_executionMode == value)
+                {
+                    return;
+                }
+
+                _executionMode = value;
+
+                QueryExecutor = QueryExecutorFactory.Create(_executionMode);
+            }
         }
     }
 }

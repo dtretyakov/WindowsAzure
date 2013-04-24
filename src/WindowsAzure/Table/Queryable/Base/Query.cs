@@ -24,7 +24,7 @@ namespace WindowsAzure.Table.Queryable.Base
         /// </summary>
         /// <param name="provider">Query provider.</param>
         /// <param name="expression">Expression.</param>
-        public Query(IQueryProvider provider, Expression expression)
+        internal Query(IQueryProvider provider, Expression expression)
         {
             if (provider == null)
             {

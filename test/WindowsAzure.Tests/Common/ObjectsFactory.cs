@@ -60,5 +60,12 @@ namespace WindowsAzure.Tests.Common
                         }
                 };
         }
+
+        public static CloudTable GetCloudTable()
+        {
+            var storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
+            var tableClient = storageAccount.CreateCloudTableClient();
+            return tableClient.GetTableReference("Table");
+        }
     }
 }

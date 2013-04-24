@@ -5,7 +5,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
     /// <summary>
     ///     Defines interface of OData translation result.
     /// </summary>
-    public interface ITranslationResult
+    internal interface ITranslationResult
     {
         /// <summary>
         ///     Adds a filter expression.

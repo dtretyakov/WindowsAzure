@@ -7,7 +7,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     ///     Defines base interface for an entity type data converter.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IEntityTypeData<T>
+    internal interface IEntityTypeData<T>
     {
         /// <summary>
         ///     Gets an entity members name changes.

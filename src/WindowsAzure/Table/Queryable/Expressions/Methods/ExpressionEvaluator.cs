@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// <summary>
     ///     Performs evaluation of the LINQ Expression.
     /// </summary>
-    public sealed class ExpressionEvaluator : ExpressionVisitor
+    internal sealed class ExpressionEvaluator : ExpressionVisitor
     {
         /// <summary>
         ///     Evaluates an expression.

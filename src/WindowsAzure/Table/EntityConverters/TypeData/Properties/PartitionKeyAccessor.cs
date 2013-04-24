@@ -12,7 +12,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     ///     Handles access to PartitionKey value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class PartitionKeyAccessor<T> : IKeyProperty<T>
+    internal sealed class PartitionKeyAccessor<T> : IKeyProperty<T>
     {
         private readonly Type _partitionKeyAttributeType;
         private readonly Type _stringType;
@@ -21,7 +21,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public PartitionKeyAccessor()
+        internal PartitionKeyAccessor()
         {
             _partitionKeyAttributeType = typeof (PartitionKeyAttribute);
             _stringType = typeof (String);

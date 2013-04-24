@@ -12,7 +12,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// <summary>
     ///     Performs a constant value serialization.
     /// </summary>
-    public static class SerializationExtensions
+    internal static class SerializationExtensions
     {
         /// <summary>
         ///     Collection of supported constant types.

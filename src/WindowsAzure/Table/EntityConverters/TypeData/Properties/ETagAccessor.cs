@@ -12,7 +12,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     ///     Handles access to ETag value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class ETagAccessor<T> : IKeyProperty<T>
+    internal sealed class ETagAccessor<T> : IKeyProperty<T>
     {
         private readonly Type _eTagAttributeType;
         private readonly Type _stringType;
@@ -21,7 +21,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public ETagAccessor()
+        internal ETagAccessor()
         {
             _eTagAttributeType = typeof (ETagAttribute);
             _stringType = typeof (String);

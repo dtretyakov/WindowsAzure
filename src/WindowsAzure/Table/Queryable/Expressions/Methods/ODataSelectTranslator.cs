@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// <summary>
     ///     Select expression translator.
     /// </summary>
-    public sealed class ODataSelectTranslator : ExpressionVisitor, IMethodTranslator
+    internal sealed class ODataSelectTranslator : ExpressionVisitor, IMethodTranslator
     {
         private static readonly List<String> SupportedMethods = new List<string> {"Select"};
         private readonly IDictionary<string, string> _nameChanges;
@@ -18,7 +18,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         ///     Constructor.
         /// </summary>
         /// <param name="nameChanges">Entity properties name changes.</param>
-        public ODataSelectTranslator(IDictionary<string, string> nameChanges)
+        internal ODataSelectTranslator(IDictionary<string, string> nameChanges)
         {
             _nameChanges = nameChanges;
         }

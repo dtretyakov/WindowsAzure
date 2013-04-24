@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table;
+using WindowsAzure.Table.EntityConverters;
+using WindowsAzure.Table.QueryExecutor;
 
 namespace WindowsAzure.Tests.Common
 {
     public static class MocksFactory
     {
-        public static Mock<ITableQueryExecutor<TEntity>> GetQueryExecutorMock<TEntity>() where TEntity : new()
+        internal static Mock<ITableQueryExecutor<TEntity>> GetQueryExecutorMock<TEntity>() where TEntity : new()
         {
             var mock = new Mock<ITableQueryExecutor<TEntity>>();
 
@@ -23,12 +25,23 @@ namespace WindowsAzure.Tests.Common
                 .Returns((TEntity entity, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken) => Task.FromResult(entity));
 
             // Execute batches
-            mock.Setup(executor => executor.ExecuteBatches(It.IsAny<IList<TEntity>>(), It.IsAny<Func<ITableEntity, TableOperation>>()))
-                .Returns((IList<TEntity> entities, Func<ITableEntity, TableOperation> operation) => entities);
+            mock.Setup(executor => executor.ExecuteBatches(It.IsAny<IEnumerable<TEntity>>(), It.IsAny<Func<ITableEntity, TableOperation>>()))
+                .Returns((IEnumerable<TEntity> entities, Func<ITableEntity, TableOperation> operation) => entities);
 
             // Execute batches async
-            mock.Setup(executor => executor.ExecuteBatchesAsync(It.IsAny<IList<TEntity>>(), It.IsAny<Func<ITableEntity, TableOperation>>(), It.IsAny<CancellationToken>()))
-                .Returns((IList<TEntity> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken) => Task.FromResult(entities));
+            mock.Setup(executor => executor.ExecuteBatchesAsync(It.IsAny<IEnumerable<TEntity>>(), It.IsAny<Func<ITableEntity, TableOperation>>(), It.IsAny<CancellationToken>()))
+                .Returns((IEnumerable<TEntity> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken) => Task.FromResult(entities));
+
+            return mock;
+        }
+
+        internal static Mock<ITableEntityConverter<T>> GetTableEntityConverterMock<T>() where T : new()
+        {
+            var mock = new Mock<ITableEntityConverter<T>>();
+
+            mock.Setup(converter => converter.GetEntity(It.IsAny<DynamicTableEntity>())).Returns(() => default(T));
+
+            mock.Setup(converter => converter.GetEntity(It.IsAny<T>())).Returns(() => new DynamicTableEntity());
 
             return mock;
         }

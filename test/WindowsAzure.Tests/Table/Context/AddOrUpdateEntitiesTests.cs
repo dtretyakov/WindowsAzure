@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table;
+using WindowsAzure.Table.QueryExecutor;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -24,10 +25,10 @@ namespace WindowsAzure.Tests.Table.Context
                     QueryExecutor = mock.Object
                 };
 
-            IList<Country> countries = ObjectsFactory.GetCountries();
+            var countries = ObjectsFactory.GetCountries();
 
             // Act
-            IList<Country> result = context.AddOrUpdate(countries);
+            var result = context.AddOrUpdate(countries);
 
             // Assert
             Assert.NotNull(result);
@@ -46,14 +47,35 @@ namespace WindowsAzure.Tests.Table.Context
                     QueryExecutor = mock.Object
                 };
 
-            IList<Country> result = null;
+            IEnumerable<Country> result = null;
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => { result = context.AddOrUpdate((IList<Country>) null); });
+            Assert.Throws<ArgumentNullException>(() => { result = context.AddOrUpdate((IEnumerable<Country>)null); });
 
             // Assert
             Assert.Null(result);
-            mock.Verify(executor => executor.ExecuteBatches(It.IsAny<IList<Country>>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
+            mock.Verify(executor => executor.ExecuteBatches(It.IsAny<IEnumerable<Country>>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
+        }
+
+        [Fact]
+        public void AddOrUpdateEmptyCollection()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+            {
+                QueryExecutor = mock.Object
+            };
+
+            var countries = new List<Country>();
+
+            // Act
+            var result = context.AddOrUpdate(countries);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(countries, result);
         }
 
         [Fact]
@@ -67,10 +89,10 @@ namespace WindowsAzure.Tests.Table.Context
                     QueryExecutor = mock.Object
                 };
 
-            IList<Country> countries = ObjectsFactory.GetCountries();
+            var countries = ObjectsFactory.GetCountries();
 
             // Act
-            IList<Country> result = await context.AddOrUpdateAsync(countries);
+            var result = await context.AddOrUpdateAsync(countries);
 
             // Assert
             Assert.NotNull(result);
@@ -89,12 +111,12 @@ namespace WindowsAzure.Tests.Table.Context
                     QueryExecutor = mock.Object
                 };
 
-            IList<Country> result = null;
+            IEnumerable<Country> result = null;
 
             // Act
             try
             {
-                result = await context.AddOrUpdateAsync((IList<Country>) null, CancellationToken.None);
+                result = await context.AddOrUpdateAsync((IEnumerable<Country>)null, CancellationToken.None);
             }
             catch (ArgumentNullException)
             {
@@ -102,7 +124,28 @@ namespace WindowsAzure.Tests.Table.Context
 
             // Assert
             Assert.Null(result);
-            mock.Verify(executor => executor.ExecuteBatches(It.IsAny<IList<Country>>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
+            mock.Verify(executor => executor.ExecuteBatches(It.IsAny<IEnumerable<Country>>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
+        }
+
+        [Fact]
+        public async Task AddOrUpdateEmptyCollectionAsync()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+            {
+                QueryExecutor = mock.Object
+            };
+
+            var countries = new List<Country>();
+
+            // Act
+            var result = await context.AddOrUpdateAsync(countries);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(countries, result);
         }
     }
 }

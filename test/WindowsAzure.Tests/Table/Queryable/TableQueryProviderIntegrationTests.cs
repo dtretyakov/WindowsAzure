@@ -23,58 +23,54 @@ namespace WindowsAzure.Tests.Table.Queryable
         public TableQueryProviderIntegrationTests()
         {
             TableSet<Country> tableSet = GetTableSet();
-            tableSet.Add(
-                new List<Country>
-                    {
-                        new Country
-                            {
-                                Area = 357021,
-                                Continent = "Europe",
-                                TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                Formed = new DateTime(1871, 1, 18),
-                                Id = Guid.NewGuid(),
-                                IsExists = true,
-                                Name = Germany,
-                                Population = 81799600,
-                                PresidentsCount = 11
-                            },
-                        new Country
-                            {
-                                Area = 505992,
-                                Continent = "Europe",
-                                TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                Formed = new DateTime(1812, 1, 1),
-                                Id = Guid.NewGuid(),
-                                IsExists = false,
-                                Name = Spain,
-                                Population = 47190493,
-                                PresidentsCount = 8
-                            },
-                        new Country
-                            {
-                                Area = 674843,
-                                Continent = "Europe",
-                                TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                Formed = new DateTime(1792, 1, 1),
-                                Id = Guid.NewGuid(),
-                                IsExists = true,
-                                Name = France,
-                                Population = 65350000,
-                                PresidentsCount = 24
-                            },
-                        new Country
-                            {
-                                Area = 338424,
-                                Continent = "Europe",
-                                TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                                Formed = new DateTime(1809, 3, 29),
-                                Id = Guid.NewGuid(),
-                                IsExists = true,
-                                Name = Finland,
-                                Population = 5421827,
-                                PresidentsCount = 12
-                            }
-                    }
+            tableSet.Add(new Country
+                {
+                    Area = 357021,
+                    Continent = "Europe",
+                    TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
+                    Formed = new DateTime(1871, 1, 18),
+                    Id = Guid.NewGuid(),
+                    IsExists = true,
+                    Name = Germany,
+                    Population = 81799600,
+                    PresidentsCount = 11
+                });
+            tableSet.Add(new Country
+                {
+                    Area = 505992,
+                    Continent = "Europe",
+                    TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
+                    Formed = new DateTime(1812, 1, 1),
+                    Id = Guid.NewGuid(),
+                    IsExists = false,
+                    Name = Spain,
+                    Population = 47190493,
+                    PresidentsCount = 8
+                });
+            tableSet.Add(new Country
+                {
+                    Area = 674843,
+                    Continent = "Europe",
+                    TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
+                    Formed = new DateTime(1792, 1, 1),
+                    Id = Guid.NewGuid(),
+                    IsExists = true,
+                    Name = France,
+                    Population = 65350000,
+                    PresidentsCount = 24
+                });
+            tableSet.Add(new Country
+                {
+                    Area = 338424,
+                    Continent = "Europe",
+                    TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
+                    Formed = new DateTime(1809, 3, 29),
+                    Id = Guid.NewGuid(),
+                    IsExists = true,
+                    Name = Finland,
+                    Population = 5421827,
+                    PresidentsCount = 12
+                }
                 );
         }
 
@@ -108,7 +104,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.True(result is IEnumerable<Country>);
 
             List<Country> typedResult = ((IEnumerable<Country>) result).ToList();
-            Assert.Equal(typedResult.Count, 3);
+            Assert.Equal(3, typedResult.Count);
 
             List<string> names = typedResult.Select(p => p.Name).ToList();
             Assert.Contains(Germany, names);
@@ -132,8 +128,8 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.True(result is IEnumerable<Country>);
 
             List<Country> typedResult = ((IEnumerable<Country>) result).ToList();
-            Assert.Equal(typedResult.Count, 1);
-            Assert.Equal(typedResult[0].Name, Spain);
+            Assert.Equal(1, typedResult.Count);
+            Assert.Equal(Spain, typedResult[0].Name);
         }
     }
 }

@@ -12,27 +12,25 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     ///     Handles access to Timestamp value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class TimestampAccessor<T> : IKeyProperty<T>
+    internal sealed class TimestampAccessor<T> : IKeyProperty<T>
     {
         private readonly Type _timestampAttributeType = typeof (TimestampAttribute);
-        private readonly List<Type> _timestampTypes;
+
+        private readonly List<Type> _timestampTypes = new List<Type>
+            {
+                typeof (DateTime),
+                typeof (DateTime?),
+                typeof (DateTimeOffset),
+                typeof (DateTimeOffset?)
+            };
+
         private IValueAccessor<T> _accessor;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public TimestampAccessor()
+        internal TimestampAccessor()
         {
-            _timestampAttributeType = typeof (TimestampAttribute);
-
-            _timestampTypes = new List<Type>
-                {
-                    typeof (DateTime),
-                    typeof (DateTime?),
-                    typeof (DateTimeOffset),
-                    typeof (DateTimeOffset?)
-                };
-
             NameChanges = new Dictionary<string, string>();
         }
 

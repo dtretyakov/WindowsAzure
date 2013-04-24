@@ -9,7 +9,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     ///     Handles access operations to the entity type member via Expressions.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public abstract class ExpressionValueAccesorBase<T> : IValueAccessor<T>
+    internal abstract class ExpressionValueAccesorBase<T> : IValueAccessor<T>
     {
         /// <summary>
         ///     Entity instance expression.

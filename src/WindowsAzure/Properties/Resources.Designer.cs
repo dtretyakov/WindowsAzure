@@ -169,11 +169,11 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid partitioning mode &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Invalid request execution mode &apos;{0}&apos;..
         /// </summary>
-        internal static string TableQueryExecutorInvalidPartitioningMode {
+        internal static string TableQueryExecutorInvalidMode {
             get {
-                return ResourceManager.GetString("TableQueryExecutorInvalidPartitioningMode", resourceCulture);
+                return ResourceManager.GetString("TableQueryExecutorInvalidMode", resourceCulture);
             }
         }
         

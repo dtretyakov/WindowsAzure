@@ -88,7 +88,10 @@
     <Compile Include="Table\Context\AddOrUpdateEntitiesTests.cs" />
     <Compile Include="Table\Context\AddOrUpdateEntityTests.cs" />
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
-    <Compile Include="Table\Context\PartitionerTests.cs" />
+    <Compile Include="Table\QueryExecutor\SequentialExecutorTests.cs" />
+    <Compile Include="Table\QueryExecutor\ExecutorFactoryTests.cs" />
+    <Compile Include="Table\QueryExecutor\ParallelExecutorTests.cs" />
+    <Compile Include="Table\QueryExecutor\PartitionerTests.cs" />
     <Compile Include="Table\Context\TableSetTests.cs" />
     <Compile Include="Table\Context\UpdateEntitiesTests.cs" />
     <Compile Include="Table\Extensions\CloudTableExtensionsIntegrationTests.cs" />

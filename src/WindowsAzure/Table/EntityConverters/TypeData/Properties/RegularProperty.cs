@@ -11,7 +11,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     ///     Handles access to regular property.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class RegularProperty<T> : IProperty<T>
+    internal sealed class RegularProperty<T> : IProperty<T>
     {
         private readonly IValueAccessor<T> _accessor;
         private readonly string _memberName;
@@ -22,7 +22,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         /// </summary>
         /// <param name="memberInfo">Member info.</param>
         /// <param name="accessor">Value accessor.</param>
-        public RegularProperty(MemberInfo memberInfo, IValueAccessor<T> accessor)
+        internal RegularProperty(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
             _nameChanges = new Dictionary<string, string>();
 

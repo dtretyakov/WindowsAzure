@@ -13,7 +13,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     ///     Keeps an entity type data.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class EntityTypeData<T> : IEntityTypeData<T> where T : class, new()
+    internal sealed class EntityTypeData<T> : IEntityTypeData<T> where T : class, new()
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
@@ -23,7 +23,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public EntityTypeData()
+        internal EntityTypeData()
         {
             _nameChanges = new Dictionary<string, string>();
             _properties = new List<IProperty<T>>();

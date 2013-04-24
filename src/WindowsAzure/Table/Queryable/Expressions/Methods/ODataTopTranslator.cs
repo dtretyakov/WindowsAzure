@@ -7,7 +7,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// <summary>
     ///     Take expression translator.
     /// </summary>
-    public sealed class ODataTopTranslator : ExpressionVisitor, IMethodTranslator
+    internal sealed class ODataTopTranslator : ExpressionVisitor, IMethodTranslator
     {
         private static readonly List<String> SupportedMethods = new List<string> {"Take"};
         private ITranslationResult _result;

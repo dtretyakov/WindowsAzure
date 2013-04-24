@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     ///     Handles property value manipulations.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public sealed class PropertyValueAccessor<T> : ExpressionValueAccesorBase<T>
+    internal sealed class PropertyValueAccessor<T> : ExpressionValueAccesorBase<T>
     {
         /// <summary>
         ///     Creates a property value accessor.

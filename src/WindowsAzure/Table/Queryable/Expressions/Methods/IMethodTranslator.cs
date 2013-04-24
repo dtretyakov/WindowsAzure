@@ -7,7 +7,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// <summary>
     ///     Expression method translator.
     /// </summary>
-    public interface IMethodTranslator
+    internal interface IMethodTranslator
     {
         /// <summary>
         ///     Gets a list of accepted methods.

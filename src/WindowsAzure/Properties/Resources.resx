@@ -171,7 +171,7 @@
   <data name="TableBatchPartitionerNoEntities" xml:space="preserve">
     <value>Empty entities collection.</value>
   </data>
-  <data name="TableQueryExecutorInvalidPartitioningMode" xml:space="preserve">
-    <value>Invalid partitioning mode '{0}'.</value>
+  <data name="TableQueryExecutorInvalidMode" xml:space="preserve">
+    <value>Invalid request execution mode '{0}'.</value>
   </data>
 </root>

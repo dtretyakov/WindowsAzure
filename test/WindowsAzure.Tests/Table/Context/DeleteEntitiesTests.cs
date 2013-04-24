@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table;
+using WindowsAzure.Table.QueryExecutor;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -52,6 +53,23 @@ namespace WindowsAzure.Tests.Table.Context
         }
 
         [Fact]
+        public void RemoveEmptyCollection()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+            {
+                QueryExecutor = mock.Object
+            };
+
+            var countries = new List<Country>();
+
+            // Act
+            context.Remove(countries);
+        }
+
+        [Fact]
         public async Task RemoveEntitiesAsync()
         {
             // Arrange
@@ -93,6 +111,23 @@ namespace WindowsAzure.Tests.Table.Context
 
             // Assert
             mock.Verify(executor => executor.ExecuteBatches(It.IsAny<IList<Country>>(), It.IsAny<Func<ITableEntity, TableOperation>>()), Times.Never());
+        }
+
+        [Fact]
+        public async Task RemoveEmptyCollectionAsync()
+        {
+            // Arrange
+            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient)
+            {
+                QueryExecutor = mock.Object
+            };
+
+            var countries = new List<Country>();
+
+            // Act
+            await context.RemoveAsync(countries);
         }
     }
 }

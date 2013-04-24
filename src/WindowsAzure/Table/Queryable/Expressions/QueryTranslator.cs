@@ -10,7 +10,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
     /// <summary>
     ///     Manages translation of the LINQ expressions.
     /// </summary>
-    public class QueryTranslator : ExpressionVisitor, IQueryTranslator
+    internal class QueryTranslator : ExpressionVisitor, IQueryTranslator
     {
         private readonly IList<IMethodTranslator> _methodTranslators;
         private ITranslationResult _result;
@@ -18,7 +18,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// <summary>
         ///     Constructor.
         /// </summary>
-        public QueryTranslator(IDictionary<string, string> nameChanges)
+        internal QueryTranslator(IDictionary<string, string> nameChanges)
             : this(GetTranslators(nameChanges))
         {
         }
@@ -27,7 +27,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         ///     Constructor.
         /// </summary>
         /// <param name="methodTranslators">LINQ Expression methods translators.</param>
-        public QueryTranslator(IList<IMethodTranslator> methodTranslators)
+        internal QueryTranslator(IList<IMethodTranslator> methodTranslators)
         {
             _methodTranslators = methodTranslators;
         }

@@ -6,7 +6,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     /// <summary>
     ///     Manages entity type data collections.
     /// </summary>
-    public static class EntityTypeDataFactory
+    internal static class EntityTypeDataFactory
     {
         /// <summary>
         ///     Entity type data cache.
