@@ -10,7 +10,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
     public sealed class PropertyValueAccessorTests
     {
         [Fact]
-        public void PropertyValueAccessorCreateTest()
+        public void CreatePropertyValueAccessor()
         {
             // Arrange
             PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("Boolean");
@@ -24,7 +24,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
-        public void PropertyValueAccessorInvalidTypeTest()
+        public void ExecutePropertyValueAccessorWithInvalidType()
         {
             // Arrange
             PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("Single");
@@ -35,6 +35,17 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
                     {
                         new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
                     });
+        }
+
+        [Fact]
+        public void ExecutePropertyValueAccessorWithNullParameter()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                {
+                    new PropertyValueAccessor<EntityWithProperties>(null);
+                });
         }
 
         #region Boolean

@@ -10,7 +10,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
     public sealed class FieldValueAccessorTests
     {
         [Fact]
-        public void FieldValueAccessorCreateTest()
+        public void CreateFieldValueAccessor()
         {
             // Arrange
             FieldInfo fieldInfo = typeof(EntityWithFields).GetField("Boolean");
@@ -24,7 +24,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
-        public void FieldValueAccessorInvalidTypeTest()
+        public void ExecuteFieldValueAccessorWithInvalidType()
         {
             // Arrange
             FieldInfo fieldInfo = typeof(EntityWithFields).GetField("Single");
@@ -35,6 +35,17 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
                     {
                         new FieldValueAccessor<EntityWithFields>(fieldInfo);
                     });
+        }
+
+        [Fact]
+        public void ExecuteFieldValueAccessorWithNullParameter()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(
+                () =>
+                {
+                    new FieldValueAccessor<EntityWithFields>(null);
+                });
         }
 
         #region Boolean

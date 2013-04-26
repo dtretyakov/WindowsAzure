@@ -96,8 +96,7 @@
     <Compile Include="Table\EntityConverters\TypeData\Properties\RowKeyAccessor.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\TimestampAccessor.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\IProperty.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\EntityPropertyFactory.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\ExpressionValueAccesorBase.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\ValueAccessorBase.cs" />
     <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\PropertyValueAccessor.cs" />
     <Compile Include="Table\EntityConverters\TypeData\EntityTypeData.cs" />
     <Compile Include="Table\EntityConverters\TypeData\EntityTypeDataFactory.cs" />

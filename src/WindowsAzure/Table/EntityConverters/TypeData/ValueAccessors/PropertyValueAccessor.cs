@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     ///     Handles property value manipulations.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    internal sealed class PropertyValueAccessor<T> : ExpressionValueAccesorBase<T>
+    internal sealed class PropertyValueAccessor<T> : ValueAccessorBase<T>
     {
         /// <summary>
         ///     Creates a property value accessor.
@@ -21,23 +21,13 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
                 throw new ArgumentNullException("propertyInfo");
             }
 
-            InstanceExpression = Expression.Parameter(typeof (T), "instance");
-            MemberExpression = Expression.Property(InstanceExpression, propertyInfo);
-
             Name = propertyInfo.Name;
             Type = propertyInfo.PropertyType;
 
-            Initialize();
+            ParameterExpression instanceExpression = Expression.Parameter(typeof (T), "instance");
+            MemberExpression memberExpression = Expression.Property(instanceExpression, propertyInfo);
+
+            CreateValueAccessors(instanceExpression, memberExpression);
         }
-
-        /// <summary>
-        ///     Property type.
-        /// </summary>
-        public override Type Type { get; protected set; }
-
-        /// <summary>
-        ///     Property name.
-        /// </summary>
-        public override string Name { get; protected set; }
     }
 }

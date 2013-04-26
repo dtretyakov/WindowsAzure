@@ -9,7 +9,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
     public sealed class ValueAccesorFactoryTests
     {
         [Fact]
-        public void ValueAccessorFactoryCreatePropertyAccessor()
+        public void CreateValueAccessorFromPropertyInfo()
         {
             // Arrange
             PropertyInfo propertyInfo = typeof (Entity).GetProperty("PublicProperty");
@@ -24,7 +24,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
-        public void ValueAccessorFactoryCreateFieldAccessor()
+        public void CreateValueAccessorFromFieldAccessor()
         {
             // Arrange
             FieldInfo fieldInfo = typeof (Entity).GetField("PublicField");
@@ -39,13 +39,20 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
-        public void ValueAccessorFactoryCreateWithInvalidMember()
+        public void CreateValueAccessorFromInvalidMember()
         {
             // Arrange
             MethodInfo methodInfo = typeof (Entity).GetMethod("PublicMethod");
 
             // Act && Assert
             Assert.Throws<NotSupportedException>(() => ValueAccessorFactory.Create<Entity>(methodInfo));
+        }
+
+        [Fact]
+        public void CreateValueAccessorFromNullParameter()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => ValueAccessorFactory.Create<Entity>(null));
         }
     }
 }

@@ -17,6 +17,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         /// <returns>Value accessor.</returns>
         public static IValueAccessor<T> Create<T>(MemberInfo memberInfo)
         {
+            if (memberInfo == null)
+            {
+                throw new ArgumentNullException("memberInfo");
+            }
+
             if (memberInfo.MemberType == MemberTypes.Field)
             {
                 return new FieldValueAccessor<T>((FieldInfo) memberInfo);
