@@ -16,7 +16,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     {
         private readonly Type _partitionKeyAttributeType;
         private readonly Type _stringType;
-        private IValueAccessor<T> _accessor;
+        private Func<T, EntityProperty> _getValue;
+        private Action<T, EntityProperty> _setValue;
 
         /// <summary>
         ///     Constructor.
@@ -29,10 +30,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
             NameChanges = new Dictionary<string, string>();
         }
 
-        public bool HasAccessor
-        {
-            get { return _accessor != null; }
-        }
+        public bool HasAccessor { get; private set; }
 
         public bool Validate(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
@@ -42,7 +40,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 return false;
             }
 
-            if (_accessor != null)
+            if (HasAccessor)
             {
                 throw new ArgumentException(Resources.PartitionKeyAttributeDuplicate);
             }
@@ -52,7 +50,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 throw new ArgumentException(Resources.PartitionKeyInvalidType);
             }
 
-            _accessor = accessor;
+            HasAccessor = true;
+
+            _getValue = accessor.GetValue;
+            _setValue = accessor.SetValue;
 
             NameChanges.Add(accessor.Name, "PartitionKey");
 
@@ -61,20 +62,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
         public void FillEntity(DynamicTableEntity tableEntity, T entity)
         {
-            if (_accessor != null)
-            {
-                _accessor.SetValue(entity, new EntityProperty(tableEntity.PartitionKey));
-            }
+            _setValue(entity, new EntityProperty(tableEntity.PartitionKey));
         }
 
         public void FillTableEntity(T entity, DynamicTableEntity tableEntity)
         {
-            if (_accessor != null)
-            {
-                tableEntity.PartitionKey = _accessor.GetValue(entity).StringValue;
-            }
-
-            tableEntity.PartitionKey = tableEntity.PartitionKey ?? string.Empty;
+            tableEntity.PartitionKey = _getValue(entity).StringValue;
         }
 
         public IDictionary<string, string> NameChanges { get; private set; }

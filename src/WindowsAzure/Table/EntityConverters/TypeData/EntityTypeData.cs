@@ -16,9 +16,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     internal sealed class EntityTypeData<T> : IEntityTypeData<T> where T : class, new()
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
-
         private readonly IDictionary<string, string> _nameChanges;
-        private readonly List<IProperty<T>> _properties;
+        private readonly IProperty<T>[] _properties = new IProperty<T>[] {};
 
         /// <summary>
         ///     Constructor.
@@ -26,15 +25,16 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         internal EntityTypeData()
         {
             _nameChanges = new Dictionary<string, string>();
-            _properties = new List<IProperty<T>>();
 
             Type entityType = typeof (T);
 
             var typeMembers = new List<MemberInfo>(entityType.GetFields(Flags));
             typeMembers.AddRange(entityType.GetProperties(Flags).Where(p => p.CanRead && p.CanWrite));
 
-            ProcessMembers(typeMembers);
+            _properties = GetProperties(typeMembers).ToArray();
         }
+
+        // ReSharper disable ForCanBeConvertedToForeach
 
         /// <summary>
         ///     Converts DynamicTableEntity into POCO entity.
@@ -50,8 +50,9 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             var result = new T();
 
-            foreach (var property in _properties)
+            for (int i = 0; i < _properties.Length; i++)
             {
+                IProperty<T> property = _properties[i];
                 property.FillEntity(tableEntity, result);
             }
 
@@ -70,15 +71,18 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 throw new ArgumentNullException("entity");
             }
 
-            var result = new DynamicTableEntity();
+            var result = new DynamicTableEntity(string.Empty, string.Empty);
 
-            foreach (var property in _properties)
+            for (int i = 0; i < _properties.Length; i++)
             {
+                IProperty<T> property = _properties[i];
                 property.FillTableEntity(entity, result);
             }
 
             return result;
         }
+
+        // ReSharper restore ForCanBeConvertedToForeach
 
         /// <summary>
         ///     Gets an entity members name changes.
@@ -92,8 +96,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         ///     Processes type members.
         /// </summary>
         /// <param name="memberInfos">Type memebers.</param>
-        private void ProcessMembers(IEnumerable<MemberInfo> memberInfos)
+        private IEnumerable<IProperty<T>> GetProperties(IList<MemberInfo> memberInfos)
         {
+            var properties = new List<IProperty<T>>(memberInfos.Count);
+
             // List of available key properties
             var keyProperties = new List<IKeyProperty<T>>
                 {
@@ -117,7 +123,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 var property = new RegularProperty<T>(memberInfo, valueAccessor);
                 if (property.HasAccessor)
                 {
-                    _properties.Add(property);
+                    properties.Add(property);
                 }
             }
 
@@ -129,13 +135,15 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             }
 
             // Merge properties
-            _properties.AddRange(keyProperties);
+            properties.AddRange(keyProperties.Where(p => p.HasAccessor));
 
             // Get name changes
-            foreach (var pair in _properties.SelectMany(keyProperty => keyProperty.NameChanges))
+            foreach (var pair in properties.SelectMany(keyProperty => keyProperty.NameChanges))
             {
                 _nameChanges.Add(pair.Key, pair.Value);
             }
+
+            return properties;
         }
     }
 }

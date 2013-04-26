@@ -14,6 +14,26 @@ namespace WindowsAzure.Tests.Common
             return storageAccount.CreateCloudTableClient();
         }
 
+        public static DynamicTableEntity GetCountryDynamicTableEntity()
+        {
+            return new DynamicTableEntity
+            {
+                
+                PartitionKey = "Europe",
+                RowKey = "Spain",
+                Properties = new Dictionary<string, EntityProperty>()
+                    {
+                        {"Area", new EntityProperty(505992.0)},
+                        {"TopSecretKey", new EntityProperty(new byte[] { 0xaa, 0xbb, 0xcc })},
+                        {"Formed", new EntityProperty(new DateTime(1812, 1, 1))},
+                        {"Id", new EntityProperty(Guid.NewGuid())},
+                        {"IsExists", new EntityProperty(true)},
+                        {"Population", new EntityProperty(47190493L)},
+                        {"PresidentsCount", new EntityProperty(8)}
+                    }
+            };
+        }
+
         public static Country GetCountry()
         {
             return new Country
@@ -28,6 +48,22 @@ namespace WindowsAzure.Tests.Common
                     Population = 47190493,
                     PresidentsCount = 8
                 };
+        }
+
+        public static CountryTableEntity GetTableCountry()
+        {
+            return new CountryTableEntity
+            {
+                Area = 505992,
+                PartitionKey = "Europe",
+                TopSecretKey = new byte[] { 0xaa, 0xbb, 0xcc },
+                Formed = new DateTime(1812, 1, 1),
+                Id = Guid.NewGuid(),
+                IsExists = true,
+                RowKey = "Spain",
+                Population = 47190493,
+                PresidentsCount = 8
+            };
         }
 
         public static IList<Country> GetCountries()

@@ -24,7 +24,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 typeof (DateTimeOffset?)
             };
 
-        private IValueAccessor<T> _accessor;
+        private Action<T, EntityProperty> _setValue;
 
         /// <summary>
         ///     Constructor.
@@ -34,10 +34,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
             NameChanges = new Dictionary<string, string>();
         }
 
-        public bool HasAccessor
-        {
-            get { return _accessor != null; }
-        }
+        public bool HasAccessor { get; private set; }
 
         public bool Validate(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
@@ -46,7 +43,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 return false;
             }
 
-            if (_accessor != null)
+            if (HasAccessor)
             {
                 throw new ArgumentException(Resources.TimestampAttributeDuplicate);
             }
@@ -56,17 +53,16 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 throw new ArgumentException(Resources.TimestampInvalidType);
             }
 
-            _accessor = accessor;
+            HasAccessor = true;
+
+            _setValue = accessor.SetValue;
 
             return true;
         }
 
         public void FillEntity(DynamicTableEntity tableEntity, T entity)
         {
-            if (_accessor != null)
-            {
-                _accessor.SetValue(entity, new EntityProperty(tableEntity.Timestamp));
-            }
+            _setValue(entity, new EntityProperty(tableEntity.Timestamp));
         }
 
         public void FillTableEntity(T entity, DynamicTableEntity tableEntity)

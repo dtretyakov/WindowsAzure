@@ -8,17 +8,14 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
     public sealed class EntityTypeDataTests
     {
         [Fact]
-        public void CreateEntityTypeDataTest()
+        public void CreateEntityTypeData()
         {
             // Arrange & Act
             var entityTypeData = new EntityTypeData<Country>();
 
             // Assert
             Assert.NotNull(entityTypeData);
-
-            // Check name changes
             Assert.NotNull(entityTypeData.NameChanges);
-
             Assert.True(entityTypeData.NameChanges.ContainsKey("Continent"));
             Assert.Equal(entityTypeData.NameChanges["Continent"], "PartitionKey");
             Assert.True(entityTypeData.NameChanges.ContainsKey("Continent"));
@@ -26,7 +23,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
-        public void CreateEntityTypeDataWithDifferentAccessorsTest()
+        public void CreateEntityTypeDataWithDifferentAccessors()
         {
             // Arrange & Act
             var entityTypeData = new EntityTypeData<Entity>();
@@ -41,7 +38,33 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
-        public void CreateEntityTypeWithFactoryTest()
+        public void CreateEntityTypeDataWithIvalidProperties()
+        {
+            // Arrange
+            EntityTypeData<EntityWithProperties> typeData = null;
+
+            // Act
+            Assert.Throws<ArgumentException>(() => { typeData = new EntityTypeData<EntityWithProperties>(); });
+
+            // Assert
+            Assert.Null(typeData);
+        }
+
+        [Fact]
+        public void CreateEntityTypeDataWithIvalidFields()
+        {
+            // Arrange
+            EntityTypeData<EntityWithFields> typeData = null;
+
+            // Act
+            Assert.Throws<ArgumentException>(() => { typeData = new EntityTypeData<EntityWithFields>(); });
+
+            // Assert
+            Assert.Null(typeData);
+        }
+
+        [Fact]
+        public void CreateEntityTypeDataWithFactory()
         {
             // Arrange & Act
             IEntityTypeData<Country> entityTypeData = EntityTypeDataFactory.GetEntityTypeData<Country>();
@@ -56,24 +79,6 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Equal(entityTypeData.NameChanges["Continent"], "PartitionKey");
             Assert.True(entityTypeData.NameChanges.ContainsKey("Continent"));
             Assert.Equal(entityTypeData.NameChanges["Name"], "RowKey");
-        }
-
-        [Fact]
-        public void CreateEntityTypeDataWithIvalidPropertiesTest()
-        {
-            // Act & Assert
-            // ReSharper disable ObjectCreationAsStatement
-            Assert.Throws<ArgumentException>(() => { new EntityTypeData<EntityWithProperties>(); });
-            // ReSharper restore ObjectCreationAsStatement
-        }
-
-        [Fact]
-        public void CreateEntityTypeDataWithIvalidFieldsTest()
-        {
-            // Act & Assert
-            // ReSharper disable ObjectCreationAsStatement
-            Assert.Throws<ArgumentException>(() => { new EntityTypeData<EntityWithFields>(); });
-            // ReSharper restore ObjectCreationAsStatement
         }
     }
 }

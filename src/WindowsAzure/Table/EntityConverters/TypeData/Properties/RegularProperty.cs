@@ -13,9 +13,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     /// <typeparam name="T">Entity type.</typeparam>
     internal sealed class RegularProperty<T> : IProperty<T>
     {
-        private readonly IValueAccessor<T> _accessor;
+        private readonly Func<T, EntityProperty> _getValue;
         private readonly string _memberName;
         private readonly Dictionary<string, string> _nameChanges;
+        private readonly Action<T, EntityProperty> _setValue;
 
         /// <summary>
         ///     Constructor.
@@ -32,7 +33,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 return;
             }
 
-            _accessor = accessor;
+            HasAccessor = true;
+
+            _getValue = accessor.GetValue;
+            _setValue = accessor.SetValue;
             _memberName = memberInfo.Name;
 
             // Try to get PropertyAttribute
@@ -56,10 +60,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
             get { return _nameChanges; }
         }
 
-        public bool HasAccessor
-        {
-            get { return _accessor != null; }
-        }
+        public bool HasAccessor { get; private set; }
 
         public void FillEntity(DynamicTableEntity tableEntity, T entity)
         {
@@ -67,13 +68,13 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
             if (tableEntity.Properties.TryGetValue(_memberName, out entityProperty))
             {
-                _accessor.SetValue(entity, entityProperty);
+                _setValue(entity, entityProperty);
             }
         }
 
         public void FillTableEntity(T entity, DynamicTableEntity tableEntity)
         {
-            tableEntity.Properties.Add(_memberName, _accessor.GetValue(entity));
+            tableEntity.Properties.Add(_memberName, _getValue(entity));
         }
     }
 }

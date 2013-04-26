@@ -16,7 +16,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     {
         private readonly Type _eTagAttributeType;
         private readonly Type _stringType;
-        private IValueAccessor<T> _accessor;
+        private Func<T, EntityProperty> _getValue;
+        private Action<T, EntityProperty> _setValue;
 
         /// <summary>
         ///     Constructor.
@@ -29,10 +30,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
             NameChanges = new Dictionary<String, String>();
         }
 
-        public bool HasAccessor
-        {
-            get { return _accessor != null; }
-        }
+        public bool HasAccessor { get; private set; }
 
         public bool Validate(MemberInfo memberInfo, IValueAccessor<T> accessor)
         {
@@ -41,7 +39,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 return false;
             }
 
-            if (_accessor != null)
+            if (HasAccessor)
             {
                 throw new ArgumentException(Resources.ETagAttributeDuplicate);
             }
@@ -51,30 +49,22 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 throw new ArgumentException(Resources.ETagInvalidType);
             }
 
-            _accessor = accessor;
+            HasAccessor = true;
+
+            _getValue = accessor.GetValue;
+            _setValue = accessor.SetValue;
 
             return true;
         }
 
         public void FillEntity(DynamicTableEntity tableEntity, T entity)
         {
-            if (_accessor != null)
-            {
-                _accessor.SetValue(entity, new EntityProperty(tableEntity.ETag));
-            }
+            _setValue(entity, new EntityProperty(tableEntity.ETag));
         }
 
         public void FillTableEntity(T entity, DynamicTableEntity tableEntity)
         {
-            if (_accessor != null)
-            {
-                tableEntity.ETag = _accessor.GetValue(entity).StringValue;
-            }
-
-            if (string.IsNullOrEmpty(tableEntity.ETag))
-            {
-                tableEntity.ETag = "*";
-            }
+            tableEntity.ETag = _getValue(entity).StringValue;
         }
 
         public IDictionary<string, string> NameChanges { get; private set; }

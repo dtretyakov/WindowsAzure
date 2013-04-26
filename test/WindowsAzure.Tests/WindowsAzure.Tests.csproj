@@ -83,11 +83,13 @@
     <Compile Include="Samples\EntityWithProperties.cs" />
     <Compile Include="Samples\LogEntry.cs" />
     <Compile Include="Samples\Entity.cs" />
+    <Compile Include="Samples\CountryTableEntity.cs" />
     <Compile Include="Samples\ProjectionResult.cs" />
     <Compile Include="Table\Context\AddEntitiesTests.cs" />
     <Compile Include="Table\Context\AddOrUpdateEntitiesTests.cs" />
     <Compile Include="Table\Context\AddOrUpdateEntityTests.cs" />
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
+    <Compile Include="Table\EntityConverters\EntityConverterTests.cs" />
     <Compile Include="Table\QueryExecutor\SequentialExecutorTests.cs" />
     <Compile Include="Table\QueryExecutor\ExecutorFactoryTests.cs" />
     <Compile Include="Table\QueryExecutor\ParallelExecutorTests.cs" />
