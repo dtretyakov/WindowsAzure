@@ -270,8 +270,6 @@ namespace WindowsAzure.Table
             return RequestExecutor.ExecuteWithoutResultAsync(entity, TableOperation.Delete, cancellationToken);
         }
 
-        // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-
         /// <summary>
         ///     Removes an entities.
         /// </summary>
@@ -285,8 +283,6 @@ namespace WindowsAzure.Table
 
             RequestExecutor.ExecuteBatchesWithoutResult(entities, TableOperation.Delete);
         }
-
-        // ReSharper restore ReturnValueOfPureMethodIsNotUsed
 
         /// <summary>
         ///     Removes an entities asynchronously.
