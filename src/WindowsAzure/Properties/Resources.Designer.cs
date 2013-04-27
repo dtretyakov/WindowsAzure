@@ -171,9 +171,9 @@ namespace WindowsAzure.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Invalid request execution mode &apos;{0}&apos;..
         /// </summary>
-        internal static string TableQueryExecutorInvalidMode {
+        internal static string TableRequestExecutorInvalidMode {
             get {
-                return ResourceManager.GetString("TableQueryExecutorInvalidMode", resourceCulture);
+                return ResourceManager.GetString("TableRequestExecutorInvalidMode", resourceCulture);
             }
         }
         

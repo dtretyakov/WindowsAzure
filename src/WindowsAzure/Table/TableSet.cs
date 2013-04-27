@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
-using WindowsAzure.Table.QueryExecutor;
 using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
+using WindowsAzure.Table.RequestExecutor;
 
 namespace WindowsAzure.Table
 {
@@ -17,8 +16,8 @@ namespace WindowsAzure.Table
     /// <typeparam name="TEntity">Entity type.</typeparam>
     public sealed class TableSet<TEntity> : Query<TEntity>, ITableSet<TEntity> where TEntity : class, new()
     {
-        internal readonly TableQueryExecutorFactory<TEntity> QueryExecutorFactory;
-        internal ITableQueryExecutor<TEntity> QueryExecutor;
+        internal readonly TableRequestExecutorFactory<TEntity> RequestExecutorFactory;
+        internal ITableRequestExecutor<TEntity> RequestExecutor;
         private ExecutionMode _executionMode = ExecutionMode.Sequential;
 
         /// <summary>
@@ -50,9 +49,9 @@ namespace WindowsAzure.Table
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
             var entityConverter = new TableEntityConverter<TEntity>();
 
-            QueryExecutorFactory = new TableQueryExecutorFactory<TEntity>(cloudTable, entityConverter);
+            RequestExecutorFactory = new TableRequestExecutorFactory<TEntity>(cloudTable, entityConverter);
             Provider = new TableQueryProvider<TEntity>(cloudTable, entityConverter);
-            QueryExecutor = QueryExecutorFactory.Create(_executionMode);
+            RequestExecutor = RequestExecutorFactory.Create(_executionMode);
         }
 
         /// <summary>
@@ -67,7 +66,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return QueryExecutor.Execute(entity, TableOperation.Insert);
+            return RequestExecutor.Execute(entity, TableOperation.Insert);
         }
 
         /// <summary>
@@ -83,7 +82,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return QueryExecutor.ExecuteAsync(entity, TableOperation.Insert, cancellationToken);
+            return RequestExecutor.ExecuteAsync(entity, TableOperation.Insert, cancellationToken);
         }
 
         /// <summary>
@@ -98,7 +97,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            return QueryExecutor.ExecuteBatches(entities, TableOperation.Insert);
+            return RequestExecutor.ExecuteBatches(entities, TableOperation.Insert);
         }
 
         /// <summary>
@@ -114,7 +113,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.Insert, cancellationToken);
+            return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.Insert, cancellationToken);
         }
 
         /// <summary>
@@ -129,7 +128,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return QueryExecutor.Execute(entity, TableOperation.InsertOrReplace);
+            return RequestExecutor.Execute(entity, TableOperation.InsertOrReplace);
         }
 
         /// <summary>
@@ -145,7 +144,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return QueryExecutor.ExecuteAsync(entity, TableOperation.InsertOrReplace, cancellationToken);
+            return RequestExecutor.ExecuteAsync(entity, TableOperation.InsertOrReplace, cancellationToken);
         }
 
         /// <summary>
@@ -160,7 +159,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            return QueryExecutor.ExecuteBatches(entities, TableOperation.InsertOrReplace);
+            return RequestExecutor.ExecuteBatches(entities, TableOperation.InsertOrReplace);
         }
 
         /// <summary>
@@ -176,7 +175,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.InsertOrReplace, cancellationToken);
+            return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.InsertOrReplace, cancellationToken);
         }
 
         /// <summary>
@@ -191,7 +190,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return QueryExecutor.Execute(entity, TableOperation.Replace);
+            return RequestExecutor.Execute(entity, TableOperation.Replace);
         }
 
         /// <summary>
@@ -207,7 +206,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return QueryExecutor.ExecuteAsync(entity, TableOperation.Replace, cancellationToken);
+            return RequestExecutor.ExecuteAsync(entity, TableOperation.Replace, cancellationToken);
         }
 
         /// <summary>
@@ -222,7 +221,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            return QueryExecutor.ExecuteBatches(entities, TableOperation.Replace);
+            return RequestExecutor.ExecuteBatches(entities, TableOperation.Replace);
         }
 
         /// <summary>
@@ -238,14 +237,13 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.Replace, cancellationToken);
+            return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.Replace, cancellationToken);
         }
 
         /// <summary>
         ///     Removes an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
-        /// <returns>Result.</returns>
         public void Remove(TEntity entity)
         {
             if (entity == null)
@@ -253,7 +251,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            QueryExecutor.Execute(entity, TableOperation.Delete);
+            RequestExecutor.ExecuteWithoutResult(entity, TableOperation.Delete);
         }
 
 
@@ -262,7 +260,6 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entity">Entity.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Result.</returns>
         public Task RemoveAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
         {
             if (entity == null)
@@ -270,7 +267,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return QueryExecutor.ExecuteAsync(entity, TableOperation.Delete, cancellationToken);
+            return RequestExecutor.ExecuteWithoutResultAsync(entity, TableOperation.Delete, cancellationToken);
         }
 
         // ReSharper disable ReturnValueOfPureMethodIsNotUsed
@@ -279,7 +276,6 @@ namespace WindowsAzure.Table
         ///     Removes an entities.
         /// </summary>
         /// <param name="entities">Entities collection.</param>
-        /// <returns>Result.</returns>
         public void Remove(IEnumerable<TEntity> entities)
         {
             if (entities == null)
@@ -287,7 +283,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            QueryExecutor.ExecuteBatches(entities, TableOperation.Delete).Count();
+            RequestExecutor.ExecuteBatchesWithoutResult(entities, TableOperation.Delete);
         }
 
         // ReSharper restore ReturnValueOfPureMethodIsNotUsed
@@ -297,7 +293,6 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="entities">Entities collection.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Result.</returns>
         public Task RemoveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (entities == null)
@@ -305,7 +300,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            return QueryExecutor.ExecuteBatchesAsync(entities, TableOperation.Delete, cancellationToken);
+            return RequestExecutor.ExecuteBatchesWithoutResultAsync(entities, TableOperation.Delete, cancellationToken);
         }
 
         /// <summary>
@@ -323,7 +318,7 @@ namespace WindowsAzure.Table
 
                 _executionMode = value;
 
-                QueryExecutor = QueryExecutorFactory.Create(_executionMode);
+                RequestExecutor = RequestExecutorFactory.Create(_executionMode);
             }
         }
     }

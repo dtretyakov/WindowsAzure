@@ -19,7 +19,7 @@ namespace WindowsAzure.Tests.Table.Context
             var context = new TableSet<Country>(tableClient);
 
             // Assert
-            Assert.Equal(typeof (Country).Name, context.QueryExecutorFactory.CloudTable.Name);
+            Assert.Equal(typeof (Country).Name, context.RequestExecutorFactory.CloudTable.Name);
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace WindowsAzure.Tests.Table.Context
             var context = new TableSet<Country>(tableClient, tableName);
 
             // Assert
-            Assert.Equal(tableName, context.QueryExecutorFactory.CloudTable.Name);
+            Assert.Equal(tableName, context.RequestExecutorFactory.CloudTable.Name);
         }
 
         [Fact]

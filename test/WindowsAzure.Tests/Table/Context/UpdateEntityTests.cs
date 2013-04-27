@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table;
-using WindowsAzure.Table.QueryExecutor;
+using WindowsAzure.Table.RequestExecutor;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -17,11 +17,11 @@ namespace WindowsAzure.Tests.Table.Context
         public void UpdateEntity()
         {
             // Arrange
-            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            Mock<ITableRequestExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
             CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
             var context = new TableSet<Country>(tableClient)
             {
-                QueryExecutor = mock.Object
+                RequestExecutor = mock.Object
             };
 
             Country country = ObjectsFactory.GetCountry();
@@ -39,11 +39,11 @@ namespace WindowsAzure.Tests.Table.Context
         public void UpdateEntityWithNullParameter()
         {
             // Arrange
-            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            Mock<ITableRequestExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
             CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
             var context = new TableSet<Country>(tableClient)
             {
-                QueryExecutor = mock.Object
+                RequestExecutor = mock.Object
             };
 
             Country result = null;
@@ -60,11 +60,11 @@ namespace WindowsAzure.Tests.Table.Context
         public async Task UpdateEntityAsync()
         {
             // Arrange
-            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            Mock<ITableRequestExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
             CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
             var context = new TableSet<Country>(tableClient)
             {
-                QueryExecutor = mock.Object
+                RequestExecutor = mock.Object
             };
 
             Country country = ObjectsFactory.GetCountry();
@@ -82,11 +82,11 @@ namespace WindowsAzure.Tests.Table.Context
         public async Task UpdateEntityWithNullParameterAsync()
         {
             // Arrange
-            Mock<ITableQueryExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
+            Mock<ITableRequestExecutor<Country>> mock = MocksFactory.GetQueryExecutorMock<Country>();
             CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
             var context = new TableSet<Country>(tableClient)
             {
-                QueryExecutor = mock.Object
+                RequestExecutor = mock.Object
             };
 
             Country result = null;

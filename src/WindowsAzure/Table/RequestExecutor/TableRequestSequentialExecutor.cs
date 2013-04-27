@@ -7,13 +7,13 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Extensions;
 
-namespace WindowsAzure.Table.QueryExecutor
+namespace WindowsAzure.Table.RequestExecutor
 {
     /// <summary>
     ///     Handles query execution.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    internal sealed class TableQuerySequentialExecutor<T> : TableQueryExecutorBase<T> where T : new()
+    internal sealed class TableRequestSequentialExecutor<T> : TableRequestExecutorBase<T> where T : new()
     {
         private readonly CloudTable _cloudTable;
         private readonly ITableEntityConverter<T> _entityConverter;
@@ -24,7 +24,7 @@ namespace WindowsAzure.Table.QueryExecutor
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="entityConverter">Entity converter.</param>
-        internal TableQuerySequentialExecutor(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
+        internal TableRequestSequentialExecutor(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
             : base(cloudTable, entityConverter)
         {
             _cloudTable = cloudTable;
@@ -49,6 +49,22 @@ namespace WindowsAzure.Table.QueryExecutor
         }
 
         /// <summary>
+        ///     Executes batch operations without returning results.
+        /// </summary>
+        /// <param name="entities">List of entities.</param>
+        /// <param name="operation">Table operation.</param>
+        public override void ExecuteBatchesWithoutResult(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation)
+        {
+            IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
+            IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
+
+            foreach (TableBatchOperation batch in batches)
+            {
+                _cloudTable.ExecuteBatch(batch);
+            }
+        }
+
+        /// <summary>
         ///     Executes batch operations asynchronously.
         /// </summary>
         /// <param name="entities">List of entities.</param>
@@ -70,6 +86,21 @@ namespace WindowsAzure.Table.QueryExecutor
 
             return TaskHelpers.Iterate(tasks, cancellationToken)
                               .Then(() => result.AsEnumerable(), cancellationToken);
+        }
+
+        /// <summary>
+        ///     Executes batch operations without returning results asynchronously.
+        /// </summary>
+        /// <param name="entities">List of entities.</param>
+        /// <param name="operation">Table operation.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public override Task ExecuteBatchesWithoutResultAsync(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken)
+        {
+            IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
+            IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
+            IEnumerable<Task> tasks = batches.Select(p => _cloudTable.ExecuteBatchAsync(p, cancellationToken));
+
+            return TaskHelpers.Iterate(tasks, cancellationToken);
         }
     }
 }

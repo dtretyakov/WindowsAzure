@@ -6,9 +6,9 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Extensions;
 
-namespace WindowsAzure.Table.QueryExecutor
+namespace WindowsAzure.Table.RequestExecutor
 {
-    internal abstract class TableQueryExecutorBase<T> : ITableQueryExecutor<T> where T : new()
+    internal abstract class TableRequestExecutorBase<T> : ITableRequestExecutor<T> where T : new()
     {
         private readonly CloudTable _cloudTable;
         private readonly ITableEntityConverter<T> _entityConverter;
@@ -18,7 +18,7 @@ namespace WindowsAzure.Table.QueryExecutor
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="entityConverter">Entity converter.</param>
-        internal TableQueryExecutorBase(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
+        internal TableRequestExecutorBase(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
         {
             if (cloudTable == null)
             {
@@ -49,6 +49,17 @@ namespace WindowsAzure.Table.QueryExecutor
         }
 
         /// <summary>
+        ///     Executes operation without returning result.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <param name="operation">Operation.</param>
+        public void ExecuteWithoutResult(T entity, Func<ITableEntity, TableOperation> operation)
+        {
+            ITableEntity tableEntity = _entityConverter.GetEntity(entity);
+            _cloudTable.Execute(operation(tableEntity));
+        }
+
+        /// <summary>
         ///     Executes operation asynchronously.
         /// </summary>
         /// <param name="entity">Entity.</param>
@@ -68,8 +79,21 @@ namespace WindowsAzure.Table.QueryExecutor
                     }, cancellationToken);
         }
 
-        public abstract IEnumerable<T> ExecuteBatches(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation);
+        /// <summary>
+        ///     Executes operation without returning result asynchronously.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <param name="operation">Operation.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public Task ExecuteWithoutResultAsync(T entity, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken)
+        {
+            ITableEntity tableEntity = _entityConverter.GetEntity(entity);
+            return _cloudTable.ExecuteAsync(operation(tableEntity), cancellationToken);
+        }
 
+        public abstract IEnumerable<T> ExecuteBatches(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation);
+        public abstract void ExecuteBatchesWithoutResult(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation);
         public abstract Task<IEnumerable<T>> ExecuteBatchesAsync(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken);
+        public abstract Task ExecuteBatchesWithoutResultAsync(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken);
     }
 }

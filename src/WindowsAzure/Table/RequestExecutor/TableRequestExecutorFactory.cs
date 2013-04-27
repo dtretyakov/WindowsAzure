@@ -3,12 +3,12 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters;
 
-namespace WindowsAzure.Table.QueryExecutor
+namespace WindowsAzure.Table.RequestExecutor
 {
     /// <summary>
-    ///     Manages construction of table query executors.
+    ///     Handles construction of table request executors.
     /// </summary>
-    internal sealed class TableQueryExecutorFactory<T> where T : new()
+    internal sealed class TableRequestExecutorFactory<T> where T : new()
     {
         internal readonly CloudTable CloudTable;
         private readonly ITableEntityConverter<T> _entityConverter;
@@ -18,7 +18,7 @@ namespace WindowsAzure.Table.QueryExecutor
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="entityConverter">Entity converter.</param>
-        public TableQueryExecutorFactory(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
+        public TableRequestExecutorFactory(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
         {
             if (cloudTable == null)
             {
@@ -35,26 +35,26 @@ namespace WindowsAzure.Table.QueryExecutor
         }
 
         /// <summary>
-        ///     Creates a new <see cref="ITableQueryExecutor{TEntity}" />.
+        ///     Creates a new <see cref="ITableRequestExecutor{T}" />.
         /// </summary>
         /// <typeparam name="T">Entity type.</typeparam>
         /// <param name="executionMode">Execution mode.</param>
         /// <returns>
-        ///     <see cref="ITableQueryExecutor{TEntity}" />
+        ///     <see cref="ITableRequestExecutor{T}" />
         /// </returns>
-        public ITableQueryExecutor<T> Create(ExecutionMode executionMode)
+        public ITableRequestExecutor<T> Create(ExecutionMode executionMode)
         {
             if (executionMode == ExecutionMode.Parallel)
             {
-                return new TableQueryParallelExecutor<T>(CloudTable, _entityConverter);
+                return new TableRequestParallelExecutor<T>(CloudTable, _entityConverter);
             }
 
             if (executionMode == ExecutionMode.Sequential)
             {
-                return new TableQuerySequentialExecutor<T>(CloudTable, _entityConverter);
+                return new TableRequestSequentialExecutor<T>(CloudTable, _entityConverter);
             }
 
-            string message = string.Format(Resources.TableQueryExecutorInvalidMode, executionMode);
+            string message = string.Format(Resources.TableRequestExecutorInvalidMode, executionMode);
             throw new ArgumentOutOfRangeException("executionMode", message);
         }
     }

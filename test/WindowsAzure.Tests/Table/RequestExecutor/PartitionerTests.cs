@@ -4,10 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
-using WindowsAzure.Table.QueryExecutor;
+using WindowsAzure.Table.RequestExecutor;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.QueryExecutor
+namespace WindowsAzure.Tests.Table.RequestExecutor
 {
     public sealed class PartitionerTests
     {

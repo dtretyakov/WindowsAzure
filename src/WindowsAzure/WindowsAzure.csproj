@@ -83,11 +83,11 @@
     <Compile Include="Table\Attributes\IgnoreAttribute.cs" />
     <Compile Include="Table\Attributes\ETagAttribute.cs" />
     <Compile Include="Table\Attributes\PropertyAttribute.cs" />
-    <Compile Include="Table\QueryExecutor\TableQueryExecutorFactory.cs" />
-    <Compile Include="Table\QueryExecutor\TableQuerySequentialExecutor.cs" />
-    <Compile Include="Table\QueryExecutor\ITableBatchPartitioner.cs" />
-    <Compile Include="Table\QueryExecutor\ITableQueryExecutor.cs" />
-    <Compile Include="Table\QueryExecutor\TableBatchPartitioner.cs" />
+    <Compile Include="Table\RequestExecutor\TableRequestExecutorFactory.cs" />
+    <Compile Include="Table\RequestExecutor\TableRequestSequentialExecutor.cs" />
+    <Compile Include="Table\RequestExecutor\ITableBatchPartitioner.cs" />
+    <Compile Include="Table\RequestExecutor\ITableRequestExecutor.cs" />
+    <Compile Include="Table\RequestExecutor\TableBatchPartitioner.cs" />
     <Compile Include="Table\ExecutionMode.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\ETagAccessor.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\IKeyProperty.cs" />
@@ -126,8 +126,8 @@
     <Compile Include="Table\Queryable\Expressions\QueryTranslator.cs" />
     <Compile Include="Table\Queryable\Base\TypeSystem.cs" />
     <Compile Include="Table\Attributes\RowKeyAttribute.cs" />
-    <Compile Include="Table\QueryExecutor\TableQueryParallelExecutor.cs" />
-    <Compile Include="Table\QueryExecutor\TableQueryExecutorBase.cs" />
+    <Compile Include="Table\RequestExecutor\TableRequestParallelExecutor.cs" />
+    <Compile Include="Table\RequestExecutor\TableRequestExecutorBase.cs" />
     <Compile Include="Table\TableSet.cs" />
     <Compile Include="Table\EntityConverters\TableEntityConverter.cs" />
     <Compile Include="Table\Attributes\TimestampAttribute.cs" />

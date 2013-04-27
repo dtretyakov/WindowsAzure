@@ -3,12 +3,12 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table;
 using WindowsAzure.Table.EntityConverters;
-using WindowsAzure.Table.QueryExecutor;
+using WindowsAzure.Table.RequestExecutor;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.QueryExecutor
+namespace WindowsAzure.Tests.Table.RequestExecutor
 {
     public sealed class ExecutorFactoryTests
     {
@@ -18,14 +18,14 @@ namespace WindowsAzure.Tests.Table.QueryExecutor
             // Arrange
             Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
             CloudTable cloudTable = ObjectsFactory.GetCloudTable();
-            var executorFactory = new TableQueryExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
+            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
 
             // Act
-            ITableQueryExecutor<Country> executor = executorFactory.Create(ExecutionMode.Parallel);
+            ITableRequestExecutor<Country> executor = executorFactory.Create(ExecutionMode.Parallel);
 
             // Assert
             Assert.NotNull(executor);
-            Assert.IsType<TableQueryParallelExecutor<Country>>(executor);
+            Assert.IsType<TableRequestParallelExecutor<Country>>(executor);
             Assert.Equal(cloudTable, executorFactory.CloudTable);
         }
 
@@ -35,14 +35,14 @@ namespace WindowsAzure.Tests.Table.QueryExecutor
             // Arrange
             Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
             CloudTable cloudTable = ObjectsFactory.GetCloudTable();
-            var executorFactory = new TableQueryExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
+            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
 
             // Act
-            ITableQueryExecutor<Country> executor = executorFactory.Create(ExecutionMode.Sequential);
+            ITableRequestExecutor<Country> executor = executorFactory.Create(ExecutionMode.Sequential);
 
             // Assert
             Assert.NotNull(executor);
-            Assert.IsType<TableQuerySequentialExecutor<Country>>(executor);
+            Assert.IsType<TableRequestSequentialExecutor<Country>>(executor);
             Assert.Equal(cloudTable, executorFactory.CloudTable);
         }
 
@@ -53,7 +53,7 @@ namespace WindowsAzure.Tests.Table.QueryExecutor
             Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => new TableQueryExecutorFactory<Country>(null, entityConverterMock.Object));
+            Assert.Throws<ArgumentNullException>(() => new TableRequestExecutorFactory<Country>(null, entityConverterMock.Object));
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace WindowsAzure.Tests.Table.QueryExecutor
             CloudTable cloudTable = ObjectsFactory.GetCloudTable();
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => new TableQueryExecutorFactory<Country>(cloudTable, null));
+            Assert.Throws<ArgumentNullException>(() => new TableRequestExecutorFactory<Country>(cloudTable, null));
         }
     }
 }

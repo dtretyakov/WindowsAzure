@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace WindowsAzure.Table.QueryExecutor
+namespace WindowsAzure.Table.RequestExecutor
 {
     /// <summary>
     ///     Handles entities batching in insert operations.
