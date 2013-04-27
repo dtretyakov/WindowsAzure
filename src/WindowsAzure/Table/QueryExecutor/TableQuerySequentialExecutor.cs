@@ -69,7 +69,7 @@ namespace WindowsAzure.Table.QueryExecutor
                              tableResult => _entityConverter.GetEntity((DynamicTableEntity) tableResult.Result))), cancellationToken));
 
             return TaskHelpers.Iterate(tasks, cancellationToken)
-                              .ContinueWith(p => result.AsEnumerable(), cancellationToken);
+                              .Then(() => result.AsEnumerable(), cancellationToken);
         }
     }
 }

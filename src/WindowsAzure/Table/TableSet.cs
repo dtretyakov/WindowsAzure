@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -272,6 +273,8 @@ namespace WindowsAzure.Table
             return QueryExecutor.ExecuteAsync(entity, TableOperation.Delete, cancellationToken);
         }
 
+        // ReSharper disable ReturnValueOfPureMethodIsNotUsed
+
         /// <summary>
         ///     Removes an entities.
         /// </summary>
@@ -284,8 +287,10 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entities");
             }
 
-            QueryExecutor.ExecuteBatches(entities, TableOperation.Delete);
+            QueryExecutor.ExecuteBatches(entities, TableOperation.Delete).Count();
         }
+
+        // ReSharper restore ReturnValueOfPureMethodIsNotUsed
 
         /// <summary>
         ///     Removes an entities asynchronously.

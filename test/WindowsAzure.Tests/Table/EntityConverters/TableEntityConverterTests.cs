@@ -50,7 +50,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(context);
 
             // Assert
-            Assert.Equal(null, tableEntity.ETag);
+            Assert.Equal("*", tableEntity.ETag);
             Assert.Equal(country.Continent, tableEntity.PartitionKey);
             Assert.Equal(country.Name, tableEntity.RowKey);
             Assert.Equal(country.Area, properties["Area"].DoubleValue);

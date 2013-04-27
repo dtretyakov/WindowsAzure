@@ -71,7 +71,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 throw new ArgumentNullException("entity");
             }
 
-            var result = new DynamicTableEntity(string.Empty, string.Empty);
+            var result = new DynamicTableEntity(string.Empty, string.Empty)
+                {
+                    ETag = "*"
+                };
 
             for (int i = 0; i < _properties.Length; i++)
             {
