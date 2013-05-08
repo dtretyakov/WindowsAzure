@@ -7,23 +7,14 @@ using System.Reflection;
 using System.Text;
 using WindowsAzure.Properties;
 
-namespace WindowsAzure.Table.Queryable.Expressions.Methods
+namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 {
     /// <summary>
-    ///     Where expression translator.
+    ///     Expression translator.
     ///     http://msdn.microsoft.com/en-us/library/windowsazure/dd894031.aspx
     /// </summary>
-    internal sealed class ODataFilterTranslator : ExpressionVisitor, IMethodTranslator
+    internal sealed class ExpressionTranslator : ExpressionVisitor
     {
-        private static readonly List<String> SupportedMethods = new List<string>
-            {
-                "Where",
-                "First",
-                "FirstOrDefault",
-                "Single",
-                "SingleOrDefault"
-            };
-
         private readonly ExpressionEvaluator _constantEvaluator;
         private readonly IDictionary<string, string> _nameChanges;
         private StringBuilder _filter;
@@ -33,7 +24,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         ///     Constructor.
         /// </summary>
         /// <param name="nameChanges"></param>
-        internal ODataFilterTranslator(IDictionary<string, string> nameChanges)
+        internal ExpressionTranslator(IDictionary<string, string> nameChanges)
         {
             _nameChanges = nameChanges;
             _constantEvaluator = new ExpressionEvaluator();
@@ -49,36 +40,22 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             Visit(lambda.Body);
 
             AddFilter();
-            AddPostProcessing(method);
         }
 
-        public IList<string> AcceptedMethods
+        public void AddPostProcessing(MethodCallExpression method)
         {
-            get { return SupportedMethods; }
-        }
+            Type type = method.Arguments[0].Type.GetGenericArguments()[0];
+            Type genericType = typeof (IQueryable<>).MakeGenericType(type);
 
-        private void AddPostProcessing(MethodCallExpression method)
-        {
-            switch (method.Method.Name)
-            {
-                case "First":
-                case "FirstOrDefault":
-                case "Single":
-                case "SingleOrDefault":
-                    {
-                        Type type = method.Arguments[0].Type.GetGenericArguments()[0];
-                        Type genericType = typeof (IQueryable<>).MakeGenericType(type);
+            ParameterExpression parameter = Expression.Parameter(genericType, null);
+            MethodInfo methodInfo = typeof (System.Linq.Queryable)
+                .GetMethods()
+                .Single(p => p.Name == method.Method.Name && p.GetParameters().Length == 1)
+                .MakeGenericMethod(type);
 
-                        ParameterExpression parameter = Expression.Parameter(genericType, null);
-                        MethodInfo methodInfo = typeof(System.Linq.Queryable).GetMethods()
-                            .Single(p => p.Name == method.Method.Name && p.GetParameters().Length == 1)
-                            .MakeGenericMethod(type);
-                        MethodCallExpression call = Expression.Call(methodInfo, parameter);
+            MethodCallExpression call = Expression.Call(methodInfo, parameter);
 
-                        _result.AddPostProcesing(Expression.Lambda(call, parameter));
-                    }
-                    break;
-            }
+            _result.AddPostProcesing(Expression.Lambda(call, parameter));
         }
 
         private void AddFilter()
@@ -102,7 +79,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             return filter;
         }
 
-        private static Expression StripQuotes(Expression expression)
+        public static Expression StripQuotes(Expression expression)
         {
             while (expression.NodeType == ExpressionType.Quote)
             {
@@ -116,7 +93,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         {
             if (!unary.NodeType.IsSupported())
             {
-                string message = String.Format(Resources.WhereTranslatorOperatorNotSupported, unary.NodeType);
+                string message = String.Format(Resources.TranslatorOperatorNotSupported, unary.NodeType);
                 throw new NotSupportedException(message);
             }
 
@@ -140,7 +117,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
             if (!binary.NodeType.IsSupported())
             {
-                string message = String.Format(Resources.WhereTranslatorOperatorNotSupported, binary.NodeType);
+                string message = String.Format(Resources.TranslatorOperatorNotSupported, binary.NodeType);
                 throw new NotSupportedException(message);
             }
 
@@ -261,13 +238,13 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                     return;
                 }
 
-                string message = String.Format(Resources.WhereTranslatorMemberNotSupported, member.Member.Name);
+                string message = String.Format(Resources.TranslatorMemberNotSupported, member.Member.Name);
                 throw new NotSupportedException(message);
             }
 
             if (node.NodeType != ExpressionType.Constant)
             {
-                string message = String.Format(Resources.WhereTranslatorUnableToEvaluateExpression, node);
+                string message = String.Format(Resources.TranslatorUnableToEvaluateExpression, node);
                 throw new InvalidExpressionException(message);
             }
 

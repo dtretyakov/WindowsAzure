@@ -138,7 +138,7 @@
   <data name="PartitionKeyInvalidType" xml:space="preserve">
     <value>PartitionKey must have a string type.</value>
   </data>
-  <data name="QueryTranslatorMethodNotSupported" xml:space="preserve">
+  <data name="TranslatorMethodNotSupported" xml:space="preserve">
     <value>Method '{0}' does not supported.</value>
   </data>
   <data name="RowKeyAttributeDuplicate" xml:space="preserve">
@@ -156,13 +156,13 @@
   <data name="ValueAccessorFactoryNotSupportedType" xml:space="preserve">
     <value>Member type '{0}' does not supported.</value>
   </data>
-  <data name="WhereTranslatorMemberNotSupported" xml:space="preserve">
+  <data name="TranslatorMemberNotSupported" xml:space="preserve">
     <value>Member '{0}' does not supported.</value>
   </data>
-  <data name="WhereTranslatorOperatorNotSupported" xml:space="preserve">
+  <data name="TranslatorOperatorNotSupported" xml:space="preserve">
     <value>Operator '{0}' does not supported.</value>
   </data>
-  <data name="WhereTranslatorUnableToEvaluateExpression" xml:space="preserve">
+  <data name="TranslatorUnableToEvaluateExpression" xml:space="preserve">
     <value>Unable to evaluate an expression: '{0}'.</value>
   </data>
   <data name="SerializationExtensionsNotSupportedType" xml:space="preserve">
@@ -173,5 +173,8 @@
   </data>
   <data name="TableRequestExecutorInvalidMode" xml:space="preserve">
     <value>Invalid request execution mode '{0}'.</value>
+  </data>
+  <data name="TranslatorUnableToTranslateMethod" xml:space="preserve">
+    <value>Unable to translate method: '{0}'.</value>
   </data>
 </root>

@@ -22,6 +22,7 @@ namespace WindowsAzure.Table.Queryable
     {
         private readonly CloudTable _cloudTable;
         private readonly ITableEntityConverter<TEntity> _entityConverter;
+        private readonly QueryTranslator _queryTranslator;
 
         /// <summary>
         ///     Constructor.
@@ -42,6 +43,7 @@ namespace WindowsAzure.Table.Queryable
 
             _cloudTable = cloudTable;
             _entityConverter = entityConverter;
+            _queryTranslator = new QueryTranslator(entityConverter.NameChanges);
         }
 
         /// <summary>
@@ -56,10 +58,9 @@ namespace WindowsAzure.Table.Queryable
                 throw new ArgumentNullException("expression");
             }
 
-            var translator = new QueryTranslator(_entityConverter.NameChanges);
             var result = new TranslationResult();
 
-            translator.Translate(result, expression);
+            _queryTranslator.Translate(expression, result);
 
             IEnumerable<DynamicTableEntity> tableEntities = _cloudTable.ExecuteQuery(result.TableQuery);
 
@@ -81,10 +82,9 @@ namespace WindowsAzure.Table.Queryable
                 throw new ArgumentNullException("expression");
             }
 
-            var translator = new QueryTranslator(_entityConverter.NameChanges);
             var result = new TranslationResult();
 
-            translator.Translate(result, expression);
+            _queryTranslator.Translate(expression, result);
 
             return _cloudTable
                 .ExecuteQueryAsync(result.TableQuery)

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public sealed class ODataTopTranslatorTests
+    public sealed class TakeTranslatorTests
     {
         private static IQueryable<Country> GetQueryable()
         {
@@ -20,11 +20,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             // Arrange
             const int count = 435435;
             IQueryable<Country> query = GetQueryable().Take(count);
-            var translator = new ODataTopTranslator();
+            var translator = new TakeTranslator();
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Expression);
+            translator.Translate((MethodCallExpression) query.Expression, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -39,11 +39,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             const int count = 555;
             IQueryable<Country> query = GetQueryable()
                 .Where(p => p.Continent == "Europe").Take(count);
-            var translator = new ODataTopTranslator();
+            var translator = new TakeTranslator();
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Expression);
+            translator.Translate((MethodCallExpression) query.Expression, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);

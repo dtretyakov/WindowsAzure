@@ -10,9 +10,9 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// <summary>
         ///     Translates an expression into collection of query segments.
         /// </summary>
-        /// <param name="result">Translaion result.</param>
         /// <param name="expression">Expression.</param>
+        /// <param name="result">Translaion result.</param>
         /// <returns>Table query.</returns>
-        void Translate(ITranslationResult result, Expression expression);
+        void Translate(Expression expression, ITranslationResult result);
     }
 }

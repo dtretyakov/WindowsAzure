@@ -83,6 +83,12 @@
     <Compile Include="Table\Attributes\IgnoreAttribute.cs" />
     <Compile Include="Table\Attributes\ETagAttribute.cs" />
     <Compile Include="Table\Attributes\PropertyAttribute.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\MethodTranslatorBase.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\SingleOrDefaultTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\SingleTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\FirstOrDefaultTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\FirstTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\WhereTranslator.cs" />
     <Compile Include="Table\RequestExecutor\TableRequestExecutorFactory.cs" />
     <Compile Include="Table\RequestExecutor\TableRequestSequentialExecutor.cs" />
     <Compile Include="Table\RequestExecutor\ITableBatchPartitioner.cs" />
@@ -112,12 +118,12 @@
     <Compile Include="Table\ITableSet.cs" />
     <Compile Include="Table\Queryable\Expressions\IQueryTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\ITranslationResult.cs" />
-    <Compile Include="Table\Queryable\Expressions\Methods\ExpressionEvaluator.cs" />
-    <Compile Include="Table\Queryable\Expressions\Methods\SerializationExtensions.cs" />
-    <Compile Include="Table\Queryable\Expressions\Methods\ODataTopTranslator.cs" />
-    <Compile Include="Table\Queryable\Expressions\Methods\ODataSelectTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Infrastructure\ExpressionEvaluator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Infrastructure\SerializationExtensions.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\TakeTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Methods\SelectTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\IMethodTranslator.cs" />
-    <Compile Include="Table\Queryable\Expressions\Methods\ODataFilterTranslator.cs" />
+    <Compile Include="Table\Queryable\Expressions\Infrastructure\ExpressionTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\TranslationResult.cs" />
     <Compile Include="Table\Queryable\IAsyncQueryProvider.cs" />
     <Compile Include="Table\Queryable\TableQueryProvider.cs" />
@@ -141,6 +147,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -9,13 +9,13 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public class ODataSelectTranslatorTests
+    public class SelectTranslatorTests
     {
-        private readonly Dictionary<string, string> _nameChanges;
         private const string Germany = "Germany";
         private const string Spain = "Spain";
+        private readonly Dictionary<string, string> _nameChanges;
 
-        public ODataSelectTranslatorTests()
+        public SelectTranslatorTests()
         {
             _nameChanges = new Dictionary<string, string>
                 {
@@ -34,43 +34,43 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             return new List<Country>
                 {
                     new Country
-                    {
-                        Area = 357021,
-                        Continent = "Europe",
-                        TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                        Formed = new DateTime(1871, 1, 18),
-                        Id = Guid.NewGuid(),
-                        IsExists = true,
-                        Name = Germany,
-                        Population = 81799600,
-                        PresidentsCount = 11
-                    },
-                new Country
-                    {
-                        Area = 505992,
-                        Continent = "Europe",
-                        TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                        Formed = new DateTime(1812, 1, 1),
-                        Id = Guid.NewGuid(),
-                        IsExists = false,
-                        Name = Spain,
-                        Population = 47190493,
-                        PresidentsCount = 8
-                    }
+                        {
+                            Area = 357021,
+                            Continent = "Europe",
+                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
+                            Formed = new DateTime(1871, 1, 18),
+                            Id = Guid.NewGuid(),
+                            IsExists = true,
+                            Name = Germany,
+                            Population = 81799600,
+                            PresidentsCount = 11
+                        },
+                    new Country
+                        {
+                            Area = 505992,
+                            Continent = "Europe",
+                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
+                            Formed = new DateTime(1812, 1, 1),
+                            Id = Guid.NewGuid(),
+                            IsExists = false,
+                            Name = Spain,
+                            Population = 47190493,
+                            PresidentsCount = 8
+                        }
                 };
         }
-            
+
         [Fact]
         public void LinqSelectWithProjectionClass()
         {
             // Arrange
             IQueryable<ProjectionResult> query = GetQueryable()
                 .Select(p => new ProjectionResult {Name = p.Name, Continent = p.Continent});
-            var translator = new ODataSelectTranslator(_nameChanges);
+            var translator = new SelectTranslator(_nameChanges);
             var translation = new TranslationResult();
 
             // Act && Assert
-            translator.Translate(translation, (MethodCallExpression) query.Expression);
+            translator.Translate((MethodCallExpression) query.Expression, translation);
 
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.SelectColumns);
@@ -78,12 +78,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Contains("PartitionKey", translation.TableQuery.SelectColumns);
             Assert.Contains("RowKey", translation.TableQuery.SelectColumns);
 
-            var result = translation.PostProcessing.DynamicInvoke(GetList().AsQueryable());
+            object result = translation.PostProcessing.DynamicInvoke(GetList().AsQueryable());
 
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IEnumerable<ProjectionResult>>(result);
 
-            var entities = ((IEnumerable<ProjectionResult>)result).ToList();
+            List<ProjectionResult> entities = ((IEnumerable<ProjectionResult>) result).ToList();
             IEnumerable<string> names = entities.Select(p => p.Name).ToList();
 
             Assert.Contains(Germany, names);
@@ -96,11 +96,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             // Arrange
             IQueryable<InternalProjectionResult> query = GetQueryable()
                 .Select(p => new InternalProjectionResult {Name = p.Name, Continent = p.Continent});
-            var translator = new ODataSelectTranslator(_nameChanges);
+            var translator = new SelectTranslator(_nameChanges);
             var translation = new TranslationResult();
 
             // Act && Assert
-            translator.Translate(translation, (MethodCallExpression) query.Expression);
+            translator.Translate((MethodCallExpression) query.Expression, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -109,12 +109,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Contains("PartitionKey", translation.TableQuery.SelectColumns);
             Assert.Contains("RowKey", translation.TableQuery.SelectColumns);
 
-            var result = translation.PostProcessing.DynamicInvoke(GetList().AsQueryable());
+            object result = translation.PostProcessing.DynamicInvoke(GetList().AsQueryable());
 
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IEnumerable<InternalProjectionResult>>(result);
 
-            var entities = ((IEnumerable<InternalProjectionResult>)result).ToList();
+            List<InternalProjectionResult> entities = ((IEnumerable<InternalProjectionResult>) result).ToList();
             IEnumerable<string> names = entities.Select(p => p.Name).ToList();
 
             Assert.Contains(Germany, names);
@@ -126,11 +126,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         {
             // Arrange
             var query = GetQueryable().Select(p => new {p.Name, p.Continent});
-            var translator = new ODataSelectTranslator(_nameChanges);
+            var translator = new SelectTranslator(_nameChanges);
             var translation = new TranslationResult();
 
             // Act && Assert
-            translator.Translate(translation, (MethodCallExpression) query.Expression);
+            translator.Translate((MethodCallExpression) query.Expression, translation);
 
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.SelectColumns);
@@ -138,7 +138,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Contains("PartitionKey", translation.TableQuery.SelectColumns);
             Assert.Contains("RowKey", translation.TableQuery.SelectColumns);
 
-            var result = translation.PostProcessing.DynamicInvoke(GetList().AsQueryable());
+            object result = translation.PostProcessing.DynamicInvoke(GetList().AsQueryable());
 
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IEnumerable<object>>(result);

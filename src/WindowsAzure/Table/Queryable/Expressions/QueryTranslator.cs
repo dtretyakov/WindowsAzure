@@ -10,10 +10,9 @@ namespace WindowsAzure.Table.Queryable.Expressions
     /// <summary>
     ///     Manages translation of the LINQ expressions.
     /// </summary>
-    internal class QueryTranslator : ExpressionVisitor, IQueryTranslator
+    internal class QueryTranslator : IQueryTranslator
     {
         private readonly IList<IMethodTranslator> _methodTranslators;
-        private ITranslationResult _result;
 
         /// <summary>
         ///     Constructor.
@@ -35,48 +34,64 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// <summary>
         ///     Translates a LINQ expression into collection of query segments.
         /// </summary>
-        /// <param name="result">Translation result.</param>
         /// <param name="expression">LINQ expression.</param>
+        /// <param name="result">Translation result.</param>
         /// <returns>Collection of query segments.</returns>
-        public void Translate(ITranslationResult result, Expression expression)
+        public void Translate(Expression expression, ITranslationResult result)
         {
-            _result = result;
+            if (expression.NodeType != ExpressionType.Call)
+            {
+                return;
+            }
 
-            Visit(expression);
+            var methodCall = (MethodCallExpression) expression;
+
+            // Visit method
+            VisitMethodCall(methodCall, result);
+
+            // Visit arguments
+            for (int i = 0; i < methodCall.Arguments.Count; i++)
+            {
+                Expression argument = methodCall.Arguments[i];
+                if (argument.NodeType == ExpressionType.Call)
+                {
+                    VisitMethodCall((MethodCallExpression) argument, result);
+                }
+            }
         }
 
         private static IList<IMethodTranslator> GetTranslators(IDictionary<string, string> nameChanges)
         {
             return new List<IMethodTranslator>
                 {
-                    new ODataFilterTranslator(nameChanges),
-                    new ODataSelectTranslator(nameChanges),
-                    new ODataTopTranslator()
+                    new WhereTranslator(nameChanges),
+                    new FirstTranslator(nameChanges),
+                    new FirstOrDefaultTranslator(nameChanges),
+                    new SingleTranslator(nameChanges),
+                    new SingleOrDefaultTranslator(nameChanges),
+                    new SelectTranslator(nameChanges),
+                    new TakeTranslator()
                 };
         }
 
-        protected override Expression VisitMethodCall(MethodCallExpression methodCall)
+        private void VisitMethodCall(MethodCallExpression methodCall, ITranslationResult result)
         {
-            if (methodCall.Method.DeclaringType == typeof (System.Linq.Queryable))
+            if (methodCall.Method.DeclaringType != typeof (System.Linq.Queryable))
             {
-                string methodName = methodCall.Method.Name;
-
-                // Select method translator
-                IMethodTranslator translator = _methodTranslators.FirstOrDefault(
-                    methodTranslator => methodTranslator.AcceptedMethods.Contains(methodName));
-
-                if (translator == null)
-                {
-                    string message = String.Format(Resources.QueryTranslatorMethodNotSupported, methodName);
-                    throw new NotSupportedException(message);
-                }
-
-                translator.Translate(_result, methodCall);
-
-                Visit(methodCall.Arguments[0]);
+                throw new ArgumentException(string.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name));
             }
 
-            return base.VisitMethodCall(methodCall);
+            // Select method translator
+            IMethodTranslator translator = _methodTranslators.FirstOrDefault(
+                methodTranslator => methodTranslator.CanTranslate(methodCall));
+
+            if (translator == null)
+            {
+                string message = String.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name);
+                throw new NotSupportedException(message);
+            }
+
+            translator.Translate(methodCall, result);
         }
     }
 }

@@ -9,17 +9,16 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public sealed class ODataFilterTranslatorTests
+    public sealed class WhereTranslatorTests
     {
         private const string Germany = "Germany";
-        private const string Spain = "Spain";
         private const string Europe = "Europe";
         private const string Id = "829ea8b2-3bd5-45a4-8b54-533c69e608d7";
 
         private readonly IQueryable<Country> _countries;
         private readonly Dictionary<string, string> _nameChanges;
 
-        public ODataFilterTranslatorTests()
+        public WhereTranslatorTests()
         {
             _countries = new EnumerableQuery<Country>(new Country[] {});
             _nameChanges = new Dictionary<string, string>
@@ -29,47 +28,16 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
                 };
         }
 
-        private static IEnumerable<Country> GetList()
-        {
-            return new List<Country>
-                {
-                    new Country
-                        {
-                            Area = 357021,
-                            Continent = "Europe",
-                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                            Formed = new DateTime(1871, 1, 18),
-                            Id = Guid.NewGuid(),
-                            IsExists = true,
-                            Name = Germany,
-                            Population = 81799600,
-                            PresidentsCount = 11
-                        },
-                    new Country
-                        {
-                            Area = 505992,
-                            Continent = "Europe",
-                            TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
-                            Formed = new DateTime(1812, 1, 1),
-                            Id = Guid.NewGuid(),
-                            IsExists = false,
-                            Name = Spain,
-                            Population = 47190493,
-                            PresidentsCount = 8
-                        }
-                };
-        }
-
         [Fact]
         public void UseWhereOnPartitionKeyTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Continent == Europe);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -81,12 +49,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnRowKeyTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Name == Germany);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -100,12 +68,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseCompareToInWhereOnRowKeyTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Name.CompareTo("F") >= 0 && p.Name.CompareTo("G") <= 0);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -119,13 +87,13 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseCompareInWhereOnRowKeyTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query =
                 () => _countries.Where(p => String.Compare(p.Name, "F", StringComparison.Ordinal) >= 0 && String.Compare(p.Name, "G", StringComparison.Ordinal) <= 0);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -137,12 +105,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseCompareOrdinalInWhereOnRowKeyTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => String.CompareOrdinal(p.Name, "F") >= 0 && String.CompareOrdinal(p.Name, "G") <= 0);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -154,12 +122,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseEnumValueInWhereOnRowKeyTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Name == Countries.Germany.ToString());
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -171,12 +139,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnDoubleTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Area < 350000);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -188,12 +156,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnBytesTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.TopSecretKey == new byte[] {0xff, 0xee, 0xdd});
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -205,12 +173,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnDateTimeTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Formed < new DateTime(1800, 1, 1));
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -222,12 +190,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnGuidTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Id == new Guid(Id));
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -239,12 +207,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnBooleanTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.IsExists);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -256,12 +224,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnInt64Test()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Population >= 80000000L);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -273,12 +241,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UseWhereOnInt32Test()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.PresidentsCount <= 10);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -291,12 +259,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         {
             // Arrange
             const bool value = false;
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.IsExists == value);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -309,12 +277,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         {
             // Arrange
             const bool value = false;
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.IsExists != value);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -326,12 +294,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UnaryQueryWithBooleanValueTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.IsExists);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -343,79 +311,12 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         public void UnaryQueryWithInversedBooleanValueTest()
         {
             // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
+            var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => !p.IsExists);
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
-
-            // Assert
-            Assert.NotNull(translation.TableQuery);
-            Assert.NotNull(translation.TableQuery.FilterString);
-            Assert.Equal("not IsExists", translation.TableQuery.FilterString);
-        }
-
-        [Fact]
-        public void LinqFirstClause()
-        {
-            // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.First(p => !p.IsExists);
-            var translation = new TranslationResult();
-
-            // Act && Assert
-            translator.Translate(translation, (MethodCallExpression) query.Body);
-
-            Assert.NotNull(translation.TableQuery);
-            Assert.NotNull(translation.TableQuery.FilterString);
-            Assert.Equal("not IsExists", translation.TableQuery.FilterString);
-        }
-
-        [Fact]
-        public void LinqFirstOrDefaultClause()
-        {
-            // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.FirstOrDefault(p => !p.IsExists);
-            var translation = new TranslationResult();
-
-            // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
-
-            // Assert
-            Assert.NotNull(translation.TableQuery);
-            Assert.NotNull(translation.TableQuery.FilterString);
-            Assert.Equal("not IsExists", translation.TableQuery.FilterString);
-        }
-
-        [Fact]
-        public void LinqSingleClause()
-        {
-            // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.Single(p => !p.IsExists);
-            var translation = new TranslationResult();
-
-            // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
-
-            // Assert
-            Assert.NotNull(translation.TableQuery);
-            Assert.NotNull(translation.TableQuery.FilterString);
-            Assert.Equal("not IsExists", translation.TableQuery.FilterString);
-        }
-
-        [Fact]
-        public void LinqSingleOrDefaultClause()
-        {
-            // Arrange
-            var translator = new ODataFilterTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.SingleOrDefault(p => !p.IsExists);
-            var translation = new TranslationResult();
-
-            // Act
-            translator.Translate(translation, (MethodCallExpression) query.Body);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);

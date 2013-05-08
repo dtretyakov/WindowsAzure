@@ -7,7 +7,7 @@ using System.Xml;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Properties;
 
-namespace WindowsAzure.Table.Queryable.Expressions.Methods
+namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 {
     /// <summary>
     ///     Performs a constant value serialization.

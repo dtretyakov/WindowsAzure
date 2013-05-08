@@ -91,6 +91,10 @@
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\TableContextIntegrationTests.cs" />
     <Compile Include="Table\EntityConverters\EntityConverterTests.cs" />
+    <Compile Include="Table\Queryable\Methods\SingleOrDefaultTranslatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\SingleTranslatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\FirstOrDefaultTranslatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\FirstTranslatorTests.cs" />
     <Compile Include="Table\RequestExecutor\SequentialExecutorTests.cs" />
     <Compile Include="Table\RequestExecutor\ExecutorFactoryTests.cs" />
     <Compile Include="Table\RequestExecutor\ParallelExecutorTests.cs" />
@@ -106,11 +110,11 @@
     <Compile Include="Table\Extensions\AsyncQueryExtensionsIntegrationTests.cs" />
     <Compile Include="Table\Queryable\Expressions\SerializationExtensionsTests.cs" />
     <Compile Include="Table\Queryable\Expressions\ConstrantEvaluatorTests.cs" />
-    <Compile Include="Table\Queryable\Methods\ODataSelectTranslatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\SelectTranslatorTests.cs" />
     <Compile Include="Table\Queryable\Methods\QueryTranslatorTests.cs" />
     <Compile Include="Table\Queryable\QueryLogEntryEntitiesIntegrationTests.cs" />
-    <Compile Include="Table\Queryable\Methods\ODataTopTranslatorTests.cs" />
-    <Compile Include="Table\Queryable\Methods\ODataFilterTranslatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\TakeTranslatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\WhereTranslatorTests.cs" />
     <Compile Include="Table\Context\AddEntityTests.cs" />
     <Compile Include="Table\CountryTableSetBase.cs" />
     <Compile Include="Table\Context\UpdateEntityTests.cs" />

@@ -124,15 +124,6 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Method &apos;{0}&apos; does not supported..
-        /// </summary>
-        internal static string QueryTranslatorMethodNotSupported {
-            get {
-                return ResourceManager.GetString("QueryTranslatorMethodNotSupported", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to RowKey attribute duplication..
         /// </summary>
         internal static string RowKeyAttributeDuplicate {
@@ -196,38 +187,56 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member type &apos;{0}&apos; does not supported..
+        ///   Looks up a localized string similar to Member &apos;{0}&apos; does not supported..
         /// </summary>
-        internal static string ValueAccessorFactoryNotSupportedType {
+        internal static string TranslatorMemberNotSupported {
             get {
-                return ResourceManager.GetString("ValueAccessorFactoryNotSupportedType", resourceCulture);
+                return ResourceManager.GetString("TranslatorMemberNotSupported", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member &apos;{0}&apos; does not supported..
+        ///   Looks up a localized string similar to Method &apos;{0}&apos; does not supported..
         /// </summary>
-        internal static string WhereTranslatorMemberNotSupported {
+        internal static string TranslatorMethodNotSupported {
             get {
-                return ResourceManager.GetString("WhereTranslatorMemberNotSupported", resourceCulture);
+                return ResourceManager.GetString("TranslatorMethodNotSupported", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Operator &apos;{0}&apos; does not supported..
         /// </summary>
-        internal static string WhereTranslatorOperatorNotSupported {
+        internal static string TranslatorOperatorNotSupported {
             get {
-                return ResourceManager.GetString("WhereTranslatorOperatorNotSupported", resourceCulture);
+                return ResourceManager.GetString("TranslatorOperatorNotSupported", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Unable to evaluate an expression: &apos;{0}&apos;..
         /// </summary>
-        internal static string WhereTranslatorUnableToEvaluateExpression {
+        internal static string TranslatorUnableToEvaluateExpression {
             get {
-                return ResourceManager.GetString("WhereTranslatorUnableToEvaluateExpression", resourceCulture);
+                return ResourceManager.GetString("TranslatorUnableToEvaluateExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to translate method: &apos;{0}&apos;..
+        /// </summary>
+        internal static string TranslatorUnableToTranslateMethod {
+            get {
+                return ResourceManager.GetString("TranslatorUnableToTranslateMethod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Member type &apos;{0}&apos; does not supported..
+        /// </summary>
+        internal static string ValueAccessorFactoryNotSupportedType {
+            get {
+                return ResourceManager.GetString("ValueAccessorFactoryNotSupportedType", resourceCulture);
             }
         }
     }

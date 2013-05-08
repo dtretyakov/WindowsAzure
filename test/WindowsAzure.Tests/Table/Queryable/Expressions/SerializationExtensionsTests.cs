@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
 using System.Xml;
+using WindowsAzure.Table.Queryable.Expressions.Infrastructure;
 using WindowsAzure.Table.Queryable.Expressions.Methods;
 using Xunit;
 

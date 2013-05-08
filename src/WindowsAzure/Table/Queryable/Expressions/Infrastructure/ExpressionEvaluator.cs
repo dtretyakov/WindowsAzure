@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using WindowsAzure.Properties;
 
-namespace WindowsAzure.Table.Queryable.Expressions.Methods
+namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 {
     /// <summary>
     ///     Performs evaluation of the LINQ Expression.

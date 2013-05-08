@@ -30,7 +30,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, query.Expression);
+            translator.Translate(query.Expression, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -55,7 +55,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act && Assert
-            translator.Translate(translation, query.Expression);
+            translator.Translate(query.Expression, translation);
 
             Assert.NotNull(translation.PostProcessing);
 
@@ -93,7 +93,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate(translation, query.Expression);
+            translator.Translate(query.Expression, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);

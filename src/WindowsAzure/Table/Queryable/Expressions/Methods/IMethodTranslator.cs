@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
@@ -10,15 +8,17 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     internal interface IMethodTranslator
     {
         /// <summary>
-        ///     Gets a list of accepted methods.
+        ///     Determines whether method call can be translated.
         /// </summary>
-        IList<String> AcceptedMethods { get; }
+        /// <param name="method">Expression method.</param>
+        /// <returns>Result whether method can be translated.</returns>
+        bool CanTranslate(MethodCallExpression method);
 
         /// <summary>
         ///     Provides evaluated query information.
         /// </summary>
+        /// <param name="methodCall">Expression method.</param>
         /// <param name="result">Translation result.</param>
-        /// <param name="method">Expression method.</param>
-        void Translate(ITranslationResult result, MethodCallExpression method);
+        void Translate(MethodCallExpression methodCall, ITranslationResult result);
     }
 }
