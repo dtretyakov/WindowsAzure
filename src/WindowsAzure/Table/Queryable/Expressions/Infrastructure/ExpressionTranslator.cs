@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -113,8 +114,32 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                 _filter.Append("(");
             }
 
-            VisitBinaryLeft(binary);
+            AppendBinaryExpression(binary);
 
+            if (paranthesesRequired)
+            {
+                _filter.Append(")");
+            }
+
+            return binary;
+        }
+
+        private void AppendBinaryExpression(BinaryExpression binary)
+        {
+            // Left part
+            if (binary.Left.NodeType == ExpressionType.Call)
+            {
+                if (AppendBinaryCall((MethodCallExpression) binary.Left, binary.NodeType))
+                {
+                    return;
+                }
+            }
+            else
+            {
+                AppendBinaryPart(binary.Left);
+            }
+
+            // Comparison
             if (!binary.NodeType.IsSupported())
             {
                 string message = String.Format(Resources.TranslatorOperatorNotSupported, binary.NodeType);
@@ -123,14 +148,21 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
             _filter.AppendFormat(" {0} ", binary.NodeType.Serialize());
 
-            VisitBinaryRight(binary);
-
-            if (paranthesesRequired)
+            // Right part
+            if (binary.Right.NodeType == ExpressionType.Call)
             {
-                _filter.Append(")");
-            }
+                var methodCall = (MethodCallExpression) binary.Right;
 
-            return binary;
+                if (AppendBinaryCall(methodCall, binary.NodeType))
+                {
+                    string message = String.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name);
+                    throw new ArgumentException(message);
+                }
+            }
+            else
+            {
+                AppendBinaryPart(binary.Right);
+            }
         }
 
         private void AppendBinaryPart(Expression expression)
@@ -142,76 +174,136 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                 return;
             }
 
+            // Check whether expression is binary
             if (expression.NodeType.IsSupported())
             {
                 Visit(expression);
-                return;
             }
-
-            AppendConstant(_constantEvaluator.Evaluate(expression));
+            else
+            {
+                AppendConstant(_constantEvaluator.Evaluate(expression));
+            }
         }
 
-        private void VisitBinaryLeft(BinaryExpression binary)
+        protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (binary.Left.NodeType == ExpressionType.Call)
+            switch (node.Method.Name)
             {
-                var method = (MethodCallExpression) binary.Left;
+                case "Contains":
+                    if (node.Arguments.Count == 1)
+                    {
+                        var result = (ConstantExpression) _constantEvaluator.Evaluate(node.Object);
 
-                switch (method.Method.Name)
-                {
-                    case "CompareTo":
-                        if (method.Object != null && method.Object.Type == typeof (String))
+                        var enumerable = result.Value as IEnumerable;
+                        if (enumerable == null)
                         {
-                            AppendConstant(_constantEvaluator.Evaluate(method.Object));
-                            return;
+                            string message = string.Format(Resources.TranslatorMethodInvalidArgument, node.Method.Name);
+                            throw new ArgumentException(message);
                         }
-                        break;
 
-                    case "Compare":
-                    case "CompareOrdinal":
-                        if (method.Arguments.Count >= 2)
+                        Expression parameter = node.Arguments[0];
+
+                        // determine equality value
+                        string equality;
+
+                        if (_filter.Length >= 5 &&
+                            _filter.ToString(_filter.Length - 5, 5) == " not ")
                         {
-                            AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
-                            return;
+                            _filter.Remove(_filter.Length - 5, 5);
+                            equality = "ne";
                         }
-                        break;
-                }
+                        else
+                        {
+                            equality = "eq";
+                        }
 
-                AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
+                        _filter.Append("(");
+                        int count = 0;
+
+                        foreach (object value in enumerable)
+                        {
+                            AppendConstant(parameter);
+                            _filter.AppendFormat(" {0} ", equality);
+                            AppendConstant(Expression.Constant(value));
+                            _filter.Append(" or ");
+                            count++;
+                        }
+
+                        if (count > 0)
+                        {
+                            _filter.Remove(_filter.Length - 4, 4);
+                            _filter.Append(")");
+                        }
+                        else
+                        {
+                            _filter.Remove(_filter.Length - 1, 1);
+                        }
+                    }
+                    else
+                    {
+                        string message = string.Format(Resources.TranslatorMethodInvalidArgument, node.Method.Name);
+                        throw new ArgumentException(message);
+                    }
+                    break;
+
+                case "ToString":
+                    AppendConstant(Expression.Constant(node.Object != null ? node.Object.ToString() : string.Empty));
+                    break;
+
+                default:
+                    {
+                        string message = string.Format(Resources.TranslatorMethodNotSupported, node.Method.Name);
+                        throw new ArgumentException(message);
+                    }
             }
 
-            AppendBinaryPart(binary.Left);
+            return node;
         }
 
-        private void VisitBinaryRight(BinaryExpression binary)
+        /// <summary>
+        ///     Translates method call expression.
+        /// </summary>
+        /// <param name="node">Expression.</param>
+        /// <param name="type">Expression type.</param>
+        /// <returns>Whether expression has been completely translated.</returns>
+        private bool AppendBinaryCall(MethodCallExpression node, ExpressionType type)
         {
-            if (binary.Left.NodeType == ExpressionType.Call)
+            switch (node.Method.Name)
             {
-                var method = (MethodCallExpression) binary.Left;
+                case "CompareTo":
+                    AppendConstant(_constantEvaluator.Evaluate(node.Object));
+                    _filter.AppendFormat(" {0} ", type.Serialize());
+                    AppendConstant(_constantEvaluator.Evaluate(node.Arguments[0]));
+                    return true;
 
-                switch (method.Method.Name)
-                {
-                    case "CompareTo":
-                        AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
-                        return;
+                case "Compare":
+                case "CompareOrdinal":
+                    if (node.Arguments.Count >= 2)
+                    {
+                        AppendConstant(_constantEvaluator.Evaluate(node.Arguments[0]));
+                        _filter.AppendFormat(" {0} ", type.Serialize());
+                        AppendConstant(_constantEvaluator.Evaluate(node.Arguments[1]));
+                    }
+                    else
+                    {
+                        string message = string.Format(Resources.TranslatorMethodInvalidArgument, node.Method.Name);
+                        throw new ArgumentException(message);
+                    }
+                    return true;
 
-                    case "Compare":
-                    case "CompareOrdinal":
-                        AppendConstant(_constantEvaluator.Evaluate(method.Arguments[1]));
-                        return;
-                }
-
-                AppendConstant(_constantEvaluator.Evaluate(method.Arguments[0]));
+                default:
+                    VisitMethodCall(node);
+                    break;
             }
 
-            AppendBinaryPart(binary.Right);
+            return false;
         }
 
         protected override Expression VisitMember(MemberExpression node)
         {
             AppendConstant(node);
 
-            return base.VisitMember(node);
+            return node;
         }
 
         private void AppendConstant(Expression node)

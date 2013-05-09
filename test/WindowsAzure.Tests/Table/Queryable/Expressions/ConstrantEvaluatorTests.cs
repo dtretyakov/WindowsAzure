@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
 using WindowsAzure.Table.Queryable.Expressions.Infrastructure;
-using WindowsAzure.Table.Queryable.Expressions.Methods;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 

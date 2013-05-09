@@ -177,4 +177,7 @@
   <data name="TranslatorUnableToTranslateMethod" xml:space="preserve">
     <value>Unable to translate method: '{0}'.</value>
   </data>
+  <data name="TranslatorMethodInvalidArgument" xml:space="preserve">
+    <value>Invalid method '{0}' arguments.</value>
+  </data>
 </root>

@@ -91,10 +91,12 @@
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\TableContextIntegrationTests.cs" />
     <Compile Include="Table\EntityConverters\EntityConverterTests.cs" />
+    <Compile Include="Table\Queryable\Methods\ContainsTests.cs" />
     <Compile Include="Table\Queryable\Methods\SingleOrDefaultTranslatorTests.cs" />
     <Compile Include="Table\Queryable\Methods\SingleTranslatorTests.cs" />
     <Compile Include="Table\Queryable\Methods\FirstOrDefaultTranslatorTests.cs" />
     <Compile Include="Table\Queryable\Methods\FirstTranslatorTests.cs" />
+    <Compile Include="Table\Queryable\Methods\StringCompareTests.cs" />
     <Compile Include="Table\RequestExecutor\SequentialExecutorTests.cs" />
     <Compile Include="Table\RequestExecutor\ExecutorFactoryTests.cs" />
     <Compile Include="Table\RequestExecutor\ParallelExecutorTests.cs" />

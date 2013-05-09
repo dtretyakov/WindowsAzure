@@ -196,6 +196,15 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid method &apos;{0}&apos; arguments..
+        /// </summary>
+        internal static string TranslatorMethodInvalidArgument {
+            get {
+                return ResourceManager.GetString("TranslatorMethodInvalidArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Method &apos;{0}&apos; does not supported..
         /// </summary>
         internal static string TranslatorMethodNotSupported {
