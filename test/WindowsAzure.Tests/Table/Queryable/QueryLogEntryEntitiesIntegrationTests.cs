@@ -27,7 +27,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             }
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task QueryLogEntryAndUpdateTest()
         {
             // Arrange
@@ -44,7 +44,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.NotEqual(result.ETag, updatedResult.ETag);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task QueryLogEntryTwiceAndCheckETagTest()
         {
             // Arrange
@@ -59,7 +59,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(result1.ETag, result2.ETag);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task QueryLogEntryByMessageValueTest()
         {
             // Arrange

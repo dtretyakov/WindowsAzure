@@ -57,7 +57,7 @@ namespace WindowsAzure.Tests.Table.Extensions
         //    Assert.Equal(properties.DefaultServiceVersion, serviceVersion);
         //}
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task CloudTableClientGetAllTablesTest()
         {
             // Act
@@ -68,7 +68,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.True(_tableNames.All(allTables.Select(p => p.Name).Contains));
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task CloudTableClientGetTablesWithTPrefixTest()
         {
             // Arrange
@@ -82,7 +82,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             Assert.True(_tableNames.All(p => p.StartsWith(prefix)));
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task CloudTableClientGetTwoTablesWithTPrefixTest()
         {
             // Arrange

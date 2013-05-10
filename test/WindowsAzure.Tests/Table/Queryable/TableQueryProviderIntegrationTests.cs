@@ -88,7 +88,7 @@ namespace WindowsAzure.Tests.Table.Queryable
                 tableEntityConverter);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void CallExecuteMethodOfQueryProviderTest()
         {
             // Arrange
@@ -112,7 +112,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Finland, names);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task CallExecuteAsyncMethodOfQueryProviderTest()
         {
             // Arrange

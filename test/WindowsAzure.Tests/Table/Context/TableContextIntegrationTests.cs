@@ -10,7 +10,7 @@ namespace WindowsAzure.Tests.Table.Context
 {
     public sealed class TableContextIntegrationTests : CountryTableSetBase
     {
-        [IntegrationalFact]
+        [IntegrationFact]
         public void CreateUpdatedAndDeleteEntities()
         {
             // Arrange
@@ -31,7 +31,7 @@ namespace WindowsAzure.Tests.Table.Context
             tableSet.Remove(updatedEntities);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task CreateUpdatedAndDeleteEntitiesAsync()
         {
             // Arrange
@@ -52,7 +52,7 @@ namespace WindowsAzure.Tests.Table.Context
             await tableSet.RemoveAsync(updatedEntities);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void DeleteEntityByCompositeKey()
         {
             // Arrange
@@ -70,7 +70,7 @@ namespace WindowsAzure.Tests.Table.Context
                     });
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task DeleteEntityByCompositeKeyAsync()
         {
             // Arrange

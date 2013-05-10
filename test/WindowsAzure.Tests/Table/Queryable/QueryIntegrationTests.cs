@@ -74,7 +74,7 @@ namespace WindowsAzure.Tests.Table.Queryable
                     });
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task QueryWithMultipleScopesTest()
         {
             // Arrange
@@ -96,7 +96,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task QueryTableSetTwiceTest()
         {
             // Arrange
@@ -123,7 +123,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, results.Select(p => p.Name));
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithSelectClause()
         {
             // Arrange
@@ -142,7 +142,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task QueryWithSelectClauseAsync()
         {
             // Arrange
@@ -161,7 +161,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithFirstClause()
         {
             // Arrange
@@ -175,7 +175,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithFirstClauseWithoutResult()
         {
             // Arrange
@@ -190,7 +190,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Null(result);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithFirstOrDefaultClause()
         {
             // Arrange
@@ -204,7 +204,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithFirstOrDefaultClauseWithoutResult()
         {
             // Arrange
@@ -217,7 +217,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Null(result);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithSingleClause()
         {
             // Arrange
@@ -231,7 +231,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithSingleClauseWithoutResult()
         {
             // Arrange
@@ -246,7 +246,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Null(result);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithSingleOrDefaultClause()
         {
             // Arrange
@@ -260,7 +260,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             Assert.Equal(Finland, result.Name);
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public void QueryWithSingleOrDefaultClauseWithoutResult()
         {
             // Arrange
@@ -271,6 +271,28 @@ namespace WindowsAzure.Tests.Table.Queryable
 
             // Assert
             Assert.Null(result);
+        }
+
+        [IntegrationFact]
+        public void QueryWithContains()
+        {
+            // Arrange
+            var names = new List<string>
+                {
+                    Germany,
+                    Finland
+                };
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var result = tableSet.Where(p => names.Contains(p.Name)).ToList();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            var resultNames = result.Select(p => p.Name).ToList();
+            Assert.Contains(Germany, resultNames);
+            Assert.Contains(Finland, resultNames);
         }
     }
 }

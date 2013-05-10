@@ -24,7 +24,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             _cloudTable.DeleteIfExists();
         }
 
-        [IntegrationalFact]
+        [IntegrationFact]
         public async Task CloudTableExtensionsTest()
         {
             // Arrange

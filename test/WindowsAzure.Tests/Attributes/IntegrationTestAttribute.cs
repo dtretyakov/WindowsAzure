@@ -5,12 +5,12 @@ namespace WindowsAzure.Tests.Attributes
     /// <summary>
     ///     Skips tests when runned outside cloud environment.
     /// </summary>
-    public sealed class IntegrationalFactAttribute : FactAttribute
+    public sealed class IntegrationFactAttribute : FactAttribute
     {
 #if NOCLOUDSTORAGE
-        public IntegrationalFactAttribute()
+        public IntegrationFactAttribute()
         {
-            Skip = "Skipped integrational test";
+            Skip = "Skipped integration test";
         }
 #endif
     }
