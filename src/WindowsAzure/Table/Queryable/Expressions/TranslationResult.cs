@@ -11,20 +11,16 @@ namespace WindowsAzure.Table.Queryable.Expressions
     internal sealed class TranslationResult : ITranslationResult
     {
         private readonly List<LambdaExpression> _expressions = new List<LambdaExpression>();
+        private readonly TableQuery _tableQuery = new TableQuery();
         private Delegate _postProcessing;
-
-        /// <summary>
-        ///     Constructor.
-        /// </summary>
-        internal TranslationResult()
-        {
-            TableQuery = new TableQuery();
-        }
 
         /// <summary>
         ///     Gets a TableQuery.
         /// </summary>
-        public TableQuery TableQuery { get; private set; }
+        public TableQuery TableQuery
+        {
+            get { return _tableQuery; }
+        }
 
         /// <summary>
         ///     Gets a post processing handler.
@@ -42,22 +38,22 @@ namespace WindowsAzure.Table.Queryable.Expressions
 
         public void AddFilter(string filter)
         {
-            TableQuery.FilterString = filter;
+            _tableQuery.FilterString = filter;
         }
 
         public void AddTop(int top)
         {
-            TableQuery.TakeCount = top;
+            _tableQuery.TakeCount = top;
         }
 
         public void AddColumn(string column)
         {
-            if (TableQuery.SelectColumns == null)
+            if (_tableQuery.SelectColumns == null)
             {
-                TableQuery.SelectColumns = new List<string>();
+                _tableQuery.SelectColumns = new List<string>();
             }
 
-            TableQuery.SelectColumns.Add(column);
+            _tableQuery.SelectColumns.Add(column);
         }
 
         public void AddPostProcesing(LambdaExpression lambda)

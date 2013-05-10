@@ -78,19 +78,21 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
         /// <returns>Serialized value.</returns>
         public static string Serialize(this ConstantExpression constant)
         {
-            if (constant.Value == null)
+            var value = constant.Value;
+            if (value == null)
             {
                 return "null";
             }
 
             // Trying to serialize constant value
-            if (!Serialization.ContainsKey(constant.Type))
+            Func<object, string> serializer;
+            if (!Serialization.TryGetValue(constant.Type, out serializer))
             {
                 string message = String.Format(Resources.SerializationExtensionsNotSupportedType, constant.Type);
                 throw new NotSupportedException(message);
             }
 
-            return Serialization[constant.Type](constant.Value);
+            return serializer(value);
         }
 
         /// <summary>
@@ -100,7 +102,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
         /// <returns>Serialized value.</returns>
         public static string Serialize(this ExpressionType type)
         {
-            return LogicalOperators[type];
+            string value;
+            if (!LogicalOperators.TryGetValue(type, out value))
+            {
+                string message = String.Format(Resources.TranslatorOperatorNotSupported, type);
+                throw new NotSupportedException(message);
+            }
+
+            return value;
         }
 
         /// <summary>

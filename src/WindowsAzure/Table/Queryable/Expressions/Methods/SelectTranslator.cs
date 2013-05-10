@@ -24,9 +24,9 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             _nameChanges = nameChanges;
         }
 
-        public bool CanTranslate(MethodCallExpression method)
+        public string Name
         {
-            return method.Method.Name == MethodName;
+            get { return MethodName; }
         }
 
         public void Translate(MethodCallExpression method, ITranslationResult result)
@@ -37,6 +37,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             }
 
             var lambda = (LambdaExpression) ExpressionTranslator.StripQuotes(method.Arguments[1]);
+
+            // ReSharper disable ForCanBeConvertedToForeach
 
             if (lambda.Body.NodeType == ExpressionType.MemberInit)
             {
@@ -64,12 +66,20 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
                 throw new ArgumentException(string.Format(Resources.TranslatorMemberNotSupported, lambda.Body.NodeType), "method");
             }
 
+            // ReSharper restore ForCanBeConvertedToForeach
+
             AddPostProcessing(method, result);
         }
 
-        private void AddColumn(string name, ITranslationResult result)
+        private void AddColumn(string parameterName, ITranslationResult result)
         {
-            result.AddColumn(_nameChanges.ContainsKey(name) ? _nameChanges[name] : name);
+            string name;
+            if (!_nameChanges.TryGetValue(parameterName, out name))
+            {
+                name = parameterName;
+            }
+
+            result.AddColumn(name);
         }
 
         private void AddPostProcessing(MethodCallExpression method, ITranslationResult result)

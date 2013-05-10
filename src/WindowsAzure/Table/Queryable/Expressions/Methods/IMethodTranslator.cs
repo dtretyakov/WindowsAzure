@@ -8,11 +8,9 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     internal interface IMethodTranslator
     {
         /// <summary>
-        ///     Determines whether method call can be translated.
+        ///     Gets a method name.
         /// </summary>
-        /// <param name="method">Expression method.</param>
-        /// <returns>Result whether method can be translated.</returns>
-        bool CanTranslate(MethodCallExpression method);
+        string Name { get; }
 
         /// <summary>
         ///     Provides evaluated query information.

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
@@ -15,9 +14,9 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         {
         }
 
-        public override bool CanTranslate(MethodCallExpression method)
+        public override string Name
         {
-            return method.Method.Name == MethodName;
+            get { return MethodName; }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using WindowsAzure.Table.Queryable.Expressions;
@@ -10,6 +11,9 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
     public class QueryTranslatorTests
     {
+        private const string ResultFormat = "{0} iterations took {1} ms";
+        private const int IteractionsCount = 1000000;
+
         private readonly Dictionary<string, string> _nameChanges = new Dictionary<string, string>
             {
                 {"Continent", "PartitionKey"},
@@ -64,7 +68,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IEnumerable<object>>(result);
 
-            var entities = ((IEnumerable<ProjectionClass>) result).ToList();
+            List<ProjectionClass> entities = ((IEnumerable<ProjectionClass>) result).ToList();
             IEnumerable<string> names = entities.Select(p => p.Name).ToList();
             IEnumerable<string> continents = entities.Select(p => p.Continent).ToList();
 
@@ -72,6 +76,44 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Contains("name2", names);
             Assert.Contains("continent1", continents);
             Assert.Contains("continent2", continents);
+        }
+
+        [Fact(Skip = "Only for performance measurement")]
+        public void QueryTranslatorPerformanceMeasurement()
+        {
+            // Arrange
+            var list = new List<Guid>
+                {
+                    new Guid("48ed2917-f7d4-4383-aa29-4062f1296bbc"),
+                    new Guid("8a024e77-4f06-49d9-9d46-9a0e59d74fcd")
+                };
+
+            IQueryable<Country> query = GetQueryable<Country>()
+                .Where(
+                    p => p.Formed > new DateTime(123, 1, 1) &&
+                         (p.PresidentsCount < 10 && list.Contains(p.Id) ||
+                          p.Population < 10000000 && p.PresidentsCount > 10 && p.IsExists));
+
+            var queryTranslator = new QueryTranslator(_nameChanges);
+            TranslationResult translationResult = null;
+
+            // Act
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            for (int i = 0; i < IteractionsCount; i++)
+            {
+                translationResult = new TranslationResult();
+                queryTranslator.Translate(query.Expression, translationResult);
+            }
+
+            stopwatch.Stop();
+
+            // Assert
+            Assert.NotNull(translationResult);
+            Assert.Equal(
+                "Formed gt datetime'0123-01-01T00:00:00' and ((PresidentsCount lt 10 and (Id eq guid'48ed2917-f7d4-4383-aa29-4062f1296bbc' or Id eq guid'8a024e77-4f06-49d9-9d46-9a0e59d74fcd')) or ((Population lt 10000000L and PresidentsCount gt 10) and IsExists))",
+                translationResult.TableQuery.FilterString);
+            Console.WriteLine(ResultFormat, IteractionsCount, stopwatch.ElapsedMilliseconds);
         }
 
         // ReSharper disable ConvertToConstant.Local

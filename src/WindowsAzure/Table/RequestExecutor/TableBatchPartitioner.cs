@@ -36,14 +36,10 @@ namespace WindowsAzure.Table.RequestExecutor
             {
                 TableBatchOperation batch;
 
-                if (!batches.ContainsKey(tableEntity.PartitionKey))
+                if (!batches.TryGetValue(tableEntity.PartitionKey, out batch))
                 {
                     batch = new TableBatchOperation();
                     batches.Add(tableEntity.PartitionKey, batch);
-                }
-                else
-                {
-                    batch = batches[tableEntity.PartitionKey];
                 }
 
                 batch.Add(operation(tableEntity));

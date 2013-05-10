@@ -38,7 +38,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -82,12 +82,34 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.FilterString);
             Assert.Equal("(RowKey eq 'Latvia' or RowKey eq 'Germany') and PartitionKey eq 'Africa'", translation.TableQuery.FilterString);
+        }
+
+        [Fact]
+        public void UseEqualityAndContainsInWhereOnRowKeyTest()
+        {
+            // Arrange
+            var list = new List<String>
+                {
+                    "Latvia",
+                    "Germany"
+                };
+            var translator = new WhereTranslator(_nameChanges);
+            Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Continent == "Africa" && list.Contains(p.Name));
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression) query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.NotNull(translation.TableQuery.FilterString);
+            Assert.Equal("PartitionKey eq 'Africa' and (RowKey eq 'Latvia' or RowKey eq 'Germany')", translation.TableQuery.FilterString);
         }
 
         [Fact]
@@ -104,7 +126,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -126,7 +148,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -148,7 +170,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -170,7 +192,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -192,7 +214,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -214,7 +236,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -236,7 +258,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -250,15 +272,15 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             // Arrange
             var list = new List<byte[]>
                 {
-                    new byte[]{0x11, 0x22, 0x33},
-                    new byte[]{0x44, 0x55, 0x66}
+                    new byte[] {0x11, 0x22, 0x33},
+                    new byte[] {0x44, 0x55, 0x66}
                 };
             var translator = new WhereTranslator(_nameChanges);
             Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => list.Contains(p.TopSecretKey));
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);

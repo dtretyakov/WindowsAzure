@@ -11,9 +11,9 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     {
         private const string MethodName = "Take";
 
-        public bool CanTranslate(MethodCallExpression method)
+        public string Name
         {
-            return method.Method.Name == MethodName;
+            get { return MethodName; }
         }
 
         public void Translate(MethodCallExpression methodCall, ITranslationResult result)

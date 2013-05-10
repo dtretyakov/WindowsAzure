@@ -37,10 +37,9 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             _filter = new StringBuilder();
 
             var lambda = (LambdaExpression) StripQuotes(method.Arguments[1]);
-
             Visit(lambda.Body);
 
-            AddFilter();
+            _result.AddFilter(TrimString(_filter));
         }
 
         public void AddPostProcessing(MethodCallExpression method)
@@ -59,25 +58,35 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             _result.AddPostProcesing(Expression.Lambda(call, parameter));
         }
 
-        private void AddFilter()
+        private static String TrimString(StringBuilder builder)
         {
-            string filter = RemoveParentheses(_filter.ToString().Trim());
-            _result.AddFilter(filter);
-        }
-
-        private static String RemoveParentheses(string filter)
-        {
-            if (filter == null)
+            if (builder == null)
             {
-                throw new ArgumentNullException("filter");
+                throw new ArgumentNullException("builder");
             }
 
-            while (filter.Length > 2 && filter[0] == '(' && filter[filter.Length - 1] == ')')
+            int i = 0;
+            int j = builder.Length - 1;
+
+            // Trim spaces
+            while (i < j && builder[i] == ' ')
             {
-                filter = filter.Substring(1, filter.Length - 2);
+                i++;
+            }
+            
+            while (j > i && builder[j] == ' ')
+            {
+                j--;
             }
 
-            return filter;
+            // Remove Parentheses
+            while (j - i > 2 && builder[i] == '(' && builder[j] == ')')
+            {
+                i++;
+                j--;
+            }
+
+            return builder.ToString(i, j - i + 1);
         }
 
         public static Expression StripQuotes(Expression expression)
@@ -92,12 +101,6 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
         protected override Expression VisitUnary(UnaryExpression unary)
         {
-            if (!unary.NodeType.IsSupported())
-            {
-                string message = String.Format(Resources.TranslatorOperatorNotSupported, unary.NodeType);
-                throw new NotSupportedException(message);
-            }
-
             _filter.AppendFormat(" {0} ", unary.NodeType.Serialize());
 
             Visit(unary.Operand);
@@ -107,14 +110,48 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
         protected override Expression VisitBinary(BinaryExpression binary)
         {
-            bool paranthesesRequired = binary.NodeType.IsSupported() && (binary.Left.NodeType.IsSupported() || binary.Right.NodeType.IsSupported());
+            var nodeType = binary.NodeType;
+            var leftType = binary.Left.NodeType;
+            var rightType = binary.Right.NodeType;
+
+            bool paranthesesRequired = nodeType.IsSupported() && (leftType.IsSupported() || rightType.IsSupported());
 
             if (paranthesesRequired)
             {
                 _filter.Append("(");
             }
 
-            AppendBinaryExpression(binary);
+            // Left part
+            if (leftType == ExpressionType.Call)
+            {
+                if (AppendBinaryCall((MethodCallExpression)binary.Left, nodeType))
+                {
+                    return binary;
+                }
+            }
+            else
+            {
+                AppendBinaryPart(binary.Left, leftType);
+            }
+
+            // Comparison
+            _filter.AppendFormat(" {0} ", nodeType.Serialize());
+
+            // Right part
+            if (rightType == ExpressionType.Call)
+            {
+                var methodCall = (MethodCallExpression)binary.Right;
+
+                if (AppendBinaryCall(methodCall, nodeType))
+                {
+                    string message = String.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name);
+                    throw new ArgumentException(message);
+                }
+            }
+            else
+            {
+                AppendBinaryPart(binary.Right, rightType);
+            }
 
             if (paranthesesRequired)
             {
@@ -124,64 +161,46 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             return binary;
         }
 
-        private void AppendBinaryExpression(BinaryExpression binary)
+        private void AppendBinaryPart(Expression node, ExpressionType type)
         {
-            // Left part
-            if (binary.Left.NodeType == ExpressionType.Call)
+            switch (type)
             {
-                if (AppendBinaryCall((MethodCallExpression) binary.Left, binary.NodeType))
-                {
-                    return;
-                }
-            }
-            else
-            {
-                AppendBinaryPart(binary.Left);
-            }
+                case ExpressionType.Invoke:
+                    var invocation = (InvocationExpression) node;
+                    Visit(invocation.Expression);
+                    break;
 
-            // Comparison
-            if (!binary.NodeType.IsSupported())
-            {
-                string message = String.Format(Resources.TranslatorOperatorNotSupported, binary.NodeType);
-                throw new NotSupportedException(message);
-            }
+                case ExpressionType.New:
+                case ExpressionType.NewArrayInit:
+                case ExpressionType.Constant:
+                    AppendConstant(_constantEvaluator.Evaluate(node));
+                    break;
 
-            _filter.AppendFormat(" {0} ", binary.NodeType.Serialize());
+                case ExpressionType.MemberAccess:
+                    var member = (MemberExpression) node;
+                    var expression = member.Expression;
+                    if (expression != null && expression.NodeType == ExpressionType.Parameter)
+                    {
+                        AppendParameter(node);
+                    }
+                    else
+                    {
+                        AppendConstant(node);
+                    }
+                    break;
 
-            // Right part
-            if (binary.Right.NodeType == ExpressionType.Call)
-            {
-                var methodCall = (MethodCallExpression) binary.Right;
-
-                if (AppendBinaryCall(methodCall, binary.NodeType))
-                {
-                    string message = String.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name);
-                    throw new ArgumentException(message);
-                }
-            }
-            else
-            {
-                AppendBinaryPart(binary.Right);
-            }
-        }
-
-        private void AppendBinaryPart(Expression expression)
-        {
-            if (expression.NodeType == ExpressionType.Invoke)
-            {
-                var invocation = (InvocationExpression) expression;
-                Visit(invocation.Expression);
-                return;
-            }
-
-            // Check whether expression is binary
-            if (expression.NodeType.IsSupported())
-            {
-                Visit(expression);
-            }
-            else
-            {
-                AppendConstant(_constantEvaluator.Evaluate(expression));
+                default:
+                    // Check whether expression is binary
+                    if (type.IsSupported())
+                    {
+                        Visit(node);
+                    }
+                    else
+                    {
+                        string message = String.Format(Resources.TranslatorMemberNotSupported, type);
+                        throw new ArgumentException(message);
+                    }
+                    break;
             }
         }
 
@@ -210,11 +229,11 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                             _filter.ToString(_filter.Length - 5, 5) == " not ")
                         {
                             _filter.Remove(_filter.Length - 5, 5);
-                            equality = "ne";
+                            equality = " ne ";
                         }
                         else
                         {
-                            equality = "eq";
+                            equality = " eq ";
                         }
 
                         _filter.Append("(");
@@ -222,8 +241,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
                         foreach (object value in enumerable)
                         {
-                            AppendConstant(parameter);
-                            _filter.AppendFormat(" {0} ", equality);
+                            AppendParameter(parameter);
+                            _filter.Append(equality);
                             AppendConstant(Expression.Constant(value));
                             _filter.Append(" or ");
                             count++;
@@ -247,7 +266,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                     break;
 
                 case "ToString":
-                    AppendConstant(Expression.Constant(node.Object != null ? node.Object.ToString() : string.Empty));
+                    ConstantExpression constant = Expression.Constant(node.Object != null ? node.Object.ToString() : string.Empty);
+                    AppendConstant(constant);
                     break;
 
                 default:
@@ -271,7 +291,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             switch (node.Method.Name)
             {
                 case "CompareTo":
-                    AppendConstant(_constantEvaluator.Evaluate(node.Object));
+                    AppendParameter(_constantEvaluator.Evaluate(node.Object));
                     _filter.AppendFormat(" {0} ", type.Serialize());
                     AppendConstant(_constantEvaluator.Evaluate(node.Arguments[0]));
                     return true;
@@ -280,7 +300,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                 case "CompareOrdinal":
                     if (node.Arguments.Count >= 2)
                     {
-                        AppendConstant(_constantEvaluator.Evaluate(node.Arguments[0]));
+                        AppendParameter(_constantEvaluator.Evaluate(node.Arguments[0]));
                         _filter.AppendFormat(" {0} ", type.Serialize());
                         AppendConstant(_constantEvaluator.Evaluate(node.Arguments[1]));
                     }
@@ -301,43 +321,44 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            AppendConstant(node);
-
+            AppendParameter(node);
             return node;
+        }
+
+        private void AppendParameter(Expression node)
+        {
+            if (node.NodeType != ExpressionType.MemberAccess)
+            {
+                string message = String.Format(Resources.TranslatorMemberNotSupported, node.NodeType);
+                throw new NotSupportedException(message);
+            }
+
+            var member = (MemberExpression) node;
+
+            // Append member
+            string name;
+            var memberName = member.Member.Name;
+            if (!_nameChanges.TryGetValue(memberName, out name))
+            {
+                name = memberName;
+            }
+
+            _filter.Append(name);
         }
 
         private void AppendConstant(Expression node)
         {
-            if (node.NodeType == ExpressionType.MemberAccess)
-            {
-                var member = (MemberExpression) node;
-
-                if (member.Expression == null || member.Expression.NodeType != ExpressionType.Parameter)
-                {
-                    node = _constantEvaluator.Evaluate(member);
-                }
-            }
-
-            if (node.NodeType == ExpressionType.MemberAccess)
-            {
-                var member = (MemberExpression) node;
-
-                if (member.Expression != null && member.Expression.NodeType == ExpressionType.Parameter)
-                {
-                    string name = member.Member.Name;
-                    _filter.Append(_nameChanges.ContainsKey(name) ? _nameChanges[name] : name);
-
-                    return;
-                }
-
-                string message = String.Format(Resources.TranslatorMemberNotSupported, member.Member.Name);
-                throw new NotSupportedException(message);
-            }
-
+            // Evaluate if required
             if (node.NodeType != ExpressionType.Constant)
             {
-                string message = String.Format(Resources.TranslatorUnableToEvaluateExpression, node);
-                throw new InvalidExpressionException(message);
+                Expression result = _constantEvaluator.Evaluate(node);
+                if (result.NodeType != ExpressionType.Constant)
+                {
+                    string message = String.Format(Resources.TranslatorUnableToEvaluateExpression, node);
+                    throw new InvalidExpressionException(message);
+                }
+
+                node = result;
             }
 
             var constant = (ConstantExpression) node;

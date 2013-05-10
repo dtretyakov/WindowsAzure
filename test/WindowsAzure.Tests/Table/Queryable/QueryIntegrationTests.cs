@@ -91,7 +91,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             List<Country> values = await query.ToListAsync();
 
             // Assert
-            Assert.Equal(values.Count, 2);
+            Assert.Equal(2, values.Count);
             Assert.Contains(Finland, values.Select(p => p.Name));
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
@@ -117,8 +117,8 @@ namespace WindowsAzure.Tests.Table.Queryable
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(result.Name, Germany);
-            Assert.Equal(results.Count, 2);
+            Assert.Equal(Germany, result.Name);
+            Assert.Equal(2, results.Count);
             Assert.Contains(Finland, results.Select(p => p.Name));
             Assert.Contains(Spain, results.Select(p => p.Name));
         }
@@ -137,7 +137,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             var values = query.ToList();
 
             // Assert
-            Assert.Equal(values.Count, 2);
+            Assert.Equal(2, values.Count);
             Assert.Contains(France, values.Select(p => p.Name));
             Assert.Contains(Spain, values.Select(p => p.Name));
         }
@@ -156,7 +156,7 @@ namespace WindowsAzure.Tests.Table.Queryable
             var values = await query.ToListAsync();
 
             // Assert
-            Assert.Equal(values.Count, 2);
+            Assert.Equal(2, values.Count);
             Assert.Contains(France, values.Select(p => p.Name));
             Assert.Contains(Spain, values.Select(p => p.Name));
         }

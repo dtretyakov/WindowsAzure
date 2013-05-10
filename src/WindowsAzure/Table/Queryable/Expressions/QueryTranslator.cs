@@ -12,7 +12,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
     /// </summary>
     internal class QueryTranslator : IQueryTranslator
     {
-        private readonly IList<IMethodTranslator> _methodTranslators;
+        private readonly IDictionary<string, IMethodTranslator> _methodTranslators;
 
         /// <summary>
         ///     Constructor.
@@ -26,9 +26,9 @@ namespace WindowsAzure.Table.Queryable.Expressions
         ///     Constructor.
         /// </summary>
         /// <param name="methodTranslators">LINQ Expression methods translators.</param>
-        internal QueryTranslator(IList<IMethodTranslator> methodTranslators)
+        internal QueryTranslator(IEnumerable<IMethodTranslator> methodTranslators)
         {
-            _methodTranslators = methodTranslators;
+            _methodTranslators = methodTranslators.ToDictionary(translator => translator.Name);
         }
 
         /// <summary>
@@ -49,6 +49,8 @@ namespace WindowsAzure.Table.Queryable.Expressions
             // Visit method
             VisitMethodCall(methodCall, result);
 
+            // ReSharper disable ForCanBeConvertedToForeach
+
             // Visit arguments
             for (int i = 0; i < methodCall.Arguments.Count; i++)
             {
@@ -58,9 +60,11 @@ namespace WindowsAzure.Table.Queryable.Expressions
                     VisitMethodCall((MethodCallExpression) argument, result);
                 }
             }
+
+            // ReSharper restore ForCanBeConvertedToForeach
         }
 
-        private static IList<IMethodTranslator> GetTranslators(IDictionary<string, string> nameChanges)
+        private static IEnumerable<IMethodTranslator> GetTranslators(IDictionary<string, string> nameChanges)
         {
             return new List<IMethodTranslator>
                 {
@@ -81,11 +85,10 @@ namespace WindowsAzure.Table.Queryable.Expressions
                 throw new ArgumentException(string.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name));
             }
 
-            // Select method translator
-            IMethodTranslator translator = _methodTranslators.FirstOrDefault(
-                methodTranslator => methodTranslator.CanTranslate(methodCall));
+            // Get a method translator
+            IMethodTranslator translator;
 
-            if (translator == null)
+            if (!_methodTranslators.TryGetValue(methodCall.Method.Name, out translator))
             {
                 string message = String.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name);
                 throw new NotSupportedException(message);
