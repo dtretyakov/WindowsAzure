@@ -48,7 +48,9 @@ To utilize [filtering capabilities of string properties](http://msdn.microsoft.c
 * [CompareTo](http://msdn.microsoft.com/en-us/library/fkw3h78a.aspx)
 * [CompareOrdinal](http://msdn.microsoft.com/en-us/library/af26w0wa.aspx)
 
-**NOTE**: For creating a custom queries you should take a look at next article [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
+Also you can use [**Contains** method](http://msdn.microsoft.com/en-us/library/ms132407.aspx). In this case query statement for each collection's item will be joined by using OData _or_ operator.
+
+**NOTE**: For creating a custom queries you should take a look at next article: [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
 
 ###Asynchronous LINQ Queries
 
@@ -176,6 +178,13 @@ var projection = from country in countryTable
 
 var result = projection.ToList();
 result = await projection.ToListAsync();
+```
+
+* Using Contains in the LINQ query:
+
+```csharp
+var countryNames = new List<string> { "Germany", "Finland" };
+var countries = countryTable.Where(p => countryNames.Contains(p.Name)).ToList();
 ```
 
 ## Sponsors
