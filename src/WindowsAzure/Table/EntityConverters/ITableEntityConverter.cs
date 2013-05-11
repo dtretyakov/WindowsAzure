@@ -8,7 +8,7 @@ namespace WindowsAzure.Table.EntityConverters
     ///     Table entity converter.
     /// </summary>
     /// <typeparam name="TEntity">Entity type.</typeparam>
-    internal interface ITableEntityConverter<TEntity> where TEntity : new()
+    public interface ITableEntityConverter<TEntity> where TEntity : new()
     {
         /// <summary>
         ///     Gets an entity property name maping connection.
