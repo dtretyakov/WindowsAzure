@@ -3,10 +3,10 @@
 namespace WindowsAzure.Table.Attributes
 {
     /// <summary>
-    ///     Defines whether property keep timestamp value.
+    ///     Defines whether property should keep a timestamp value.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public class TimestampAttribute : Attribute
+    public sealed class TimestampAttribute : Attribute
     {
     }
 }

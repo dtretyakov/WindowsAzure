@@ -1,42 +1,41 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 {
     /// <summary>
-    ///     Handles access to the property value.
+    ///     Handles access to the etag value.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    internal sealed class RegularProperty<T> : IProperty<T>
+    internal sealed class ETagProperty<T> : IProperty<T>
     {
         private readonly Func<T, EntityProperty> _getValue;
-        private readonly string _memberName;
         private readonly Action<T, EntityProperty> _setValue;
+        private readonly Type _stringType = typeof (String);
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         /// <param name="member">Entity member.</param>
-        /// <param name="name">Member name.</param>
-        internal RegularProperty(MemberInfo member, string name)
+        internal ETagProperty(MemberInfo member)
         {
             if (member == null)
             {
                 throw new ArgumentNullException("member");
             }
 
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException("name");
-            }
-
             IValueAccessor<T> accessor = ValueAccessorFactory.Create<T>(member);
+
+            if (accessor.Type != _stringType)
+            {
+                throw new ArgumentException(Resources.PropertyETagInvalidType);
+            }
 
             _getValue = accessor.GetValue;
             _setValue = accessor.SetValue;
-            _memberName = name;
         }
 
         /// <summary>
@@ -46,12 +45,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         /// <param name="entity">POCO entity.</param>
         public void SetMemberValue(DynamicTableEntity tableEntity, T entity)
         {
-            EntityProperty entityProperty;
-
-            if (tableEntity.Properties.TryGetValue(_memberName, out entityProperty))
-            {
-                _setValue(entity, entityProperty);
-            }
+            _setValue(entity, new EntityProperty(tableEntity.ETag));
         }
 
         /// <summary>
@@ -61,7 +55,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         /// <param name="tableEntity">Table entity.</param>
         public void GetMemberValue(T entity, DynamicTableEntity tableEntity)
         {
-            tableEntity.Properties.Add(_memberName, _getValue(entity));
+            tableEntity.ETag = _getValue(entity).StringValue;
         }
     }
 }

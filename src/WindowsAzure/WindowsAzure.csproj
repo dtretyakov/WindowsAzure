@@ -95,12 +95,11 @@
     <Compile Include="Table\RequestExecutor\ITableRequestExecutor.cs" />
     <Compile Include="Table\RequestExecutor\TableBatchPartitioner.cs" />
     <Compile Include="Table\ExecutionMode.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\Properties\ETagAccessor.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\Properties\IKeyProperty.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\Properties\PartitionKeyAccessor.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\Properties\ETagProperty.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\Properties\PartitionKeyProperty.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\RegularProperty.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\Properties\RowKeyAccessor.cs" />
-    <Compile Include="Table\EntityConverters\TypeData\Properties\TimestampAccessor.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\Properties\RowKeyProperty.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\Properties\TimestampProperty.cs" />
     <Compile Include="Table\EntityConverters\TypeData\Properties\IProperty.cs" />
     <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\ValueAccessorBase.cs" />
     <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\PropertyValueAccessor.cs" />

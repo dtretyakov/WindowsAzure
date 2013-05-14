@@ -7,7 +7,7 @@ namespace WindowsAzure.Tests.Samples
     {
         [PartitionKey] public string Id;
 
-        [Property(Name = "OldMessage")] public string Message;
+        [Property("OldMessage")] public string Message;
 
         [Timestamp] public DateTime Timestamp;
 
@@ -16,5 +16,8 @@ namespace WindowsAzure.Tests.Samples
 
         [Ignore]
         public byte[] PrivateData;
+
+        [Ignore]
+        public Country Country;
     }
 }

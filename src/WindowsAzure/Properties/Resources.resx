@@ -120,10 +120,7 @@
   <data name="EntityTypeDataMissingKey" xml:space="preserve">
     <value>PartitionKey or RowKey attribute should be defined for type '{0}'.</value>
   </data>
-  <data name="ETagAttributeDuplicate" xml:space="preserve">
-    <value>ETag attribute duplication.</value>
-  </data>
-  <data name="ETagInvalidType" xml:space="preserve">
+  <data name="PropertyETagInvalidType" xml:space="preserve">
     <value>ETag must have a string type.</value>
   </data>
   <data name="ExpressionEvaluatorTypeNotSupported" xml:space="preserve">
@@ -132,25 +129,16 @@
   <data name="ExpressionValueAccessorInvalidMemberType" xml:space="preserve">
     <value>Invalid entity member type: '{0}'.</value>
   </data>
-  <data name="PartitionKeyAttributeDuplicate" xml:space="preserve">
-    <value>PartitionKey attribute duplication.</value>
-  </data>
-  <data name="PartitionKeyInvalidType" xml:space="preserve">
+  <data name="PropertyPartitionKeyInvalidType" xml:space="preserve">
     <value>PartitionKey must have a string type.</value>
   </data>
   <data name="TranslatorMethodNotSupported" xml:space="preserve">
     <value>Method '{0}' does not supported.</value>
   </data>
-  <data name="RowKeyAttributeDuplicate" xml:space="preserve">
-    <value>RowKey attribute duplication.</value>
-  </data>
-  <data name="RowKeyInvalidType" xml:space="preserve">
+  <data name="PropertyRowKeyInvalidType" xml:space="preserve">
     <value>RowKey must have a string type.</value>
   </data>
-  <data name="TimestampAttributeDuplicate" xml:space="preserve">
-    <value>Timestamp attribute duplication.</value>
-  </data>
-  <data name="TimestampInvalidType" xml:space="preserve">
+  <data name="PropertyTimestampInvalidType" xml:space="preserve">
     <value>Timestamp should be a DateTime type.</value>
   </data>
   <data name="ValueAccessorFactoryNotSupportedType" xml:space="preserve">
@@ -179,5 +167,8 @@
   </data>
   <data name="TranslatorMethodInvalidArgument" xml:space="preserve">
     <value>Invalid method '{0}' arguments.</value>
+  </data>
+  <data name="EntityTypeDataShouldBeOneAttribute" xml:space="preserve">
+    <value>'{0}' entity '{1}' member should be marked just by one attribute.</value>
   </data>
 </root>

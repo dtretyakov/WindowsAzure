@@ -15,22 +15,22 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         private readonly Type _entityPropertyType = typeof (EntityProperty);
 
         /// <summary>
-        ///     Gets an entity property value.
+        ///     Gets an entity member accessor.
         /// </summary>
         public Func<T, EntityProperty> GetValue { get; private set; }
 
         /// <summary>
-        ///     Sets an entity property value.
+        ///     Sets an entity member mutator.
         /// </summary>
         public Action<T, EntityProperty> SetValue { get; private set; }
 
         /// <summary>
-        ///     Member type.
+        ///     Gets a member type.
         /// </summary>
         public Type Type { get; protected set; }
 
         /// <summary>
-        ///     Member name.
+        ///     Gets a member name.
         /// </summary>
         public string Name { get; protected set; }
 

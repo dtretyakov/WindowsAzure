@@ -70,20 +70,11 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ETag attribute duplication..
+        ///   Looks up a localized string similar to &apos;{0}&apos; entity &apos;{1}&apos; member should be marked just by one attribute..
         /// </summary>
-        internal static string ETagAttributeDuplicate {
+        internal static string EntityTypeDataShouldBeOneAttribute {
             get {
-                return ResourceManager.GetString("ETagAttributeDuplicate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to ETag must have a string type..
-        /// </summary>
-        internal static string ETagInvalidType {
-            get {
-                return ResourceManager.GetString("ETagInvalidType", resourceCulture);
+                return ResourceManager.GetString("EntityTypeDataShouldBeOneAttribute", resourceCulture);
             }
         }
         
@@ -106,38 +97,38 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PartitionKey attribute duplication..
+        ///   Looks up a localized string similar to ETag must have a string type..
         /// </summary>
-        internal static string PartitionKeyAttributeDuplicate {
+        internal static string PropertyETagInvalidType {
             get {
-                return ResourceManager.GetString("PartitionKeyAttributeDuplicate", resourceCulture);
+                return ResourceManager.GetString("PropertyETagInvalidType", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to PartitionKey must have a string type..
         /// </summary>
-        internal static string PartitionKeyInvalidType {
+        internal static string PropertyPartitionKeyInvalidType {
             get {
-                return ResourceManager.GetString("PartitionKeyInvalidType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to RowKey attribute duplication..
-        /// </summary>
-        internal static string RowKeyAttributeDuplicate {
-            get {
-                return ResourceManager.GetString("RowKeyAttributeDuplicate", resourceCulture);
+                return ResourceManager.GetString("PropertyPartitionKeyInvalidType", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to RowKey must have a string type..
         /// </summary>
-        internal static string RowKeyInvalidType {
+        internal static string PropertyRowKeyInvalidType {
             get {
-                return ResourceManager.GetString("RowKeyInvalidType", resourceCulture);
+                return ResourceManager.GetString("PropertyRowKeyInvalidType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timestamp should be a DateTime type..
+        /// </summary>
+        internal static string PropertyTimestampInvalidType {
+            get {
+                return ResourceManager.GetString("PropertyTimestampInvalidType", resourceCulture);
             }
         }
         
@@ -165,24 +156,6 @@ namespace WindowsAzure.Properties {
         internal static string TableRequestExecutorInvalidMode {
             get {
                 return ResourceManager.GetString("TableRequestExecutorInvalidMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Timestamp attribute duplication..
-        /// </summary>
-        internal static string TimestampAttributeDuplicate {
-            get {
-                return ResourceManager.GetString("TimestampAttributeDuplicate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Timestamp should be a DateTime type..
-        /// </summary>
-        internal static string TimestampInvalidType {
-            get {
-                return ResourceManager.GetString("TimestampInvalidType", resourceCulture);
             }
         }
         

@@ -4,28 +4,28 @@ using Microsoft.WindowsAzure.Storage.Table;
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
 {
     /// <summary>
-    ///     Value accessor.
+    ///     Entity member value accessor.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
     internal interface IValueAccessor<in T>
     {
         /// <summary>
-        ///     Gets an entity property value.
+        ///     Gets an entity memeber accessor.
         /// </summary>
         Func<T, EntityProperty> GetValue { get; }
 
         /// <summary>
-        ///     Sets an entity property value.
+        ///     Sets an entity member mutator.
         /// </summary>
         Action<T, EntityProperty> SetValue { get; }
 
         /// <summary>
-        ///     Member type.
+        ///     Gets a member type.
         /// </summary>
         Type Type { get; }
 
         /// <summary>
-        ///     Member name.
+        ///     Gets a member name.
         /// </summary>
         string Name { get; }
     }

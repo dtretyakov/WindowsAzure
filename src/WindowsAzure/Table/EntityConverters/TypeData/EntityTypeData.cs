@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Properties;
+using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
-using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -16,7 +16,21 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     internal sealed class EntityTypeData<T> : IEntityTypeData<T> where T : class, new()
     {
         private const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
-        private readonly IDictionary<string, string> _nameChanges;
+        private const string PartitionKey = "PartitionKey";
+        private const string RowKey = "RowKey";
+
+        private static readonly Dictionary<Type, Func<MemberInfo, object, IDictionary<string, string>, IProperty<T>>> PropertyFactories =
+            new Dictionary<Type, Func<MemberInfo, object, IDictionary<string, string>, IProperty<T>>>
+                {
+                    {typeof (ETagAttribute), CreateETagProperty},
+                    {typeof (IgnoreAttribute), (member, attribute, names) => null},
+                    {typeof (PartitionKeyAttribute), CreatePartitionKeyProperty},
+                    {typeof (PropertyAttribute), CreateNamedProperty},
+                    {typeof (RowKeyAttribute), CreateRowKeyProperty},
+                    {typeof (TimestampAttribute), CreateTimestampProperty}
+                };
+
+        private readonly Dictionary<string, string> _nameChanges = new Dictionary<string, string>();
         private readonly IProperty<T>[] _properties = new IProperty<T>[] {};
 
         /// <summary>
@@ -24,23 +38,33 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// </summary>
         internal EntityTypeData()
         {
-            _nameChanges = new Dictionary<string, string>();
-
             Type entityType = typeof (T);
 
-            var typeMembers = new List<MemberInfo>(entityType.GetFields(Flags));
-            typeMembers.AddRange(entityType.GetProperties(Flags).Where(p => p.CanRead && p.CanWrite));
+            // Retrieve class members
+            var members = new List<MemberInfo>(entityType.GetFields(Flags));
+            members.AddRange(entityType.GetProperties(Flags).Where(p => p.CanRead && p.CanWrite));
 
-            _properties = GetProperties(typeMembers).ToArray();
+            // Create properties for entity members
+            var properties = new List<IProperty<T>>(
+                members.Select(member => GetMemberProperty(member, _nameChanges)).Where(result => result != null));
+
+            // Check whether entity's composite key completely defined
+            if (!_nameChanges.ContainsValue(PartitionKey) && !_nameChanges.ContainsValue(RowKey))
+            {
+                string message = string.Format(Resources.EntityTypeDataMissingKey, entityType);
+                throw new ArgumentException(message);
+            }
+
+            _properties = properties.ToArray();
         }
 
         // ReSharper disable ForCanBeConvertedToForeach
 
         /// <summary>
-        ///     Converts DynamicTableEntity into POCO entity.
+        ///     Converts <see cref="T:Microsoft.WindowsAzure.Storage.Table.DynamicTableEntity" /> into POCO.
         /// </summary>
         /// <param name="tableEntity">Table entity.</param>
-        /// <returns>POCO entity.</returns>
+        /// <returns>POCO.</returns>
         public T GetEntity(DynamicTableEntity tableEntity)
         {
             if (tableEntity == null)
@@ -52,15 +76,14 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             for (int i = 0; i < _properties.Length; i++)
             {
-                IProperty<T> property = _properties[i];
-                property.FillEntity(tableEntity, result);
+                _properties[i].SetMemberValue(tableEntity, result);
             }
 
             return result;
         }
 
         /// <summary>
-        ///     Converts POCO entity into ITableEntity.
+        ///     Converts POCO into <see cref="T:Microsoft.WindowsAzure.Storage.Table.ITableEntity" />.
         /// </summary>
         /// <param name="entity">POCO entity.</param>
         /// <returns>Table entity.</returns>
@@ -71,15 +94,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 throw new ArgumentNullException("entity");
             }
 
-            var result = new DynamicTableEntity(string.Empty, string.Empty)
-                {
-                    ETag = "*"
-                };
+            var result = new DynamicTableEntity(string.Empty, string.Empty) {ETag = "*"};
 
             for (int i = 0; i < _properties.Length; i++)
             {
-                IProperty<T> property = _properties[i];
-                property.FillTableEntity(entity, result);
+                _properties[i].GetMemberValue(entity, result);
             }
 
             return result;
@@ -88,7 +107,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         // ReSharper restore ForCanBeConvertedToForeach
 
         /// <summary>
-        ///     Gets an entity members name changes.
+        ///     Gets a name changes for entity members.
         /// </summary>
         public IDictionary<string, string> NameChanges
         {
@@ -96,57 +115,117 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
-        ///     Processes type members.
+        ///     Creates a new timestamp property.
         /// </summary>
-        /// <param name="memberInfos">Type memebers.</param>
-        private IEnumerable<IProperty<T>> GetProperties(IList<MemberInfo> memberInfos)
+        /// <param name="member">Entity member.</param>
+        /// <param name="attribute">Timestamp attribute.</param>
+        /// <param name="nameChanges">Name changes.</param>
+        /// <returns>Timestamp property.</returns>
+        private static TimestampProperty<T> CreateTimestampProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
         {
-            var properties = new List<IProperty<T>>(memberInfos.Count);
+            return new TimestampProperty<T>(member);
+        }
 
-            // List of available key properties
-            var keyProperties = new List<IKeyProperty<T>>
-                {
-                    new PartitionKeyAccessor<T>(),
-                    new RowKeyAccessor<T>(),
-                    new TimestampAccessor<T>(),
-                    new ETagAccessor<T>()
-                };
+        /// <summary>
+        ///     Creates a new row key property.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
+        /// <param name="attribute">Row key attribute.</param>
+        /// <param name="nameChanges">Name changes.</param>
+        /// <returns>Row key property.</returns>
+        private static RowKeyProperty<T> CreateRowKeyProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
+        {
+            nameChanges.Add(member.Name, RowKey);
+            return new RowKeyProperty<T>(member);
+        }
 
-            // Create accessors for entity members
-            foreach (MemberInfo memberInfo in memberInfos)
+        /// <summary>
+        ///     Creates a new named property.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
+        /// <param name="attribute">Property attribute.</param>
+        /// <param name="nameChanges">Name changes.</param>
+        /// <returns>Property.</returns>
+        private static RegularProperty<T> CreateNamedProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
+        {
+            string propertyName = ((PropertyAttribute) attribute).Name;
+            nameChanges.Add(member.Name, propertyName);
+            return new RegularProperty<T>(member, propertyName);
+        }
+
+        /// <summary>
+        ///     Creates a new partition key property.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
+        /// <param name="attribute">Partition key attribute.</param>
+        /// <param name="nameChanges">Name changes.</param>
+        /// <returns>Partition key property.</returns>
+        private static PartitionKeyProperty<T> CreatePartitionKeyProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
+        {
+            nameChanges.Add(member.Name, PartitionKey);
+            return new PartitionKeyProperty<T>(member);
+        }
+
+        /// <summary>
+        ///     Creates a new etag property.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
+        /// <param name="attribute">ETag attribute.</param>
+        /// <param name="nameChanges">Name changes.</param>
+        /// <returns>ETag property.</returns>
+        private static ETagProperty<T> CreateETagProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
+        {
+            return new ETagProperty<T>(member);
+        }
+
+        /// <summary>
+        ///     Creates a new entity member property.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
+        /// <param name="nameChanges">Name changes.</param>
+        /// <returns>Property.</returns>
+        private static IProperty<T> GetMemberProperty(MemberInfo member, IDictionary<string, string> nameChanges)
+        {
+            IList<object> attributes = SelectMetadataAttributes(member.GetCustomAttributes(false));
+
+            if (attributes.Count == 0)
             {
-                IValueAccessor<T> valueAccessor = ValueAccessorFactory.Create<T>(memberInfo);
+                return new RegularProperty<T>(member, member.Name);
+            }
 
-                if (keyProperties.Any(p => p.Validate(memberInfo, valueAccessor)))
+            if (attributes.Count == 1)
+            {
+                return PropertyFactories[attributes[0].GetType()](member, attributes[0], nameChanges);
+            }
+
+            string typeName = member.DeclaringType != null ? member.DeclaringType.Name : string.Empty;
+            string message = string.Format(Resources.EntityTypeDataShouldBeOneAttribute, typeName, member.Name);
+
+            throw new InvalidOperationException(message);
+        }
+
+        /// <summary>
+        ///     Selects a metadata attributes.
+        /// </summary>
+        /// <param name="attributes">Entity attributes.</param>
+        /// <returns>Metadata attributes.</returns>
+        private static IList<object> SelectMetadataAttributes(object[] attributes)
+        {
+            var selectedAttributes = new List<object>();
+
+            for (int i = 0; i < attributes.Length; i++)
+            {
+                Type attributeType = attributes[i].GetType();
+
+                if (!PropertyFactories.ContainsKey(attributeType))
                 {
                     continue;
                 }
 
-                // Keep as a regular property
-                var property = new RegularProperty<T>(memberInfo, valueAccessor);
-                if (property.HasAccessor)
-                {
-                    properties.Add(property);
-                }
+                selectedAttributes.Add(attributes[i]);
             }
 
-            // At least one key property should be defined
-            if (keyProperties.Count(p => p.HasAccessor && (p is PartitionKeyAccessor<T> || p is RowKeyAccessor<T>)) == 0)
-            {
-                string message = string.Format(Resources.EntityTypeDataMissingKey, typeof (T));
-                throw new ArgumentException(message);
-            }
-
-            // Merge properties
-            properties.AddRange(keyProperties.Where(p => p.HasAccessor));
-
-            // Get name changes
-            foreach (var pair in properties.SelectMany(keyProperty => keyProperty.NameChanges))
-            {
-                _nameChanges.Add(pair.Key, pair.Value);
-            }
-
-            return properties;
+            return selectedAttributes;
         }
     }
 }

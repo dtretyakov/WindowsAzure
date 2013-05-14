@@ -3,14 +3,33 @@
 namespace WindowsAzure.Table.Attributes
 {
     /// <summary>
-    ///     Allows to change custom serialization property name.
+    ///     Defines a custom property name.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class PropertyAttribute : Attribute
     {
+        private readonly string _name;
+
         /// <summary>
-        ///     Gets or sets a custom property name.
+        ///     Constructor.
         /// </summary>
-        public string Name { get; set; }
+        /// <param name="name">Custom property name.</param>
+        public PropertyAttribute(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException("name");
+            }
+
+            _name = name;
+        }
+
+        /// <summary>
+        ///     Gets a custom property name.
+        /// </summary>
+        public string Name
+        {
+            get { return _name; }
+        }
     }
 }
