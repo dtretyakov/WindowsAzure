@@ -88,6 +88,15 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to get value of the node: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ExpressionEvaluatorUnableToEvaluate {
+            get {
+                return ResourceManager.GetString("ExpressionEvaluatorUnableToEvaluate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid entity member type: &apos;{0}&apos;..
         /// </summary>
         internal static string ExpressionValueAccessorInvalidMemberType {

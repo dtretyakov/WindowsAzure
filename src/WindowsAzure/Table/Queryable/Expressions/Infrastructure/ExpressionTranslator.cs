@@ -277,10 +277,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                     break;
 
                 default:
-                    {
-                        string message = string.Format(Resources.TranslatorMethodNotSupported, node.Method.Name);
-                        throw new ArgumentException(message);
-                    }
+                    AppendConstant(_constantEvaluator.Evaluate(node));
+                    break;
             }
 
             return node;

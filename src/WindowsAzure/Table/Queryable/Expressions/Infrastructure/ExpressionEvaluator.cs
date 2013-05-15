@@ -20,13 +20,25 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             return Visit(expression);
         }
 
+        private ConstantExpression TryToEvaluate(Expression expression)
+        {
+            Expression result = Evaluate(expression);
+            if (result.NodeType == ExpressionType.Constant)
+            {
+                return (ConstantExpression) result;
+            }
+
+            string message = string.Format(Resources.ExpressionEvaluatorUnableToEvaluate, expression);
+            throw new NotSupportedException(message);
+        }
+
         protected override Expression VisitNew(NewExpression node)
         {
             var arguments = new object[node.Arguments.Count];
 
             for (int i = 0; i < node.Arguments.Count; i++)
             {
-                var result = (ConstantExpression) Evaluate(node.Arguments[i]);
+                ConstantExpression result = TryToEvaluate(node.Arguments[i]);
                 arguments[i] = result.Value;
             }
 
@@ -45,7 +57,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
             for (int i = 0; i < node.Expressions.Count; i++)
             {
-                var result = (ConstantExpression) Evaluate(node.Expressions[i]);
+                ConstantExpression result = TryToEvaluate(node.Expressions[i]);
                 array[i] = (Byte) result.Value;
             }
 
@@ -58,12 +70,19 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
             for (int i = 0; i < node.Arguments.Count; i++)
             {
-                var result = (ConstantExpression) Evaluate(node.Arguments[i]);
+                ConstantExpression result = TryToEvaluate(node.Arguments[i]);
                 arguments[i] = result.Value;
             }
 
-            var constantObject = (ConstantExpression) Evaluate(node.Object);
-            object value = node.Method.Invoke(constantObject.Value, arguments);
+            object instance = null;
+
+            if (node.Object != null)
+            {
+                ConstantExpression constantObject = TryToEvaluate(node.Object);
+                instance = constantObject.Value;
+            }
+
+            object value = node.Method.Invoke(instance, arguments);
 
             return Expression.Constant(value, node.Type);
         }
@@ -113,29 +132,29 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
         private object GetFieldValue(MemberExpression node)
         {
             var fieldInfo = (FieldInfo) node.Member;
-            object @object = null;
+            object instance = null;
 
             if (node.Expression != null)
             {
-                var ce = (ConstantExpression) Evaluate(node.Expression);
-                @object = ce.Value;
+                ConstantExpression ce = TryToEvaluate(node.Expression);
+                instance = ce.Value;
             }
 
-            return fieldInfo.GetValue(@object);
+            return fieldInfo.GetValue(instance);
         }
 
         private object GetPropertyValue(MemberExpression node)
         {
             var propertyInfo = (PropertyInfo) node.Member;
-            object @object = null;
+            object instance = null;
 
             if (node.Expression != null)
             {
-                var ce = (ConstantExpression) Evaluate(node.Expression);
-                @object = ce.Value;
+                ConstantExpression ce = TryToEvaluate(node.Expression);
+                instance = ce.Value;
             }
 
-            return propertyInfo.GetValue(@object, null);
+            return propertyInfo.GetValue(instance, null);
         }
     }
 }

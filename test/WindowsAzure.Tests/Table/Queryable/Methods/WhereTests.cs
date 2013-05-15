@@ -29,7 +29,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnPartitionKeyTest()
+        public void UseWhereOnPartitionKey()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -46,7 +46,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnRowKeyTest()
+        public void UseWhereOnRowKey()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -63,7 +63,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseEnumValueInWhereOnRowKeyTest()
+        public void UseEnumValueInWhereOnRowKey()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -80,7 +80,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnDoubleTest()
+        public void UseWhereOnDouble()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -97,7 +97,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnBytesTest()
+        public void UseWhereOnBytes()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -114,7 +114,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnDateTimeTest()
+        public void UseWhereOnDateTime()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -131,7 +131,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnGuidTest()
+        public void UseWhereOnGuid()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -148,7 +148,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnBooleanTest()
+        public void UseWhereOnBoolean()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -165,7 +165,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnInt64Test()
+        public void UseWhereOnInt64()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -182,7 +182,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UseWhereOnInt32Test()
+        public void UseWhereOnInt32()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -199,7 +199,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void BinaryQueryWithEqualBooleanValueTest()
+        public void BinaryQueryWithEqualBooleanValue()
         {
             // Arrange
             const bool value = false;
@@ -217,7 +217,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void BinaryQueryWithNotEqualBooleanValueTest()
+        public void BinaryQueryWithNotEqualBooleanValue()
         {
             // Arrange
             const bool value = false;
@@ -235,7 +235,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UnaryQueryWithBooleanValueTest()
+        public void UnaryQueryWithBooleanValue()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -252,7 +252,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void UnaryQueryWithInversedBooleanValueTest()
+        public void UnaryQueryWithInversedBooleanValue()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);
@@ -266,6 +266,65 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.FilterString);
             Assert.Equal("not IsExists", translation.TableQuery.FilterString);
+        }
+
+        // ReSharper disable CompareOfFloatsByEqualityOperator
+
+        [Fact]
+        public void BinaryExpressionWithExternalMethodCall()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Area == Convert.ToDouble(555));
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.NotNull(translation.TableQuery.FilterString);
+            Assert.Equal("Area eq 555.0", translation.TableQuery.FilterString);
+        }
+
+        // ReSharper restore CompareOfFloatsByEqualityOperator
+
+        [Fact]
+        public void BinaryExpressionWithComplexExpression()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => Math.Abs(p.Area - Convert.ToDouble(555)) < 0.2);
+            var translation = new TranslationResult();
+
+            // Act
+            Assert.Throws<NotSupportedException>(() => translator.Translate((MethodCallExpression) query.Body, translation));
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Null(translation.TableQuery.FilterString);
+        }
+
+        [Fact]
+        public void BinaryExpressionWithPrivateMethodCall()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            Expression<Func<IQueryable<Country>>> query = () => _countries.Where(p => p.Name == GetName());
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.NotNull(translation.TableQuery.FilterString);
+            Assert.Equal("RowKey eq 'new name'", translation.TableQuery.FilterString);
+        }
+
+        private string GetName()
+        {
+            return "new name";
         }
     }
 }
