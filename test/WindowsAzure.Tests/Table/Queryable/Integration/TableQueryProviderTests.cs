@@ -10,17 +10,16 @@ using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Queryable
+namespace WindowsAzure.Tests.Table.Queryable.Integration
 {
-    public sealed class TableQueryProviderIntegrationTests : CountryTableSetBase
+    public sealed class TableQueryProviderTests : CountryTableSetBase
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";
         private const string Finland = "Finland";
         private const string France = "France";
 
-
-        public TableQueryProviderIntegrationTests()
+        public TableQueryProviderTests()
         {
             TableSet<Country> tableSet = GetTableSet();
             tableSet.Add(new Country

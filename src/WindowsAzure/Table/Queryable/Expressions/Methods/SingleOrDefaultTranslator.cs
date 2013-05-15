@@ -13,6 +13,11 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             : base(nameChanges)
         {
         }
+        public override void Translate(System.Linq.Expressions.MethodCallExpression methodCall, ITranslationResult result)
+        {
+            base.Translate(methodCall, result);
+            result.AddTop(2);
+        }
 
         public override string Name
         {

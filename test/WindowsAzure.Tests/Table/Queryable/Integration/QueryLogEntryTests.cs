@@ -6,13 +6,13 @@ using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
-namespace WindowsAzure.Tests.Table.Queryable
+namespace WindowsAzure.Tests.Table.Queryable.Integration
 {
-    public sealed class QueryLogEntryEntitiesIntegrationTests : LogEntryTableSetBase
+    public sealed class QueryLogEntryTests : LogEntryTableSetBase
     {
         private const string MessageTemplate = "My message {0}";
 
-        public QueryLogEntryEntitiesIntegrationTests()
+        public QueryLogEntryTests()
         {
             TableSet<LogEntry> tableSet = GetTableSet();
 
@@ -28,7 +28,7 @@ namespace WindowsAzure.Tests.Table.Queryable
         }
 
         [IntegrationFact]
-        public async Task QueryLogEntryAndUpdateTest()
+        public async Task CheckFieldAccessor()
         {
             // Arrange
             const string value = "New message";
@@ -45,7 +45,7 @@ namespace WindowsAzure.Tests.Table.Queryable
         }
 
         [IntegrationFact]
-        public async Task QueryLogEntryTwiceAndCheckETagTest()
+        public async Task CheckETagAccessor()
         {
             // Arrange
             TableSet<LogEntry> tableSet = GetTableSet();
@@ -60,7 +60,7 @@ namespace WindowsAzure.Tests.Table.Queryable
         }
 
         [IntegrationFact]
-        public async Task QueryLogEntryByMessageValueTest()
+        public async Task UseFieldInQueryExpression()
         {
             // Arrange
             TableSet<LogEntry> tableSet = GetTableSet();

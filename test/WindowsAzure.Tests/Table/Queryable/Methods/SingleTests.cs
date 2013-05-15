@@ -9,12 +9,12 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public sealed class SingleOrDefaultTranslatorTests
+    public sealed class SingleTests
     {
         private readonly IQueryable<Country> _countries;
         private readonly Dictionary<string, string> _nameChanges;
 
-        public SingleOrDefaultTranslatorTests()
+        public SingleTests()
         {
             _countries = new EnumerableQuery<Country>(new Country[] {});
             _nameChanges = new Dictionary<string, string>
@@ -25,11 +25,11 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void LinqSingleOrDefaultClause()
+        public void LinqSingleClause()
         {
             // Arrange
-            var translator = new SingleOrDefaultTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.SingleOrDefault(p => !p.IsExists);
+            var translator = new SingleTranslator(_nameChanges);
+            Expression<Func<Country>> query = () => _countries.Single(p => !p.IsExists);
             var translation = new TranslationResult();
 
             // Act
@@ -41,14 +41,14 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Equal("not IsExists", translation.TableQuery.FilterString);
         }
 
-        // ReSharper disable ReplaceWithSingleCallToSingleOrDefault
+        // ReSharper disable ReplaceWithSingleCallToSingle
 
         [Fact]
-        public void LinqSingleOrDefaultAfterWhereClause()
+        public void LinqSingleAfterWhereClause()
         {
             // Arrange
-            var translator = new SingleOrDefaultTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.Where(p => !p.IsExists).SingleOrDefault();
+            var translator = new SingleTranslator(_nameChanges);
+            Expression<Func<Country>> query = () => _countries.Where(p => !p.IsExists).Single();
             var translation = new TranslationResult();
 
             // Act
@@ -60,6 +60,6 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Equal("not IsExists", translation.TableQuery.FilterString);
         }
 
-        // ReSharper restore ReplaceWithSingleCallToSingleOrDefault
+        // ReSharper restore ReplaceWithSingleCallToSingle
     }
 }

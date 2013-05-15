@@ -7,7 +7,7 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public sealed class TakeTranslatorTests
+    public sealed class TakeTests
     {
         private static IQueryable<Country> GetQueryable()
         {

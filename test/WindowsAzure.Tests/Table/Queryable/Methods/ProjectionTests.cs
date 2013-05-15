@@ -9,13 +9,13 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public class SelectTranslatorTests
+    public class ProjectionTests
     {
         private const string Germany = "Germany";
         private const string Spain = "Spain";
         private readonly Dictionary<string, string> _nameChanges;
 
-        public SelectTranslatorTests()
+        public ProjectionTests()
         {
             _nameChanges = new Dictionary<string, string>
                 {

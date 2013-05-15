@@ -9,12 +9,12 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public sealed class FirstTranslatorTests
+    public sealed class SingleOrDefaultTests
     {
         private readonly IQueryable<Country> _countries;
         private readonly Dictionary<string, string> _nameChanges;
 
-        public FirstTranslatorTests()
+        public SingleOrDefaultTests()
         {
             _countries = new EnumerableQuery<Country>(new Country[] {});
             _nameChanges = new Dictionary<string, string>
@@ -25,39 +25,41 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void LinqFirstClause()
+        public void LinqSingleOrDefaultClause()
         {
             // Arrange
-            var translator = new FirstTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.First(p => !p.IsExists);
+            var translator = new SingleOrDefaultTranslator(_nameChanges);
+            Expression<Func<Country>> query = () => _countries.SingleOrDefault(p => !p.IsExists);
             var translation = new TranslationResult();
 
-            // Act && Assert
+            // Act
             translator.Translate((MethodCallExpression) query.Body, translation);
 
+            // Assert
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.FilterString);
             Assert.Equal("not IsExists", translation.TableQuery.FilterString);
         }
 
-        // ReSharper disable ReplaceWithSingleCallToFirst
+        // ReSharper disable ReplaceWithSingleCallToSingleOrDefault
 
         [Fact]
-        public void LinqFirstAfterWhereClause()
+        public void LinqSingleOrDefaultAfterWhereClause()
         {
             // Arrange
-            var translator = new FirstTranslator(_nameChanges);
-            Expression<Func<Country>> query = () => _countries.Where(p => !p.IsExists).First();
+            var translator = new SingleOrDefaultTranslator(_nameChanges);
+            Expression<Func<Country>> query = () => _countries.Where(p => !p.IsExists).SingleOrDefault();
             var translation = new TranslationResult();
 
-            // Act && Assert
+            // Act
             translator.Translate((MethodCallExpression) query.Body, translation);
 
+            // Assert
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.FilterString);
             Assert.Equal("not IsExists", translation.TableQuery.FilterString);
         }
 
-        // ReSharper restore ReplaceWithSingleCallToFirst
+        // ReSharper restore ReplaceWithSingleCallToSingleOrDefault
     }
 }

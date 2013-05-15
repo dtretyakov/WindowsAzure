@@ -9,12 +9,12 @@ using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Methods
 {
-    public sealed class FirstOrDefaultTranslatorTests
+    public sealed class FirstOrDefaultTests
     {
         private readonly IQueryable<Country> _countries;
         private readonly Dictionary<string, string> _nameChanges;
 
-        public FirstOrDefaultTranslatorTests()
+        public FirstOrDefaultTests()
         {
             _countries = new EnumerableQuery<Country>(new Country[] {});
             _nameChanges = new Dictionary<string, string>

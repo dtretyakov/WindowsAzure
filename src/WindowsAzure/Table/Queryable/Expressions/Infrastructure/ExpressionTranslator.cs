@@ -34,6 +34,12 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
         public void Translate(ITranslationResult result, MethodCallExpression method)
         {
             _result = result;
+
+            if (method.Arguments.Count != 2)
+            {
+                return;
+            }
+
             _filter = new StringBuilder();
 
             var lambda = (LambdaExpression) StripQuotes(method.Arguments[1]);
@@ -73,7 +79,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             {
                 i++;
             }
-            
+
             while (j > i && builder[j] == ' ')
             {
                 j--;
@@ -110,9 +116,9 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
         protected override Expression VisitBinary(BinaryExpression binary)
         {
-            var nodeType = binary.NodeType;
-            var leftType = binary.Left.NodeType;
-            var rightType = binary.Right.NodeType;
+            ExpressionType nodeType = binary.NodeType;
+            ExpressionType leftType = binary.Left.NodeType;
+            ExpressionType rightType = binary.Right.NodeType;
 
             bool paranthesesRequired = nodeType.IsSupported() && (leftType.IsSupported() || rightType.IsSupported());
 
@@ -124,7 +130,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             // Left part
             if (leftType == ExpressionType.Call)
             {
-                if (AppendBinaryCall((MethodCallExpression)binary.Left, nodeType))
+                if (AppendBinaryCall((MethodCallExpression) binary.Left, nodeType))
                 {
                     return binary;
                 }
@@ -140,7 +146,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             // Right part
             if (rightType == ExpressionType.Call)
             {
-                var methodCall = (MethodCallExpression)binary.Right;
+                var methodCall = (MethodCallExpression) binary.Right;
 
                 if (AppendBinaryCall(methodCall, nodeType))
                 {
@@ -178,7 +184,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
                 case ExpressionType.MemberAccess:
                     var member = (MemberExpression) node;
-                    var expression = member.Expression;
+                    Expression expression = member.Expression;
                     if (expression != null && expression.NodeType == ExpressionType.Parameter)
                     {
                         AppendParameter(node);
@@ -337,7 +343,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
             // Append member
             string name;
-            var memberName = member.Member.Name;
+            string memberName = member.Member.Name;
             if (!_nameChanges.TryGetValue(memberName, out name))
             {
                 name = memberName;
