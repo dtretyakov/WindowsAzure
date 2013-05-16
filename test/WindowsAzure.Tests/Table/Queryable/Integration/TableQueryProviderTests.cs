@@ -130,5 +130,46 @@ namespace WindowsAzure.Tests.Table.Queryable.Integration
             Assert.Equal(1, typedResult.Count);
             Assert.Equal(Spain, typedResult[0].Name);
         }
+
+        [Fact]
+        public void CreateTableQueryProviderWithNullCloudTable()
+        {
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => new TableQueryProvider<Country>(null, null));
+        }
+
+        [Fact]
+        public void CreateTableQueryProviderWithNullEntityConverter()
+        {
+            // Arrange
+            CloudTable cloudTable = GenerateCloudTableClient().GetTableReference("Table");
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => new TableQueryProvider<Country>(cloudTable, null));
+        }
+
+        [Fact]
+        public void ExecuteWithNullExpression()
+        {
+            // Arrange
+            CloudTable cloudTable = GenerateCloudTableClient().GetTableReference("Table");
+            var converter = new TableEntityConverter<Country>();
+            var provider = new TableQueryProvider<Country>(cloudTable, converter);
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => provider.Execute(null));
+        }
+
+        [Fact]
+        public void ExecuteAsyncWithNullExpression()
+        {
+            // Arrange
+            CloudTable cloudTable = GenerateCloudTableClient().GetTableReference("Table");
+            var converter = new TableEntityConverter<Country>();
+            var provider = new TableQueryProvider<Country>(cloudTable, converter);
+
+            // Act && Assert
+            Assert.Throws<ArgumentNullException>(() => provider.ExecuteAsync(null));
+        }
     }
 }

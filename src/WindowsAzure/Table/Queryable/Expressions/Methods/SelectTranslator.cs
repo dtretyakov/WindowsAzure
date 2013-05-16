@@ -31,9 +31,10 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         public void Translate(MethodCallExpression method, ITranslationResult result)
         {
-            if (method.Arguments.Count != 2)
+            if (method.Method.Name != MethodName || method.Arguments.Count != 2)
             {
-                throw new ArgumentException(string.Format(Resources.TranslatorMethodNotSupported, method.Method.Name), "method");
+                var message = string.Format(Resources.TranslatorMethodNotSupported, method.Method.Name);
+                throw new ArgumentOutOfRangeException("method", message);
             }
 
             var lambda = (LambdaExpression) ExpressionTranslator.StripQuotes(method.Arguments[1]);

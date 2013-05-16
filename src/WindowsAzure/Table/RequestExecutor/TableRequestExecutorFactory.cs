@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters;
@@ -55,7 +56,7 @@ namespace WindowsAzure.Table.RequestExecutor
             }
 
             string message = string.Format(Resources.TableRequestExecutorInvalidMode, executionMode);
-            throw new ArgumentOutOfRangeException("executionMode", message);
+            throw new InvalidEnumArgumentException(message, (int)executionMode, typeof(ExecutionMode));
         }
     }
 }

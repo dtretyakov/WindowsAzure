@@ -16,14 +16,15 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             get { return MethodName; }
         }
 
-        public void Translate(MethodCallExpression methodCall, ITranslationResult result)
+        public void Translate(MethodCallExpression method, ITranslationResult result)
         {
-            if (methodCall.Arguments.Count != 2 || methodCall.Arguments[1].NodeType != ExpressionType.Constant)
+            if (method.Method.Name != MethodName || method.Arguments.Count != 2)
             {
-                throw new ArgumentException(string.Format(Resources.TranslatorMemberNotSupported, methodCall.NodeType), "methodCall");
+                var message = string.Format(Resources.TranslatorMemberNotSupported, method.NodeType);
+                throw new ArgumentOutOfRangeException("method", message);
             }
 
-            var constant = (ConstantExpression) methodCall.Arguments[1];
+            var constant = (ConstantExpression) method.Arguments[1];
 
             result.AddTop((int) constant.Value);
         }

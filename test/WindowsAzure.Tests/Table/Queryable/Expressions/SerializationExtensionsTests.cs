@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using WindowsAzure.Table.Queryable.Expressions.Infrastructure;
 using WindowsAzure.Table.Queryable.Expressions.Methods;
+using WindowsAzure.Tests.Samples;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.Queryable.Expressions
@@ -184,6 +185,21 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
             stringBuilder.Append("'");
 
             Assert.Equal(result, stringBuilder.ToString());
+        }
+
+        [Fact]
+        public void SerializeCountryValueTest()
+        {
+            // Arrange
+            var value = new Country();
+            ConstantExpression constant = Expression.Constant(value, value.GetType());
+            string result = null;
+
+            // Act
+            Assert.Throws<NotSupportedException>(() => result = constant.Serialize());
+
+            // Assert
+            Assert.Null(result);
         }
     }
 }

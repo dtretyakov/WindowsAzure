@@ -15,6 +15,7 @@ namespace WindowsAzure.Tests.Samples
         [RowKey]
         public string LastName { get; set; }
 
+        [MyCustom]
         public string PublicProperty { get; set; }
 
         private float PrivateProperty { get; set; }

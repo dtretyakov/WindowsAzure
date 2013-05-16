@@ -182,6 +182,24 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
+        public void AddTwoPostProcessing()
+        {
+            // Arrange
+            var result = new TranslationResult();
+            Expression<Func<int>> expression1 = () => 2;
+            Expression<Func<int, int>> expression2 = (val) => val + 3;
+
+            // Act
+            result.AddPostProcesing(expression1);
+            result.AddPostProcesing(expression2);
+
+            // Assert
+            Assert.NotNull(result.TableQuery);
+            var etalon = expression2.Compile().DynamicInvoke(expression1.Compile().DynamicInvoke());
+            Assert.Equal(etalon, result.PostProcessing.DynamicInvoke());
+        }
+
+        [Fact]
         public void AddNullPostProcessingExpression()
         {
             // Arrange

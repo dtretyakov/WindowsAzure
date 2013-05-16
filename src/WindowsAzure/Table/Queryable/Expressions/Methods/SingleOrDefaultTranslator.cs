@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
 {
@@ -7,21 +8,15 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
     /// </summary>
     internal sealed class SingleOrDefaultTranslator : MethodTranslatorBase
     {
-        private const string MethodName = "SingleOrDefault";
-
         public SingleOrDefaultTranslator(IDictionary<string, string> nameChanges)
-            : base(nameChanges)
+            : base(nameChanges, "SingleOrDefault")
         {
-        }
-        public override void Translate(System.Linq.Expressions.MethodCallExpression methodCall, ITranslationResult result)
-        {
-            base.Translate(methodCall, result);
-            result.AddTop(2);
         }
 
-        public override string Name
+        public override void Translate(MethodCallExpression method, ITranslationResult result)
         {
-            get { return MethodName; }
+            base.Translate(method, result);
+            result.AddTop(2);
         }
     }
 }

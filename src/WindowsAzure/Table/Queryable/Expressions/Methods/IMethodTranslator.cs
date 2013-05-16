@@ -15,8 +15,8 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
         /// <summary>
         ///     Provides evaluated query information.
         /// </summary>
-        /// <param name="methodCall">Expression method.</param>
+        /// <param name="method">Expression method.</param>
         /// <param name="result">Translation result.</param>
-        void Translate(MethodCallExpression methodCall, ITranslationResult result);
+        void Translate(MethodCallExpression method, ITranslationResult result);
     }
 }

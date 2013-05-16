@@ -279,7 +279,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
@@ -314,12 +314,28 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             var translation = new TranslationResult();
 
             // Act
-            translator.Translate((MethodCallExpression)query.Body, translation);
+            translator.Translate((MethodCallExpression) query.Body, translation);
 
             // Assert
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.FilterString);
             Assert.Equal("RowKey eq 'new name'", translation.TableQuery.FilterString);
+        }
+
+        [Fact]
+        public void WhereWithInvalidMethod()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            Expression<Func<IQueryable<Country>>> query = () => _countries.Take(2);
+            var translation = new TranslationResult();
+
+            // Act
+            Assert.Throws<ArgumentOutOfRangeException>(() => translator.Translate((MethodCallExpression) query.Body, translation));
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Null(translation.TableQuery.FilterString);
         }
 
         private string GetName()

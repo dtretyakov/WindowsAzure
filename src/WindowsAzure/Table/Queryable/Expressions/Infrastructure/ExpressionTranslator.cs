@@ -66,11 +66,6 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
 
         private static String TrimString(StringBuilder builder)
         {
-            if (builder == null)
-            {
-                throw new ArgumentNullException("builder");
-            }
-
             int i = 0;
             int j = builder.Length - 1;
 

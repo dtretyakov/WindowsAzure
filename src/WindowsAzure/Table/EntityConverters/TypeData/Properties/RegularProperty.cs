@@ -19,6 +19,15 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         ///     Constructor.
         /// </summary>
         /// <param name="member">Entity member.</param>
+        public RegularProperty(MemberInfo member)
+            : this(member, member.Name)
+        {
+        }
+
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
         /// <param name="name">Member name.</param>
         internal RegularProperty(MemberInfo member, string name)
         {

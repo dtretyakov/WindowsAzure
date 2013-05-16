@@ -25,7 +25,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         [Fact]
-        public void LinqFirstClause()
+        public void FirstClause()
         {
             // Arrange
             var translator = new FirstTranslator(_nameChanges);
@@ -43,7 +43,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         // ReSharper disable ReplaceWithSingleCallToFirst
 
         [Fact]
-        public void LinqFirstAfterWhereClause()
+        public void FirstAfterWhere()
         {
             // Arrange
             var translator = new FirstTranslator(_nameChanges);
@@ -59,5 +59,22 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         }
 
         // ReSharper restore ReplaceWithSingleCallToFirst
+
+        [Fact]
+        public void FirstWithInvalidMethod()
+        {
+            // Arrange
+            var translator = new FirstTranslator(_nameChanges);
+            Expression<Func<Country>> query = () => _countries.FirstOrDefault(p => !p.IsExists);
+            var translation = new TranslationResult();
+
+            // Act
+            Assert.Throws<ArgumentOutOfRangeException>(() => translator.Translate((MethodCallExpression) query.Body, translation));
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Null(translation.TableQuery.FilterString);
+            Assert.Null(translation.PostProcessing);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table;
+using WindowsAzure.Table.RequestExecutor;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -20,6 +21,8 @@ namespace WindowsAzure.Tests.Table.Context
 
             // Assert
             Assert.Equal(typeof (Country).Name, context.RequestExecutorFactory.CloudTable.Name);
+            Assert.Equal(ExecutionMode.Sequential, context.ExecutionMode);
+            Assert.IsType<TableRequestSequentialExecutor<Country>>(context.RequestExecutor);
         }
 
         [Fact]
@@ -57,6 +60,38 @@ namespace WindowsAzure.Tests.Table.Context
             Assert.Throws<ArgumentNullException>(() => { context = new TableSet<Country>(tableClient, null); });
 
             Assert.Null(context);
+        }
+
+        [Fact]
+        public void SetTheSameExecutionMode()
+        {
+            // Arrange
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient);
+            var executor = context.RequestExecutor;
+
+            // Act
+            context.ExecutionMode = ExecutionMode.Sequential;
+
+            // Assert
+            Assert.Equal(ExecutionMode.Sequential, context.ExecutionMode);
+            Assert.IsType<TableRequestSequentialExecutor<Country>>(context.RequestExecutor);
+            Assert.Same(executor, context.RequestExecutor);
+        }
+
+        [Fact]
+        public void ChangeTableSetExecutionMode()
+        {
+            // Arrange
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Country>(tableClient);
+
+            // Act
+            context.ExecutionMode = ExecutionMode.Parallel;
+
+            // Assert
+            Assert.Equal(ExecutionMode.Parallel, context.ExecutionMode);
+            Assert.IsType<TableRequestParallelExecutor<Country>>(context.RequestExecutor);
         }
     }
 }

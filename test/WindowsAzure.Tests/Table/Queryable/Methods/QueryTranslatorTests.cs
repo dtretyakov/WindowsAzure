@@ -145,6 +145,21 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
 
         // ReSharper restore ConvertToConstant.Local
 
+        [Fact]
+        public void TranslateExpressionWithNotSupportedMethod()
+        {
+            // Arrange
+            var query = GetQueryable<Country>().TakeWhile(p => p.Name != string.Empty);
+            var translator = new QueryTranslator(_nameChanges);
+            var translation = new TranslationResult();
+
+            // Act
+            Assert.Throws<NotSupportedException>(() => translator.Translate(query.Expression, translation));
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+        }
+
         public static Expression<Func<T, bool>> Or<T>(Expression<Func<T, bool>> expr1,
                                                       Expression<Func<T, bool>> expr2)
         {

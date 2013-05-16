@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters.TypeData;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -51,19 +52,6 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
-        public void CreateEntityTypeDataWithIvalidFields()
-        {
-            // Arrange
-            EntityTypeData<EntityWithFields> typeData = null;
-
-            // Act
-            Assert.Throws<ArgumentException>(() => { typeData = new EntityTypeData<EntityWithFields>(); });
-
-            // Assert
-            Assert.Null(typeData);
-        }
-
-        [Fact]
         public void CreateEntityTypeDataWithFactory()
         {
             // Arrange & Act
@@ -79,6 +67,60 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Equal(entityTypeData.NameChanges["Continent"], "PartitionKey");
             Assert.True(entityTypeData.NameChanges.ContainsKey("Continent"));
             Assert.Equal(entityTypeData.NameChanges["Name"], "RowKey");
+        }
+
+        [Fact]
+        public void GetPocoEntityFromNull()
+        {
+            // Arrange
+            var entityTypeData = new EntityTypeData<Entity>();
+            Entity entity = null;
+
+            // Act
+            Assert.Throws<ArgumentNullException>(() => { entity = entityTypeData.GetEntity((DynamicTableEntity)null); });
+
+            // Assert
+            Assert.Null(entity);
+        }
+
+        [Fact]
+        public void GetTableEntityFromNull()
+        {
+            // Arrange
+            var entityTypeData = new EntityTypeData<Entity>();
+            ITableEntity entity = null;
+
+            // Act
+            Assert.Throws<ArgumentNullException>(() => { entity = entityTypeData.GetEntity((Entity)null); });
+
+            // Assert
+            Assert.Null(entity);
+        }
+
+        [Fact]
+        public void CreateEntityTypeDataWithoutCompositeKey()
+        {
+            // Arrange
+            EntityTypeData<EntityWithoutCompositeKey> typeData = null;
+
+            // Act
+            Assert.Throws<InvalidOperationException>(() => { typeData = new EntityTypeData<EntityWithoutCompositeKey>(); });
+
+            // Assert
+            Assert.Null(typeData);
+        }
+
+        [Fact]
+        public void CreateEntityTypeDataWithMultipleAttributes()
+        {
+            // Arrange
+            EntityTypeData<EntityWithMultipleAttributes> typeData = null;
+
+            // Act
+            Assert.Throws<InvalidOperationException>(() => { typeData = new EntityTypeData<EntityWithMultipleAttributes>(); });
+
+            // Assert
+            Assert.Null(typeData);
         }
     }
 }

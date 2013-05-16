@@ -31,7 +31,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
             if (accessor.Type != _stringType)
             {
-                throw new ArgumentException(Resources.PropertyRowKeyInvalidType);
+                throw new ArgumentOutOfRangeException(Resources.PropertyRowKeyInvalidType);
             }
 
             _getValue = accessor.GetValue;

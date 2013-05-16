@@ -52,7 +52,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             if (!_nameChanges.ContainsValue(PartitionKey) && !_nameChanges.ContainsValue(RowKey))
             {
                 string message = string.Format(Resources.EntityTypeDataMissingKey, entityType);
-                throw new ArgumentException(message);
+                throw new InvalidOperationException(message);
             }
 
             _properties = properties.ToArray();
@@ -190,7 +190,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             if (attributes.Count == 0)
             {
-                return new RegularProperty<T>(member, member.Name);
+                return new RegularProperty<T>(member);
             }
 
             if (attributes.Count == 1)

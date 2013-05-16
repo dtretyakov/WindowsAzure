@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using WindowsAzure.Properties;
 using WindowsAzure.Table.Queryable.Expressions.Infrastructure;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Methods
@@ -24,6 +26,12 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
 
         public void Translate(MethodCallExpression method, ITranslationResult result)
         {
+            if (method.Method.Name != MethodName)
+            {
+                var message = string.Format(Resources.TranslatorMemberNotSupported, method.NodeType);
+                throw new ArgumentOutOfRangeException("method", message);
+            }
+
             var expressionTranslator = new ExpressionTranslator(_nameChanges);
             expressionTranslator.Translate(result, method);
         }

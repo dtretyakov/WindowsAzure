@@ -80,10 +80,14 @@
     <Compile Include="Samples\Countries.cs" />
     <Compile Include="Samples\EntityWithContructor.cs" />
     <Compile Include="Samples\EntityWithFields.cs" />
+    <Compile Include="Samples\EntityWithInvalidPropertyAttribute.cs" />
+    <Compile Include="Samples\EntityWithMultipleAttributes.cs" />
+    <Compile Include="Samples\EntityWithoutCompositeKey.cs" />
     <Compile Include="Samples\EntityWithProperties.cs" />
     <Compile Include="Samples\LogEntry.cs" />
     <Compile Include="Samples\Entity.cs" />
     <Compile Include="Samples\CountryTableEntity.cs" />
+    <Compile Include="Samples\MyCustomAttribute.cs" />
     <Compile Include="Samples\ProjectionResult.cs" />
     <Compile Include="Table\Context\AddEntitiesTests.cs" />
     <Compile Include="Table\Context\AddOrUpdateEntitiesTests.cs" />
@@ -91,6 +95,11 @@
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\TableContextIntegrationTests.cs" />
     <Compile Include="Table\EntityConverters\EntityConverterTests.cs" />
+    <Compile Include="Table\EntityConverters\Properties\RegularPropertyTests.cs" />
+    <Compile Include="Table\EntityConverters\Properties\TimestampPropertyTests.cs" />
+    <Compile Include="Table\EntityConverters\Properties\ETagPropertyTests.cs" />
+    <Compile Include="Table\EntityConverters\Properties\RowKeyPropertyTests.cs" />
+    <Compile Include="Table\EntityConverters\Properties\PartitionKeyPropertyTests.cs" />
     <Compile Include="Table\Queryable\Integration\ContainsTests.cs" />
     <Compile Include="Table\Queryable\Integration\SingleTests.cs" />
     <Compile Include="Table\Queryable\Integration\SingleOrDefaultTests.cs" />

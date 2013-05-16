@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table;
@@ -64,6 +65,22 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
 
             // Act && Assert
             Assert.Throws<ArgumentNullException>(() => new TableRequestExecutorFactory<Country>(cloudTable, null));
+        }
+
+        [Fact]
+        public void CreateExecutorWithInvalidMode()
+        {
+            // Arrange
+            Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
+            CloudTable cloudTable = ObjectsFactory.GetCloudTable();
+            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
+            ITableRequestExecutor<Country> executor = null;
+
+            // Act
+            Assert.Throws<InvalidEnumArgumentException>(() => executor = executorFactory.Create((ExecutionMode)2));
+
+            // Assert
+            Assert.Null(executor);
         }
     }
 }

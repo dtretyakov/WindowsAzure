@@ -38,7 +38,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
 
             if (!_timestampTypes.Contains(accessor.Type))
             {
-                throw new ArgumentException(Resources.PropertyTimestampInvalidType);
+                throw new ArgumentOutOfRangeException(Resources.PropertyTimestampInvalidType);
             }
 
             _setValue = accessor.SetValue;

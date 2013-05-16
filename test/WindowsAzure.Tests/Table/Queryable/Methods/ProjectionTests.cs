@@ -65,7 +65,7 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
         {
             // Arrange
             IQueryable<ProjectionResult> query = GetQueryable()
-                .Select(p => new ProjectionResult {Name = p.Name, Continent = p.Continent});
+                .Select(p => new ProjectionResult {Name = p.Name, Continent = p.Continent, Area = p.Area});
             var translator = new SelectTranslator(_nameChanges);
             var translation = new TranslationResult();
 
@@ -74,9 +74,10 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
 
             Assert.NotNull(translation.TableQuery);
             Assert.NotNull(translation.TableQuery.SelectColumns);
-            Assert.Equal(2, translation.TableQuery.SelectColumns.Count);
+            Assert.Equal(3, translation.TableQuery.SelectColumns.Count);
             Assert.Contains("PartitionKey", translation.TableQuery.SelectColumns);
             Assert.Contains("RowKey", translation.TableQuery.SelectColumns);
+            Assert.Contains("Area", translation.TableQuery.SelectColumns);
 
             object result = translation.PostProcessing.DynamicInvoke(GetList().AsQueryable());
 
@@ -142,6 +143,21 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
 
             Assert.NotNull(result);
             Assert.IsAssignableFrom<IEnumerable<object>>(result);
+        }
+
+        [Fact]
+        public void LinqSelectWithInvalidMethod()
+        {
+            // Arrange
+            IQueryable<Country> query = GetQueryable().Where(p => p.Name == string.Empty);
+            var translator = new SelectTranslator(_nameChanges);
+            var translation = new TranslationResult();
+
+            // Act && Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => translator.Translate((MethodCallExpression) query.Expression, translation));
+
+            Assert.NotNull(translation.TableQuery);
+            Assert.Null(translation.TableQuery.SelectColumns);
         }
 
         private class InternalProjectionResult

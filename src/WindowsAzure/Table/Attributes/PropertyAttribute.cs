@@ -16,11 +16,6 @@ namespace WindowsAzure.Table.Attributes
         /// <param name="name">Custom property name.</param>
         public PropertyAttribute(string name)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException("name");
-            }
-
             _name = name;
         }
 
