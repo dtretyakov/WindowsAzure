@@ -392,7 +392,8 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Equal("NullableInt64 ge 22L", translation.TableQuery.FilterString);
         }
 
-        [Fact] public void WhereWithNullableDouble()
+        [Fact] 
+        public void WhereWithNullableDouble()
         {
             // Arrange
             var translator = new WhereTranslator(_nameChanges);

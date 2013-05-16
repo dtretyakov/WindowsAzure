@@ -122,5 +122,19 @@ namespace WindowsAzure.Tests.Table.Queryable.Integration
             Assert.Contains(Finland, results.Select(p => p.Name));
             Assert.Contains(Spain, results.Select(p => p.Name));
         }
+
+        [IntegrationFact]
+        public void GetAllEntities()
+        {
+            // Arrange
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            var results = tableSet.ToList();
+
+            // Assert
+            Assert.NotNull(results);
+            Assert.Equal(4, results.Count);
+        }
     }
 }
