@@ -199,7 +199,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             }
 
             string typeName = member.DeclaringType != null ? member.DeclaringType.Name : string.Empty;
-            string message = string.Format(Resources.EntityTypeDataShouldBeOneAttribute, typeName, member.Name);
+            string message = string.Format(Resources.EntityTypeDataShouldBeOneAttribute, member.Name, typeName);
 
             throw new InvalidOperationException(message);
         }

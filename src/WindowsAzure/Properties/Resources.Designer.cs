@@ -70,7 +70,7 @@ namespace WindowsAzure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; entity &apos;{1}&apos; member should be marked just by one attribute..
+        ///   Looks up a localized string similar to Member &apos;{0}&apos; in type &apos;{1}&apos; should be marked only by one metadata attribute..
         /// </summary>
         internal static string EntityTypeDataShouldBeOneAttribute {
             get {

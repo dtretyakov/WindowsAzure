@@ -169,7 +169,7 @@
     <value>Invalid method '{0}' arguments.</value>
   </data>
   <data name="EntityTypeDataShouldBeOneAttribute" xml:space="preserve">
-    <value>'{0}' entity '{1}' member should be marked just by one attribute.</value>
+    <value>Member '{0}' in type '{1}' should be marked only by one metadata attribute.</value>
   </data>
   <data name="ExpressionEvaluatorUnableToEvaluate" xml:space="preserve">
     <value>Unable to get value of the node: '{0}'.</value>

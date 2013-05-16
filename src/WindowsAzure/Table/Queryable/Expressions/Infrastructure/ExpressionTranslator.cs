@@ -40,9 +40,15 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                 return;
             }
 
+            var lambda = (LambdaExpression) StripQuotes(method.Arguments[1]);
+
+            if (lambda.Body.NodeType == ExpressionType.Constant)
+            {
+                return;
+            }
+
             _filter = new StringBuilder();
 
-            var lambda = (LambdaExpression) StripQuotes(method.Arguments[1]);
             Visit(lambda.Body);
 
             _result.AddFilter(TrimString(_filter));
