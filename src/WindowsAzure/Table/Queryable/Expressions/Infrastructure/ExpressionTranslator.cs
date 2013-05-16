@@ -177,6 +177,12 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                     AppendConstant(_constantEvaluator.Evaluate(node));
                     break;
 
+                case ExpressionType.Convert:
+                case ExpressionType.ConvertChecked:
+                    var unary = (UnaryExpression) node;
+                    AppendConstant(_constantEvaluator.Evaluate(unary.Operand));
+                    break;
+
                 case ExpressionType.MemberAccess:
                     var member = (MemberExpression) node;
                     Expression expression = member.Expression;

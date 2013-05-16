@@ -338,6 +338,77 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Null(translation.TableQuery.FilterString);
         }
 
+        [Fact]
+        public void WhereWithNullableDateTime()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            var queryable = new EnumerableQuery<EntityWithFields>(new List<EntityWithFields>());
+            var value = new DateTime(1980, 1, 1);
+            Expression<Func<IQueryable<EntityWithFields>>> query = () => queryable.Where(p => p.NullableDateTime < value);
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Equal("NullableDateTime lt datetime'1980-01-01T00:00:00'", translation.TableQuery.FilterString);
+        }
+
+        [Fact]
+        public void WhereWithNullableInt32()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            var queryable = new EnumerableQuery<EntityWithFields>(new List<EntityWithFields>());
+            const int value = 33;
+            Expression<Func<IQueryable<EntityWithFields>>> query = () => queryable.Where(p => p.NullableInt32 <= value);
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Equal("NullableInt32 le 33", translation.TableQuery.FilterString);
+        }
+
+        [Fact]
+        public void WhereWithNullableInt64()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            var queryable = new EnumerableQuery<EntityWithFields>(new List<EntityWithFields>());
+            const long value = 22L;
+            Expression<Func<IQueryable<EntityWithFields>>> query = () => queryable.Where(p => p.NullableInt64 >= value);
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Equal("NullableInt64 ge 22L", translation.TableQuery.FilterString);
+        }
+
+        [Fact] public void WhereWithNullableDouble()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            var queryable = new EnumerableQuery<EntityWithFields>(new List<EntityWithFields>());
+            const double value = .3;
+            Expression<Func<IQueryable<EntityWithFields>>> query = () => queryable.Where(p => p.NullableDouble > value);
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Equal("NullableDouble gt .3", translation.TableQuery.FilterString);
+        }
+
         private string GetName()
         {
             return "new name";
