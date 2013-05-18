@@ -4,13 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
-using WindowsAzure.Table.Extensions;
+using WindowsAzure.Table.Wrappers;
 
 namespace WindowsAzure.Table.RequestExecutor
 {
     internal abstract class TableRequestExecutorBase<T> : ITableRequestExecutor<T> where T : new()
     {
-        private readonly CloudTable _cloudTable;
+        private readonly ICloudTable _cloudTable;
         private readonly ITableEntityConverter<T> _entityConverter;
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace WindowsAzure.Table.RequestExecutor
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="entityConverter">Entity converter.</param>
-        internal TableRequestExecutorBase(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
+        internal TableRequestExecutorBase(ICloudTable cloudTable, ITableEntityConverter<T> entityConverter)
         {
             if (cloudTable == null)
             {
@@ -92,8 +92,11 @@ namespace WindowsAzure.Table.RequestExecutor
         }
 
         public abstract IEnumerable<T> ExecuteBatches(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation);
+
         public abstract void ExecuteBatchesWithoutResult(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation);
+
         public abstract Task<IEnumerable<T>> ExecuteBatchesAsync(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken);
+
         public abstract Task ExecuteBatchesWithoutResultAsync(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken);
     }
 }

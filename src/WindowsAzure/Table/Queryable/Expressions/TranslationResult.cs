@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Table.Wrappers;
 
 namespace WindowsAzure.Table.Queryable.Expressions
 {
@@ -13,13 +14,13 @@ namespace WindowsAzure.Table.Queryable.Expressions
     internal sealed class TranslationResult : ITranslationResult
     {
         private readonly List<LambdaExpression> _expressions = new List<LambdaExpression>();
-        private readonly TableQuery _tableQuery = new TableQuery();
+        private readonly TableQueryWrapper _tableQuery = new TableQueryWrapper(new TableQuery());
         private int _filtersCount;
 
         /// <summary>
         ///     Gets a TableQuery.
         /// </summary>
-        public TableQuery TableQuery
+        public ITableQuery TableQuery
         {
             get { return _tableQuery; }
         }

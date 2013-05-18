@@ -6,6 +6,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable;
+using WindowsAzure.Table.Wrappers;
 using WindowsAzure.Tests.Attributes;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -81,10 +82,9 @@ namespace WindowsAzure.Tests.Table.Queryable.Integration
         {
             var tableEntityConverter = new TableEntityConverter<Country>();
             CloudTableClient tableClient = GenerateCloudTableClient();
+            CloudTable cloudTable = tableClient.GetTableReference(TableName);
 
-            return new TableQueryProvider<Country>(
-                tableClient.GetTableReference(TableName),
-                tableEntityConverter);
+            return new TableQueryProvider<Country>(new CloudTableWrapper(cloudTable), tableEntityConverter);
         }
 
         [IntegrationFact]
@@ -129,47 +129,6 @@ namespace WindowsAzure.Tests.Table.Queryable.Integration
             List<Country> typedResult = ((IEnumerable<Country>) result).ToList();
             Assert.Equal(1, typedResult.Count);
             Assert.Equal(Spain, typedResult[0].Name);
-        }
-
-        [Fact]
-        public void CreateTableQueryProviderWithNullCloudTable()
-        {
-            // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => new TableQueryProvider<Country>(null, null));
-        }
-
-        [Fact]
-        public void CreateTableQueryProviderWithNullEntityConverter()
-        {
-            // Arrange
-            CloudTable cloudTable = GenerateCloudTableClient().GetTableReference("Table");
-
-            // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => new TableQueryProvider<Country>(cloudTable, null));
-        }
-
-        [Fact]
-        public void ExecuteWithNullExpression()
-        {
-            // Arrange
-            CloudTable cloudTable = GenerateCloudTableClient().GetTableReference("Table");
-            var converter = new TableEntityConverter<Country>();
-            var provider = new TableQueryProvider<Country>(cloudTable, converter);
-
-            // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => provider.Execute(null));
-        }
-
-        [Fact]
-        public void ExecuteAsyncWithNullExpression()
-        {
-            // Arrange
-            CloudTable cloudTable = GenerateCloudTableClient().GetTableReference("Table");
-            var converter = new TableEntityConverter<Country>();
-            var provider = new TableQueryProvider<Country>(cloudTable, converter);
-
-            // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => provider.ExecuteAsync(null));
         }
     }
 }

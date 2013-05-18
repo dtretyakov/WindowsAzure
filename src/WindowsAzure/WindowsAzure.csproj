@@ -136,6 +136,10 @@
     <Compile Include="Table\TableSet.cs" />
     <Compile Include="Table\EntityConverters\TableEntityConverter.cs" />
     <Compile Include="Table\Attributes\TimestampAttribute.cs" />
+    <Compile Include="Table\Wrappers\CloudTableWrapper.cs" />
+    <Compile Include="Table\Wrappers\TableQueryWrapper.cs" />
+    <Compile Include="Table\Wrappers\ICloudTable.cs" />
+    <Compile Include="Table\Wrappers\ITableQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

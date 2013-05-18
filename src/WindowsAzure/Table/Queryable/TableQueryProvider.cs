@@ -7,9 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
-using WindowsAzure.Table.Extensions;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.Queryable.Expressions;
+using WindowsAzure.Table.Wrappers;
 
 namespace WindowsAzure.Table.Queryable
 {
@@ -20,7 +20,7 @@ namespace WindowsAzure.Table.Queryable
     /// <typeparam name="TEntity">Entity type.</typeparam>
     internal class TableQueryProvider<TEntity> : QueryProviderBase, IAsyncQueryProvider where TEntity : new()
     {
-        private readonly CloudTable _cloudTable;
+        private readonly ICloudTable _cloudTable;
         private readonly ITableEntityConverter<TEntity> _entityConverter;
         private readonly QueryTranslator _queryTranslator;
 
@@ -29,7 +29,7 @@ namespace WindowsAzure.Table.Queryable
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="entityConverter"></param>
-        internal TableQueryProvider(CloudTable cloudTable, ITableEntityConverter<TEntity> entityConverter)
+        internal TableQueryProvider(ICloudTable cloudTable, ITableEntityConverter<TEntity> entityConverter)
         {
             if (cloudTable == null)
             {
@@ -87,7 +87,7 @@ namespace WindowsAzure.Table.Queryable
             _queryTranslator.Translate(expression, result);
 
             return _cloudTable
-                .ExecuteQueryAsync(result.TableQuery)
+                .ExecuteQueryAsync(result.TableQuery, cancellationToken)
                 .Then(p => GetProcessedResult(p, result), cancellationToken);
         }
 

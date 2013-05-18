@@ -82,7 +82,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         {
             if (methodCall.Method.DeclaringType != typeof (System.Linq.Queryable))
             {
-                throw new ArgumentException(string.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name));
+                throw new NotSupportedException(string.Format(Resources.TranslatorMethodNotSupported, methodCall.Method.Name));
             }
 
             // Get a method translator

@@ -410,6 +410,68 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.Equal("NullableDouble gt .3", translation.TableQuery.FilterString);
         }
 
+        [Fact]
+        public void WhereWithOverloadedToString()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            var queryable = new EnumerableQuery<EntityWithFields>(new List<EntityWithFields>());
+            var value = new EntityWithToString("My value");
+            Expression<Func<IQueryable<EntityWithFields>>> query = () => queryable.Where(p => p.String == value.ToString());
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Equal(string.Format("String eq '{0}'", value), translation.TableQuery.FilterString);
+        }
+
+        // ReSharper disable ConvertToConstant.Local
+
+        [Fact]
+        public void WhereWithEnumartionValue()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            var queryable = new EnumerableQuery<EntityWithFields>(new List<EntityWithFields>());
+
+            var value = Countries.Germany;
+
+            Expression<Func<IQueryable<EntityWithFields>>> query = () => queryable.Where(p => p.String == value.ToString());
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Equal(string.Format("String eq '{0}'", value), translation.TableQuery.FilterString);
+        }
+
+        // ReSharper restore ConvertToConstant.Local
+
+        [Fact]
+        public void WhereWithEnumartionConstantValue()
+        {
+            // Arrange
+            var translator = new WhereTranslator(_nameChanges);
+            var queryable = new EnumerableQuery<EntityWithFields>(new List<EntityWithFields>());
+
+            const Countries value = Countries.Germany;
+
+            Expression<Func<IQueryable<EntityWithFields>>> query = () => queryable.Where(p => p.String == value.ToString());
+            var translation = new TranslationResult();
+
+            // Act
+            translator.Translate((MethodCallExpression)query.Body, translation);
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+            Assert.Equal(string.Format("String eq '{0}'", value), translation.TableQuery.FilterString);
+        }
+
         private string GetName()
         {
             return "new name";

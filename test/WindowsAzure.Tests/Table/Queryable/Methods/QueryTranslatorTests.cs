@@ -160,6 +160,21 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
             Assert.NotNull(translation.TableQuery);
         }
 
+        [Fact]
+        public void TranslateInvalidExpression()
+        {
+            // Arrange
+            Expression<Func<double, double>> expression = d => Math.Ceiling(.5);
+            var translator = new QueryTranslator(_nameChanges);
+            var translation = new TranslationResult();
+
+            // Act
+            Assert.Throws<NotSupportedException>(() => translator.Translate(expression.Body, translation));
+
+            // Assert
+            Assert.NotNull(translation.TableQuery);
+        }
+
         public static Expression<Func<T, bool>> Or<T>(Expression<Func<T, bool>> expr1,
                                                       Expression<Func<T, bool>> expr2)
         {

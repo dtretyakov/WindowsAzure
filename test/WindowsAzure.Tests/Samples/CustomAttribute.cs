@@ -2,7 +2,7 @@
 
 namespace WindowsAzure.Tests.Samples
 {
-    public sealed class MyCustomAttribute : Attribute
+    public sealed class CustomAttribute : Attribute
     {
     }
 }

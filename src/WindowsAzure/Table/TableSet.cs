@@ -7,6 +7,7 @@ using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.RequestExecutor;
+using WindowsAzure.Table.Wrappers;
 
 namespace WindowsAzure.Table
 {
@@ -47,10 +48,11 @@ namespace WindowsAzure.Table
             }
 
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+            var cloudTableWrapper = new CloudTableWrapper(cloudTable);
             var entityConverter = new TableEntityConverter<TEntity>();
 
-            RequestExecutorFactory = new TableRequestExecutorFactory<TEntity>(cloudTable, entityConverter);
-            Provider = new TableQueryProvider<TEntity>(cloudTable, entityConverter);
+            RequestExecutorFactory = new TableRequestExecutorFactory<TEntity>(cloudTableWrapper, entityConverter);
+            Provider = new TableQueryProvider<TEntity>(cloudTableWrapper, entityConverter);
             RequestExecutor = RequestExecutorFactory.Create(_executionMode);
         }
 

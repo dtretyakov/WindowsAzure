@@ -279,7 +279,18 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                     break;
 
                 case "ToString":
-                    ConstantExpression constant = Expression.Constant(node.Object != null ? node.Object.ToString() : string.Empty);
+                    ConstantExpression constant;
+
+                    if (node.Object != null)
+                    {
+                        var instance = _constantEvaluator.Evaluate(node.Object);
+                        constant = Expression.Constant(instance.ToString());
+                    }
+                    else
+                    {
+                        constant = Expression.Constant(string.Empty);
+                    }
+
                     AppendConstant(constant);
                     break;
 

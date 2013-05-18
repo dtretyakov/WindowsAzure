@@ -64,7 +64,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             }
             else
             {
-                throw new ArgumentException(string.Format(Resources.TranslatorMemberNotSupported, lambda.Body.NodeType), "method");
+                throw new NotSupportedException(string.Format(Resources.TranslatorMemberNotSupported, lambda.Body.NodeType));
             }
 
             // ReSharper restore ForCanBeConvertedToForeach

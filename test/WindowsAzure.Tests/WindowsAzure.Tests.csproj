@@ -80,14 +80,15 @@
     <Compile Include="Samples\Countries.cs" />
     <Compile Include="Samples\EntityWithContructor.cs" />
     <Compile Include="Samples\EntityWithFields.cs" />
-    <Compile Include="Samples\EntityWithInvalidPropertyAttribute.cs" />
     <Compile Include="Samples\EntityWithMultipleAttributes.cs" />
     <Compile Include="Samples\EntityWithoutCompositeKey.cs" />
     <Compile Include="Samples\EntityWithProperties.cs" />
+    <Compile Include="Samples\EntityWithToString.cs" />
     <Compile Include="Samples\LogEntry.cs" />
     <Compile Include="Samples\Entity.cs" />
     <Compile Include="Samples\CountryTableEntity.cs" />
-    <Compile Include="Samples\MyCustomAttribute.cs" />
+    <Compile Include="Samples\MapFedid.cs" />
+    <Compile Include="Samples\CustomAttribute.cs" />
     <Compile Include="Samples\ProjectionResult.cs" />
     <Compile Include="Table\Context\AddEntitiesTests.cs" />
     <Compile Include="Table\Context\AddOrUpdateEntitiesTests.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Table\Queryable\Methods\FirstTests.cs" />
     <Compile Include="Table\Queryable\Methods\StringCompareTests.cs" />
     <Compile Include="Table\Queryable\Methods\TranslationResultTests.cs" />
+    <Compile Include="Table\Queryable\TableQueryProviderTests.cs" />
     <Compile Include="Table\RequestExecutor\SequentialExecutorTests.cs" />
     <Compile Include="Table\RequestExecutor\ExecutorFactoryTests.cs" />
     <Compile Include="Table\RequestExecutor\ParallelExecutorTests.cs" />
@@ -143,6 +145,7 @@
     <Compile Include="Samples\Country.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Table\Queryable\Integration\TableQueryProviderTests.cs" />
+    <Compile Include="Wrappers\WrappersTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\WindowsAzure\WindowsAzure.csproj">

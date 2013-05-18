@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
-using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.RequestExecutor;
+using WindowsAzure.Table.Wrappers;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -18,8 +18,8 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
         {
             // Arrange
             Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
-            CloudTable cloudTable = ObjectsFactory.GetCloudTable();
-            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
+            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
+            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTableMock.Object, entityConverterMock.Object);
 
             // Act
             ITableRequestExecutor<Country> executor = executorFactory.Create(ExecutionMode.Parallel);
@@ -27,7 +27,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             // Assert
             Assert.NotNull(executor);
             Assert.IsType<TableRequestParallelExecutor<Country>>(executor);
-            Assert.Equal(cloudTable, executorFactory.CloudTable);
+            Assert.Equal(cloudTableMock.Object, executorFactory.CloudTable);
         }
 
         [Fact]
@@ -35,8 +35,8 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
         {
             // Arrange
             Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
-            CloudTable cloudTable = ObjectsFactory.GetCloudTable();
-            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
+            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
+            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTableMock.Object, entityConverterMock.Object);
 
             // Act
             ITableRequestExecutor<Country> executor = executorFactory.Create(ExecutionMode.Sequential);
@@ -44,7 +44,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             // Assert
             Assert.NotNull(executor);
             Assert.IsType<TableRequestSequentialExecutor<Country>>(executor);
-            Assert.Equal(cloudTable, executorFactory.CloudTable);
+            Assert.Equal(cloudTableMock.Object, executorFactory.CloudTable);
         }
 
         [Fact]
@@ -61,10 +61,10 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
         public void CreateExecutorWithNullEntityConverterParameter()
         {
             // Arrange
-            CloudTable cloudTable = ObjectsFactory.GetCloudTable();
+            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => new TableRequestExecutorFactory<Country>(cloudTable, null));
+            Assert.Throws<ArgumentNullException>(() => new TableRequestExecutorFactory<Country>(cloudTableMock.Object, null));
         }
 
         [Fact]
@@ -72,12 +72,12 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
         {
             // Arrange
             Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
-            CloudTable cloudTable = ObjectsFactory.GetCloudTable();
-            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTable, entityConverterMock.Object);
+            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
+            var executorFactory = new TableRequestExecutorFactory<Country>(cloudTableMock.Object, entityConverterMock.Object);
             ITableRequestExecutor<Country> executor = null;
 
             // Act
-            Assert.Throws<InvalidEnumArgumentException>(() => executor = executorFactory.Create((ExecutionMode)2));
+            Assert.Throws<InvalidEnumArgumentException>(() => executor = executorFactory.Create((ExecutionMode) 2));
 
             // Assert
             Assert.Null(executor);

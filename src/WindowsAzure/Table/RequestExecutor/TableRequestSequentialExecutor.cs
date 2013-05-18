@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
-using WindowsAzure.Table.Extensions;
+using WindowsAzure.Table.Wrappers;
 
 namespace WindowsAzure.Table.RequestExecutor
 {
@@ -15,21 +15,27 @@ namespace WindowsAzure.Table.RequestExecutor
     /// <typeparam name="T">Entity type.</typeparam>
     internal sealed class TableRequestSequentialExecutor<T> : TableRequestExecutorBase<T> where T : new()
     {
-        private readonly CloudTable _cloudTable;
+        private readonly ICloudTable _cloudTable;
         private readonly ITableEntityConverter<T> _entityConverter;
-        private readonly TableBatchPartitioner _partitioner;
+        private readonly ITableBatchPartitioner _partitioner;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         /// <param name="cloudTable">Cloud table.</param>
         /// <param name="entityConverter">Entity converter.</param>
-        internal TableRequestSequentialExecutor(CloudTable cloudTable, ITableEntityConverter<T> entityConverter)
+        /// <param name="partitioner">Batch partitioner.</param>
+        internal TableRequestSequentialExecutor(ICloudTable cloudTable, ITableEntityConverter<T> entityConverter, ITableBatchPartitioner partitioner)
             : base(cloudTable, entityConverter)
         {
+            if (partitioner == null)
+            {
+                throw new ArgumentNullException("partitioner");
+            }
+
             _cloudTable = cloudTable;
             _entityConverter = entityConverter;
-            _partitioner = new TableBatchPartitioner();
+            _partitioner = partitioner;
         }
 
         /// <summary>
@@ -40,6 +46,16 @@ namespace WindowsAzure.Table.RequestExecutor
         /// <returns>Result entities.</returns>
         public override IEnumerable<T> ExecuteBatches(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            if (operation == null)
+            {
+                throw new ArgumentNullException("operation");
+            }
+
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
             IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
 
@@ -55,6 +71,16 @@ namespace WindowsAzure.Table.RequestExecutor
         /// <param name="operation">Table operation.</param>
         public override void ExecuteBatchesWithoutResult(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            if (operation == null)
+            {
+                throw new ArgumentNullException("operation");
+            }
+
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
             IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
 
@@ -73,6 +99,16 @@ namespace WindowsAzure.Table.RequestExecutor
         /// <returns>Result entities.</returns>
         public override Task<IEnumerable<T>> ExecuteBatchesAsync(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            if (operation == null)
+            {
+                throw new ArgumentNullException("operation");
+            }
+
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
             IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
 
@@ -96,6 +132,16 @@ namespace WindowsAzure.Table.RequestExecutor
         /// <param name="cancellationToken">Cancellation token.</param>
         public override Task ExecuteBatchesWithoutResultAsync(IEnumerable<T> entities, Func<ITableEntity, TableOperation> operation, CancellationToken cancellationToken)
         {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            if (operation == null)
+            {
+                throw new ArgumentNullException("operation");
+            }
+
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
             IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
             IEnumerable<Task> tasks = batches.Select(p => _cloudTable.ExecuteBatchAsync(p, cancellationToken));

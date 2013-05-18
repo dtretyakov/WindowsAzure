@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Moq;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.RequestExecutor;
+using WindowsAzure.Table.Wrappers;
 
 namespace WindowsAzure.Tests.Common
 {
@@ -49,8 +51,70 @@ namespace WindowsAzure.Tests.Common
             var mock = new Mock<ITableEntityConverter<T>>();
 
             mock.Setup(converter => converter.GetEntity(It.IsAny<DynamicTableEntity>())).Returns(() => default(T));
+            mock.Setup(converter => converter.GetEntity(It.IsAny<T>())).Returns(() => new DynamicTableEntity("pk", "rk"));
 
-            mock.Setup(converter => converter.GetEntity(It.IsAny<T>())).Returns(() => new DynamicTableEntity());
+            return mock;
+        }
+
+        internal static Mock<ICloudTable> GetCloudTableMock()
+        {
+            var mock = new Mock<ICloudTable>();
+
+            mock.Setup(p => p.Execute(It.IsAny<TableOperation>())).Returns(() => new TableResult());
+            mock.Setup(p => p.ExecuteAsync(It.IsAny<TableOperation>(), It.IsAny<CancellationToken>()))
+                .Returns(() => Task.FromResult(new TableResult()));
+            mock.Setup(p => p.ExecuteBatch(It.IsAny<TableBatchOperation>()))
+                .Returns(() => new List<TableResult>
+                    {
+                        new TableResult {Result = new DynamicTableEntity("pk", "rk")}
+                    });
+            mock.Setup(p => p.ExecuteBatchAsync(It.IsAny<TableBatchOperation>(), It.IsAny<CancellationToken>()))
+                .Returns(() => Task.FromResult((IList<TableResult>) new List<TableResult>
+                    {
+                        new TableResult {Result = new DynamicTableEntity("pk", "rk")}
+                    }));
+            mock.Setup(p => p.ExecuteQuery(It.IsAny<ITableQuery>())).Returns(() => new List<DynamicTableEntity>());
+            mock.Setup(p => p.ExecuteQueryAsync(It.IsAny<ITableQuery>(), It.IsAny<CancellationToken>()))
+                .Returns(() => Task.FromResult((IEnumerable<DynamicTableEntity>) new List<DynamicTableEntity>()));
+
+            return mock;
+        }
+
+        internal static Mock<ITableBatchPartitioner> GetTableBatchPartitionerMock()
+        {
+            var mock = new Mock<ITableBatchPartitioner>();
+            const int batchCount = 100;
+
+            mock.Setup(p => p.GetBatches(It.IsAny<IEnumerable<ITableEntity>>(), It.IsAny<Func<ITableEntity, TableOperation>>()))
+                .Returns((IEnumerable<ITableEntity> tableEntities, Func<ITableEntity, TableOperation> operation) =>
+                    {
+                        var batches = new Dictionary<string, TableBatchOperation>();
+                        var result = new List<TableBatchOperation>();
+
+                        foreach (ITableEntity tableEntity in tableEntities)
+                        {
+                            TableBatchOperation batch;
+
+                            if (!batches.TryGetValue(tableEntity.PartitionKey, out batch))
+                            {
+                                batch = new TableBatchOperation();
+                                batches.Add(tableEntity.PartitionKey, batch);
+                            }
+
+                            batch.Add(operation(tableEntity));
+
+                            if (batch.Count == batchCount)
+                            {
+                                batches.Remove(tableEntity.PartitionKey);
+                                result.Add(batch);
+                            }
+                        }
+
+                        result.AddRange(batches.Select(pair => pair.Value));
+
+                        return result;
+                    });
+
 
             return mock;
         }
