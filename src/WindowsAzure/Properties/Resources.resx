@@ -174,4 +174,7 @@
   <data name="ExpressionEvaluatorUnableToEvaluate" xml:space="preserve">
     <value>Unable to get value of the node: '{0}'.</value>
   </data>
+  <data name="ExpressionEvaluatorInvalidCast" xml:space="preserve">
+    <value>Unable to cast type '{0}' to target type '{1}'.</value>
+  </data>
 </root>

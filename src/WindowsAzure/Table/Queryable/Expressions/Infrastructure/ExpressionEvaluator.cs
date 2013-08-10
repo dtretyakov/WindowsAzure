@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
@@ -18,6 +19,31 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
         public Expression Evaluate(Expression expression)
         {
             return Visit(expression);
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            switch (node.NodeType)
+            {
+                case ExpressionType.Convert:
+                case ExpressionType.ConvertChecked:
+                    {
+                        ConstantExpression operand = TryToEvaluate(node.Operand);
+
+                        var convertable = operand.Value as IConvertible;
+                        if (convertable == null)
+                        {
+                            var invalidCast = string.Format(Resources.ExpressionEvaluatorInvalidCast, operand.Value.GetType(), node.Type);
+                            throw new InvalidCastException(invalidCast);
+                        }
+
+                        object value = convertable.ToType(node.Type, Thread.CurrentThread.CurrentCulture);
+                        return Expression.Constant(value, value.GetType());
+                    }
+            }
+
+            string message = string.Format(Resources.ExpressionEvaluatorUnableToEvaluate, node);
+            throw new NotSupportedException(message);
         }
 
         private ConstantExpression TryToEvaluate(Expression expression)
@@ -98,14 +124,10 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             {
                 case ExpressionType.Constant:
                 case ExpressionType.MemberAccess:
-                    {
-                        return GetMemberConstant(node);
-                    }
+                    return GetMemberConstant(node);
 
                 default:
-                    {
-                        return base.VisitMember(node);
-                    }
+                    return base.VisitMember(node);
             }
         }
 

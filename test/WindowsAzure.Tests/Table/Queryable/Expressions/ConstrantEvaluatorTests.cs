@@ -63,6 +63,22 @@ namespace WindowsAzure.Tests.Table.Queryable.Expressions
         }
 
         [Fact]
+        public void ClosureOnCastOfEnumValue()
+        {
+            // Arrange
+            var country = Countries.Finland;
+            var evaluator = new ExpressionEvaluator();
+            Expression<Func<int>> lambda = () => (int)country;
+
+            // Act
+            Expression result = evaluator.Evaluate(lambda.Body);
+
+            // Assert
+            Assert.IsType<ConstantExpression>(result);
+            Assert.Equal((int)country, ((ConstantExpression)result).Value);
+        }
+
+        [Fact]
         public void ClosureOnClassConstant()
         {
             // Arrange

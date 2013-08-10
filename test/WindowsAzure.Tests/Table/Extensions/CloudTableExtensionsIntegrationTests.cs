@@ -38,9 +38,8 @@ namespace WindowsAzure.Tests.Table.Extensions
 
             // Act
 
-            // Create & delete table
+            // Create table
             await _cloudTable.CreateAsync();
-            await _cloudTable.DeleteAsync();
 
             // Create table
             bool createIfNotExistsResult = await _cloudTable.CreateIfNotExistsAsync();
@@ -53,10 +52,12 @@ namespace WindowsAzure.Tests.Table.Extensions
             TablePermissions permissionsResult = await _cloudTable.GetPermissionsAsync();
 
             // Delete table
+
+            await _cloudTable.DeleteAsync();
             bool deleteIfExistsResult = await _cloudTable.DeleteIfExistsAsync();
 
             // Assert
-            Assert.True(createIfNotExistsResult);
+            Assert.False(createIfNotExistsResult);
             Assert.True(existsResult);
             Assert.NotNull(permissionsResult);
             Assert.NotNull(permissionsResult.SharedAccessPolicies);
@@ -69,7 +70,7 @@ namespace WindowsAzure.Tests.Table.Extensions
                 Assert.Equal(policy.Value.Permissions, value.Permissions);
             }
 
-            Assert.True(deleteIfExistsResult);
+            Assert.False(deleteIfExistsResult);
         }
     }
 }
