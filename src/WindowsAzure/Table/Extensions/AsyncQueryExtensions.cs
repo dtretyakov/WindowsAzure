@@ -67,7 +67,7 @@ namespace WindowsAzure.Table.Extensions
         /// <param name="count">Entities count.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Entities.</returns>
-        public static Task<IEnumerable<T>> TakeAsync<T>(
+        public static Task<List<T>> TakeAsync<T>(
             this IQueryable<T> source,
             int count,
             CancellationToken cancellationToken = default (CancellationToken))
@@ -76,11 +76,11 @@ namespace WindowsAzure.Table.Extensions
 
             if (tableQueryProvider == null)
             {
-                return TaskHelpers.FromResult(source.Take(count).AsEnumerable());
+                return TaskHelpers.FromResult(source.Take(count).ToList());
             }
 
             return tableQueryProvider.ExecuteAsync(source.Take(count).Expression, cancellationToken)
-                                     .Then(result => (IEnumerable<T>) result, cancellationToken);
+                                     .Then(result => ((IEnumerable<T>)result).ToList(), cancellationToken);
         }
 
         /// <summary>

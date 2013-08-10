@@ -123,7 +123,7 @@ namespace WindowsAzure.Tests.Table.Extensions
             const int count = 2;
 
             // Act
-            List<Country> entities = (await tableSet.TakeAsync(count)).ToList();
+            List<Country> entities = await tableSet.TakeAsync(count);
 
             // Assert
             Assert.NotNull(entities);
