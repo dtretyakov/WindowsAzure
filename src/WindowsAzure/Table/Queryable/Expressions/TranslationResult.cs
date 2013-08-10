@@ -53,7 +53,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
                 // Combine filters
                 var stringBuilder = new StringBuilder(_tableQuery.FilterString.Length + filter.Length);
 
-                if (_filtersCount == 1)
+                if (_filtersCount > 0)
                 {
                     if (_tableQuery.FilterString.Count(p => p == ' ') > 2)
                     {

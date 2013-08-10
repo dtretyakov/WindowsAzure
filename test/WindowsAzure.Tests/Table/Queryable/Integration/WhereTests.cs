@@ -124,6 +124,26 @@ namespace WindowsAzure.Tests.Table.Queryable.Integration
         }
 
         [IntegrationFact]
+        public async Task UseCombinedClause()
+        {
+            // Arrange
+            const int value = 1800;
+            TableSet<Country> tableSet = GetTableSet();
+
+            // Act
+            IQueryable<Country> queryTwoEntity =
+                tableSet.Where(p => p.Formed > new DateTime(value, 1, 1))
+                        .Where(p => p.Population > 10000000)
+                        .Where(p => p.PresidentsCount > 10);
+
+            List<Country> results = await queryTwoEntity.ToListAsync();
+
+            // Assert
+            Assert.Equal(1, results.Count);
+            Assert.Contains(Germany, results[0].Name);
+        }
+
+        [IntegrationFact]
         public void GetAllEntities()
         {
             // Arrange

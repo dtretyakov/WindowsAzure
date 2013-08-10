@@ -49,7 +49,24 @@ namespace WindowsAzure.Tests.Table.Queryable.Methods
 
             // Assert
             Assert.NotNull(result.TableQuery);
-            Assert.Equal(string.Format("{0} and {1}", filter, filter), result.TableQuery.FilterString);
+            Assert.Equal(string.Format("{0} and {0}", filter), result.TableQuery.FilterString);
+        }
+
+        [Fact]
+        public void AddFilterThreeTimes()
+        {
+            // Arrange
+            var result = new TranslationResult();
+            const string filter = "name eq '123'";
+
+            // Act
+            result.AddFilter(filter);
+            result.AddFilter(filter);
+            result.AddFilter(filter);
+
+            // Assert
+            Assert.NotNull(result.TableQuery);
+            Assert.Equal(string.Format("({0} and {0}) and {0}", filter), result.TableQuery.FilterString);
         }
 
         [Fact]

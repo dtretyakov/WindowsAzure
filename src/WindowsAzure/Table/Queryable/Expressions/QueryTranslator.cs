@@ -57,7 +57,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
                 Expression argument = methodCall.Arguments[i];
                 if (argument.NodeType == ExpressionType.Call)
                 {
-                    VisitMethodCall((MethodCallExpression) argument, result);
+                    Translate(argument, result);
                 }
             }
 
