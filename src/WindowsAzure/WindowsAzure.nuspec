@@ -13,7 +13,7 @@
         <description>$description$</description>
         <tags>Azure, Storage, Blob, Table, Async, Extensions, LINQ, IQueryable</tags>
         <dependencies>
-            <dependency id="WindowsAzure.Storage" version="2.0.5.1" />
+            <dependency id="WindowsAzure.Storage" version="2.0.6.1" />
         </dependencies>
     </metadata>
 </package>
