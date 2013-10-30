@@ -91,7 +91,9 @@
     <Compile Include="Samples\CustomAttribute.cs" />
     <Compile Include="Samples\ProjectionResult.cs" />
     <Compile Include="Table\Context\AddEntitiesTests.cs" />
+    <Compile Include="Table\Context\AddOrMergeEntitiesTests.cs" />
     <Compile Include="Table\Context\AddOrUpdateEntitiesTests.cs" />
+    <Compile Include="Table\Context\AddOrMergeEntityTests.cs" />
     <Compile Include="Table\Context\AddOrUpdateEntityTests.cs" />
     <Compile Include="Table\Context\DeleteEntitiesTests.cs" />
     <Compile Include="Table\Context\TableContextIntegrationTests.cs" />

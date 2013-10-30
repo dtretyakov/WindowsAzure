@@ -72,6 +72,36 @@ namespace WindowsAzure.Table
         Task<IEnumerable<TEntity>> AddOrUpdateAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken));
 
         /// <summary>
+        ///     Inserts or merges an entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Inserted entity.</returns>
+        TEntity AddOrMerge(TEntity entity);
+
+        /// <summary>
+        ///     Inserts or merges an entity asynchronously.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Inserted entity.</returns>
+        Task<TEntity> AddOrMergeAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken));
+
+        /// <summary>
+        ///     Inserts or updates an entities.
+        /// </summary>
+        /// <param name="entities">Entities collection.</param>
+        /// <returns>Inserted entities.</returns>
+        IEnumerable<TEntity> AddOrMerge(IEnumerable<TEntity> entities);
+
+        /// <summary>
+        ///     Inserts or updates an entities asynchronously.
+        /// </summary>
+        /// <param name="entities">Entities collection.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Inserted entities.</returns>
+        Task<IEnumerable<TEntity>> AddOrMergeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken));
+
+        /// <summary>
         ///     Updates an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
