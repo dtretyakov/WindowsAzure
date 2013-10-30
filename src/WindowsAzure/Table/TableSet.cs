@@ -181,6 +181,68 @@ namespace WindowsAzure.Table
         }
 
         /// <summary>
+        ///     Inserts or merges an entity.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <returns>Inserted entity.</returns>
+        public TEntity AddOrMerge(TEntity entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+
+            return RequestExecutor.Execute(entity, TableOperation.InsertOrReplace);
+        }
+
+        /// <summary>
+        ///     Inserts or merges an entity asynchronously.
+        /// </summary>
+        /// <param name="entity">Entity.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Inserted entity.</returns>
+        public Task<TEntity> AddOrMergeAsync(TEntity entity, CancellationToken cancellationToken = default (CancellationToken))
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+
+            return RequestExecutor.ExecuteAsync(entity, TableOperation.InsertOrReplace, cancellationToken);
+        }
+
+        /// <summary>
+        ///     Inserts or merges an entities.
+        /// </summary>
+        /// <param name="entities">Entities collection.</param>
+        /// <returns>Inserted entities.</returns>
+        public IEnumerable<TEntity> AddOrMerge(IEnumerable<TEntity> entities)
+        {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            return RequestExecutor.ExecuteBatches(entities, TableOperation.InsertOrMerge);
+        }
+
+        /// <summary>
+        ///     Inserts or merges an entities asynchronously.
+        /// </summary>
+        /// <param name="entities">Entities collection.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Inserted entities.</returns>
+        public Task<IEnumerable<TEntity>> AddOrMergeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default (CancellationToken))
+        {
+            if (entities == null)
+            {
+                throw new ArgumentNullException("entities");
+            }
+
+            return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.InsertOrMerge, cancellationToken);
+        }
+
+        /// <summary>
         ///     Updates an entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
