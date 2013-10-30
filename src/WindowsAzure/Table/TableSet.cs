@@ -192,7 +192,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return RequestExecutor.Execute(entity, TableOperation.InsertOrReplace);
+            return RequestExecutor.Execute(entity, TableOperation.InsertOrMerge);
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("entity");
             }
 
-            return RequestExecutor.ExecuteAsync(entity, TableOperation.InsertOrReplace, cancellationToken);
+            return RequestExecutor.ExecuteAsync(entity, TableOperation.InsertOrMerge, cancellationToken);
         }
 
         /// <summary>
