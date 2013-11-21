@@ -46,7 +46,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             Assert.NotNull(batches);
             Assert.Equal(count, batches.Sum(p => p.Count));
 
-            var fieldInfo = typeof(TableBatchOperation).GetField("partitionKey", BindingFlags.NonPublic | BindingFlags.Instance);
+            var fieldInfo = typeof(TableBatchOperation).GetField("batchPartitionKey", BindingFlags.NonPublic | BindingFlags.Instance);
 
             var aggregateResult = batches.Select(p => fieldInfo != null ? new
                 {
