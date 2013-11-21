@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.RequestExecutor;
 using WindowsAzure.Table.Wrappers;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table
 {

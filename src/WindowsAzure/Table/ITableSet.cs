@@ -12,6 +12,11 @@ namespace WindowsAzure.Table
     public interface ITableSet<TEntity> : IOrderedQueryable<TEntity> where TEntity : class, new()
     {
         /// <summary>
+        ///     Gets or sets a value indicating request execution mode.
+        /// </summary>
+        ExecutionMode ExecutionMode { get; set; }
+
+        /// <summary>
         ///     Inserts a new entity.
         /// </summary>
         /// <param name="entity">Entity.</param>
@@ -160,10 +165,5 @@ namespace WindowsAzure.Table
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Result.</returns>
         Task RemoveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
-        ///     Gets or sets a value indicating request execution mode.
-        /// </summary>
-        ExecutionMode ExecutionMode { get; set; }
     }
 }
