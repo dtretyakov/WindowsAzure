@@ -73,6 +73,8 @@
     <Compile Include="Table\Attributes\IgnoreAttribute.cs" />
     <Compile Include="Table\Attributes\ETagAttribute.cs" />
     <Compile Include="Table\Attributes\PropertyAttribute.cs" />
+    <Compile Include="Table\EntityConverters\EntityTypeMap.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\EntityTypeMappedData.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\MethodTranslatorBase.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SingleOrDefaultTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SingleTranslator.cs" />

@@ -21,7 +21,16 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <returns>Entity type data.</returns>
         public static IEntityTypeData<T> GetEntityTypeData<T>() where T : class, new()
         {
-            return (IEntityTypeData<T>) TypesData.GetOrAdd(typeof (T), type => new EntityTypeData<T>());
+            return (IEntityTypeData<T>)TypesData.GetOrAdd(typeof(T), type => new EntityTypeData<T>());
+        }
+
+        /// <summary>
+        ///     Register an entity type data.
+        /// </summary>
+        /// <typeparam name="T">Entity type.</typeparam>
+        public static void RegisterEntityTypeData<T>(IEntityTypeData<T> entityTypeData) where T : class, new()
+        {
+            TypesData.GetOrAdd(typeof(T), type => entityTypeData);
         }
     }
 }
