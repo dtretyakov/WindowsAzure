@@ -12,6 +12,17 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     /// <summary>
     ///     Maps an entity type data.
     /// </summary>
+    public class EntityTypeMap
+    {
+        public static void RegisterAssembly(params Assembly[] assemblies)
+        {
+            EntityTypeDataFactory.RegisterMappingAssembly(assemblies);
+        }
+    }
+
+    /// <summary>
+    ///     Maps an entity type data.
+    /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
     public class EntityTypeMap<T> : IEntityTypeData<T> where T : class, new()
     {
