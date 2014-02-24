@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsAzure", "src\WindowsAzure\WindowsAzure.csproj", "{0C174C38-3AD7-4810-B165-95DCC327288F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsAzure.Tests", "test\WindowsAzure.Tests\WindowsAzure.Tests.csproj", "{7B133A3F-612C-4647-93B3-A8CC4FBF1E39}"
@@ -10,6 +12,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{1156D6
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".scripts", ".scripts", "{4AA7D406-B158-4FCA-97BE-B3CE4B9ED1AA}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\build.cmd = scripts\build.cmd
+		scripts\build.properties.ps1 = scripts\build.properties.ps1
+		scripts\build.ps1 = scripts\build.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{F729740C-2635-49A7-9342-2A2A7158992D}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\libs\core_build.ps1 = scripts\libs\core_build.ps1
+		scripts\libs\psake.psm1 = scripts\libs\psake.psm1
+		scripts\libs\psake_ext.ps1 = scripts\libs\psake_ext.ps1
 	EndProjectSection
 EndProject
 Global
@@ -29,5 +45,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F729740C-2635-49A7-9342-2A2A7158992D} = {4AA7D406-B158-4FCA-97BE-B3CE4B9ED1AA}
 	EndGlobalSection
 EndGlobal
