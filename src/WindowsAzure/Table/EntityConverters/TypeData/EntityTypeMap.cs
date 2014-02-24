@@ -127,6 +127,20 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         }
 
         /// <summary>
+        ///     Ignores a property map.
+        /// </summary>
+        /// <typeparam name="TMember">Entity member.</typeparam>
+        /// <param name="propertyLambda">Property lambda expression.</param>
+        /// <returns>Current instance of <see cref="T:WindowsAzure.Table.EntityConverters.TypeData.EntityTypeMap" />.</returns>
+        public EntityTypeMap<T> Ignore<TMember>(Expression<Func<T, TMember>> propertyLambda)
+        {
+            var member = GetMemberInfoFromLambda(propertyLambda);
+            _nameChanges.Remove(member.Name);
+            _properties.Remove(member.Name);
+            return this;
+        }
+
+        /// <summary>
         ///     Maps a row key property.
         /// </summary>
         /// <typeparam name="TMember">Entity member.</typeparam>

@@ -80,6 +80,7 @@
     <Compile Include="Table\Attributes\ETagAttribute.cs" />
     <Compile Include="Table\Attributes\PropertyAttribute.cs" />
     <Compile Include="Table\EntityConverters\TypeData\EntityTypeMap.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\ValueAccessors\LocalEntityProperty.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\MethodTranslatorBase.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SingleOrDefaultTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SingleTranslator.cs" />

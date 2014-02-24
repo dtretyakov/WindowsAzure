@@ -16,7 +16,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Country)
-                                                                  .RowKey(p => p.Id));
+                                                           .RowKey(p => p.Id));
             });
         }
 
@@ -27,7 +27,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Id)
-                                                                  .RowKey(p => p.Country));
+                                                           .RowKey(p => p.Country));
             });
         }
 
@@ -36,7 +36,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         {
             // Arrange & Act
             var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Country)
-                                                              .RowKey(p => p.Street));
+                                                       .RowKey(p => p.Street));
 
             // Assert
             Assert.NotNull(map.NameChanges);
@@ -59,6 +59,24 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
 
             var entity = (DynamicTableEntity)map.GetEntity(new Address());
             Assert.Equal(8, entity.Properties.Count);
+        }
+
+        [Fact]
+        public void GetEntityTypeData_IgnoreProperty()
+        {
+            // Arrange & Act
+            var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Country)
+                                                       .RowKey(p => p.Street)
+                                                       .Ignore(p => p.Area));
+
+            // Assert
+            Assert.NotNull(map.NameChanges);
+            Assert.Equal(2, map.NameChanges.Count);
+            Assert.Equal("PartitionKey", map.NameChanges["Country"]);
+            Assert.Equal("RowKey", map.NameChanges["Street"]);
+
+            var entity = (DynamicTableEntity)map.GetEntity(new Address());
+            Assert.Equal(7, entity.Properties.Count);
         }
 
         [Fact]

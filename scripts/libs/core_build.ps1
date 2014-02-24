@@ -12,7 +12,7 @@ properties {
 
 	$nuget_symbolsPack		= $true
 	
-	 # git version
+	# git version
 	if ($versionControlSystem -eq "git") {
 		$revisionNumber		= exec { git rev-list --count HEAD } 
 	}
