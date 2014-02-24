@@ -103,8 +103,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         internal IDictionary<string, IProperty<T>> AutoMap()
         {
             // Retrieve class members
-            var members = new List<MemberInfo>(_entityType.GetFields(PropertyMapFlags));
-            members.AddRange(_entityType.GetProperties(PropertyMapFlags).Where(p => p.CanRead && p.CanWrite));
+            var members = new List<MemberInfo>(_entityType.GetProperties(PropertyMapFlags).Where(p => p.CanRead && p.CanWrite));
 
             // Create properties for entity members
             var properties = members.Select(member => new { Key = member.Name, Value = (IProperty<T>)new RegularProperty<T>(member) })

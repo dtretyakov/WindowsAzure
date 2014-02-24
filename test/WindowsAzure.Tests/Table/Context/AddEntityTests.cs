@@ -14,6 +14,28 @@ namespace WindowsAzure.Tests.Table.Context
     public sealed class AddEntityTests
     {
         [Fact]
+        public void AddEntity_FluentMapping()
+        {
+            // Arrange
+            Mock<ITableRequestExecutor<Address>> mock = MocksFactory.GetQueryExecutorMock<Address>();
+            CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
+            var context = new TableSet<Address>(tableClient)
+            {
+                //RequestExecutor = mock.Object
+            };
+
+            Address model = ObjectsFactory.GetAddress();
+
+            // Act
+            Address result = context.Add(model);
+
+            // Assert
+            Assert.NotNull(result);
+            mock.Verify(executor => executor.Execute(model, TableOperation.Insert), Times.Once());
+            Assert.Equal(model, result);
+        }
+
+        [Fact]
         public void AddEntity()
         {
             // Arrange

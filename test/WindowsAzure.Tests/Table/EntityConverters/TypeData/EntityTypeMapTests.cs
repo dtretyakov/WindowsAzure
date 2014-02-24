@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using WindowsAzure.Table.EntityConverters.TypeData;
 using WindowsAzure.Tests.Samples;
@@ -55,6 +56,9 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Equal(2, map.NameChanges.Count);
             Assert.Equal("PartitionKey", map.NameChanges["Country"]);
             Assert.Equal("RowKey", map.NameChanges["Street"]);
+
+            var entity = (DynamicTableEntity)map.GetEntity(new Address());
+            Assert.Equal(8, entity.Properties.Count);
         }
 
         [Fact]
