@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -10,6 +11,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     /// </summary>
     internal static class EntityTypeDataFactory
     {
+        /// <summary>
+        ///     Assemblies to find entity type map.
+        /// </summary>
+        private static Assembly[] _mappingAssemblies = new Assembly[] { };
+
         /// <summary>
         ///     Entity type map definition.
         /// </summary>
@@ -29,10 +35,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         public static IEntityTypeData<T> GetEntityTypeData<T>() where T : class, new()
         {
             var type = typeof(T);
-            var assembly = type.Assembly;
+            var assemblies = _mappingAssemblies.Concat(new[] { type.Assembly })
+                                               .Distinct();
 
             return (IEntityTypeData<T>)TypesData.GetOrAdd(type,
-                                                          key => FindsEntityTypeMap(assembly, type) ?? new EntityTypeData<T>());
+                                                          key => FindsEntityTypeMap(assemblies, type) ?? new EntityTypeData<T>());
         }
 
         /// <summary>
@@ -55,38 +62,46 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             TypesData.GetOrAdd(entityType, type => entityTypeData);
         }
 
+        public static void RegisterMappingAssembly(params Assembly[] assemblies)
+        {
+            _mappingAssemblies = assemblies;
+        }
+
         /// <summary>
         ///     Finds an entity type mapping.
         /// </summary>
-        /// <param name="assemblyToSearch">Aseembly to search mapping types.</param>
+        /// <param name="assembliesToSearch">Aseemblies to search mapping types.</param>
         /// <param name="entityType">Entity type.</typeparam>
         /// <returns>An instance of entity type mapping.</returns>
-        private static object FindsEntityTypeMap(Assembly assemblyToSearch, Type entityType)
+        private static object FindsEntityTypeMap(IEnumerable<Assembly> assembliesToSearch, Type entityType)
         {
-            var types = assemblyToSearch.GetExportedTypes()
-                                       .Where(IsMappingType)
-                                       .ToList();
-
-            foreach (var type in types)
+            foreach (var assembly in assembliesToSearch)
             {
-                Type entityTypeMatched;
-                if (IsMappingType(type, out entityTypeMatched, t => EntityTypeMap.IsAssignableFrom(t))
-                    && entityType == entityTypeMatched)
+                var types = assembly.GetExportedTypes()
+                                    .Where(IsMappingType)
+                                    .ToList();
+
+                foreach (var type in types)
                 {
-                    try
+                    Type entityTypeMatched;
+                    if (IsMappingType(type, out entityTypeMatched, t => EntityTypeMap.IsAssignableFrom(t))
+                        && entityType == entityTypeMatched)
                     {
-                        var entityTypeData = Activator.CreateInstance(type);
-                        RegisterEntityTypeData(entityType, entityTypeData);
-                        return entityTypeData;
+                        try
+                        {
+                            var entityTypeData = Activator.CreateInstance(type);
+                            RegisterEntityTypeData(entityType, entityTypeData);
+                            return entityTypeData;
+                        }
+                        catch (TargetInvocationException ex)
+                        {
+                            throw ex.InnerException;
+                        }
                     }
-                    catch (TargetInvocationException ex)
+                    else
                     {
-                        throw ex.InnerException;
+                        continue;
                     }
-                }
-                else
-                {
-                    continue;
                 }
             }
 

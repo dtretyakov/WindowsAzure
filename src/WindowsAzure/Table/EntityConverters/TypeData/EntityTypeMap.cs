@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using WindowsAzure.Properties;
-using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
