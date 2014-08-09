@@ -72,6 +72,11 @@ The `Timestamp` property is mapped using the methods <code>Timestamp</code>, whi
 
     Timestamp(x => x.MyTimestampProperty);
 
+#### Register custom mapping assembly 
+
+The `TableEntityConverter` class will try to find the mapping classes for your entities on the same assembly of the entitie, if you are using a different assembly for mappings classes you'll need to register this assembly by using the <code>RegisterAssembly</code> method from class <code>EntityTypeMap</code>. **ATTENTION: this method just need to be called once and before instantiating the <code>TableSet</code> class**. Below there is a sample of how we call the 
+
+    EntityTypeMap.RegisterAssembly(typeof(MyEntity).Assembly)
 
 ###Entities Management
 
