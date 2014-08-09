@@ -162,7 +162,7 @@ Storage Extensions requires .NET Framework 4.0 or higher and [WindowsAzure.Stora
 
 ## Code Samples
 
-* Declaring a new POCO class:
+* Declaring a new POCO class and using attribute mapping:
 
 ```csharp
 public sealed class Country
@@ -174,6 +174,28 @@ public sealed class Country
     public long Population { get; set; }
     public double Area { get; set; }
     public DateTime Formed { get; set; }
+}
+```
+
+
+* Declaring a new POCO class and using fluent mapping:
+
+```csharp
+public sealed class Country
+{
+    public string Continent { get; set; }
+    public string Name { get; set; }
+    public long Population { get; set; }
+    public double Area { get; set; }
+    public DateTime Formed { get; set; }
+}
+
+public class CountryMapping : WindowsAzure.Table.EntityConverters.TypeData.EntityTypeMap<Country>
+{
+    public CountryMapping() {
+        this.PartitionKey(p => p.Continent)
+            .RowKey(p => p.Name);
+    }
 }
 ```
 
