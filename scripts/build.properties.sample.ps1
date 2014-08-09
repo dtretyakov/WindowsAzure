@@ -1,5 +1,8 @@
 properties {
 	
+	# NuGet Publish
+	$nuget_publish			= $false
+
 	## NuGet API Key
 	$nuget_apiKey			= "00000000-0000-0000-0000-000000000000"
 

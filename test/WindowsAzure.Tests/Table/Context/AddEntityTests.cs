@@ -21,7 +21,7 @@ namespace WindowsAzure.Tests.Table.Context
             CloudTableClient tableClient = ObjectsFactory.GetCloudTableClient();
             var context = new TableSet<Address>(tableClient)
             {
-                //RequestExecutor = mock.Object
+                RequestExecutor = mock.Object
             };
 
             Address model = ObjectsFactory.GetAddress();

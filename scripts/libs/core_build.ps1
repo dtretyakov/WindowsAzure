@@ -58,7 +58,7 @@ task Compile -depends Clean {
 task NuGet_Pack -depends Compile {
 
 	# if we want to pack the symbols too.
-    if ($nuget_symbolsPack) {
+	if ($nuget_symbolsPack) {
 		exec { nuget pack $build_appPath -Symbols -Build -Properties "Configuration=Release;Platform=AnyCPU" -Version $version -OutputDirectory $nuget_directory }
 	}
 	else {
@@ -69,28 +69,32 @@ task NuGet_Pack -depends Compile {
 
 task NuGet_Publish -depends NuGet_Pack {
 
-	Remove-Item $build_directory -Force -Recurse -ErrorAction SilentlyContinue
+	if ($nuget_publish) {
+		Remove-Item $build_directory -Force -Recurse -ErrorAction SilentlyContinue
 	
-	# push the package with assmblies.
-	exec { nuget push $nuget_packPath -ApiKey $nuget_apiKey -Source $nuget_source }
+		# push the package with assmblies.
+		exec { nuget push $nuget_packPath -ApiKey $nuget_apiKey -Source $nuget_source }
 	
-	# if there are symbols push them too.
-	if ($nuget_symbolsPack) {
-		Write-Host "Push Symbols"
-		exec { nuget push $nuget_packSymbolsPath -ApiKey $nuget_apiKey -Source $nuget_source }
+		# if there are symbols push them too.
+		if ($nuget_symbolsPack) {
+			Write-Host "Push Symbols"
+			exec { nuget push $nuget_packSymbolsPath -ApiKey $nuget_apiKey -Source $nuget_source }
+		}
 	}
 	
 }
 
 task CommitAndTag {
 
-	if ($versionControlSystem -eq "git") { 
-		exec { git commit -a -m "BUILD: New version of $logTitle" }
-		exec { git tag "$logTitle-v$commitVersion" }
-	}
-	if ($versionControlSystem -eq "hg") {
-		exec { hg commit -m "BUILD: New version of $logTitle" }
-		exec { hg tag "$logTitle-v$commitVersion" }
+	if ($nuget_publish) {
+		if ($versionControlSystem -eq "git") { 
+			exec { git commit -a -m "BUILD: New version of $logTitle" }
+			exec { git tag "$logTitle-v$commitVersion" }
+		}
+		if ($versionControlSystem -eq "hg") {
+			exec { hg commit -m "BUILD: New version of $logTitle" }
+			exec { hg tag "$logTitle-v$commitVersion" }
+		}
 	}
 
 }
