@@ -81,6 +81,7 @@
     <Compile Include="Table\Attributes\IgnoreAttribute.cs" />
     <Compile Include="Table\Attributes\ETagAttribute.cs" />
     <Compile Include="Table\Attributes\PropertyAttribute.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\EntityTypeMap.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\MethodTranslatorBase.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SingleOrDefaultTranslator.cs" />
     <Compile Include="Table\Queryable\Expressions\Methods\SingleTranslator.cs" />
@@ -148,6 +149,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="WindowsAzure.nuspec" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

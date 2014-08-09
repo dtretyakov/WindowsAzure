@@ -83,9 +83,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\IntegrationTestAttribute.cs" />
+    <Compile Include="AzureEmulatorManager.cs" />
     <Compile Include="Common\MocksFactory.cs" />
     <Compile Include="Common\ObjectsFactory.cs" />
     <Compile Include="Common\TestBase.cs" />
+    <Compile Include="Samples\Address.cs" />
     <Compile Include="Samples\Countries.cs" />
     <Compile Include="Samples\EntityWithContructor.cs" />
     <Compile Include="Samples\EntityWithFields.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Table\EntityConverters\Properties\ETagPropertyTests.cs" />
     <Compile Include="Table\EntityConverters\Properties\RowKeyPropertyTests.cs" />
     <Compile Include="Table\EntityConverters\Properties\PartitionKeyPropertyTests.cs" />
+    <Compile Include="Table\EntityConverters\TypeData\EntityTypeMapTests.cs" />
     <Compile Include="Table\Queryable\Integration\ContainsTests.cs" />
     <Compile Include="Table\Queryable\Integration\SingleTests.cs" />
     <Compile Include="Table\Queryable\Integration\SingleOrDefaultTests.cs" />
@@ -170,6 +173,11 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="storagea.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
