@@ -29,8 +29,10 @@ namespace WindowsAzure.Tests.Common
 
             if (xDocument == null)
             {
+#if !NOCLOUDSTORAGE
                 AzureEmulatorManager.Storage.Start();
                 storageAccount = CloudStorageAccount.Parse(AzureEmulatorManager.Storage.ConnectionString);
+#endif
             }
             else
             {
