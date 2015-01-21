@@ -15,10 +15,68 @@ Latest project build: <a href="http://teamcity.codebetter.com/viewType.html?buil
 
 ## Features
 
-###POCO Objects
+### POCO Objects
 
 Entity's properties and fields should be marked by one or both of `PartitionKey` and `RowKey` attributes for defining composite table key.
 Also can be used `Timestamp`, `ETag`, `Property` and `Ignore` attributes.
+
+### Fluent mapping
+
+Fluent mapping is the namesake mapping style that we use as an alternative to the AttributeMapping. It's a fluent interface that allows you to map your entities completely in code, with all the compile-time safety and refactorability that brings.
+
+#### EntityTypeMap class
+
+<code>EntityTypeMap<T></code> class is the basis of all your mappings, you derive from this to map anything.
+
+    public class AddressMap : EntityTypeMap<Address>
+    {
+      public AddressMap()
+      {
+          this.PartitionKey(p => p.CountryCode)
+              .RowKey(p => p.Id)
+              .Ignore(p => c.Country);
+      }
+    }
+
+You map your entities properties inside the constructor.
+
+> **Syntax note:** Every mapping inside a <code>EntityTypeMap<T></code> is built using lambda expressions, which allow us to reference the properties on your entities without sacrificing compile-time safety. The lambdas typically take the form of <code>x => x.Property</code>. The <code>x</code> on the left is the parameter declaration, which will implicitly be of the same type as the entity being mapped, while the <code>x.Property</code> is accessing a property on your entity (coincidentally called "Property" in this case).
+
+Once you've declared your <code>EntityTypeMap<T></code> you're going to need to map the properties on your entity. There are several methods available that map your properties in different ways, and each one of those is a [chainable method](http://martinfowler.com/dslwip/MethodChaining.html) that you can use to customise the individual mapping.
+
+##### PartitionKey and RowKey
+
+Every mapping requires an `PartitionKey` and `RowKey` of some kind.
+
+The PartitionKey is mapped using the <code>PartitionKey</code> method, which takes a lambda expression that accesses the property on your entity that will be used for the PartitionKey.
+
+    PartitionKey(x => x.MyPartitionKeyProperty);
+    
+The PartitionKey is mapped using the <code>RowKey</code> method, which takes a lambda expression that accesses the property on your entity that will be used for the PartitionKey.
+
+    RowKey(x => x.MyRowKeyProperty);
+
+##### Ignore
+
+If you need to ignore a property by using the <code>Ignore</code> method, which takes a lambda expression that accesses the property on your entity that will ignored by the serializer.
+
+    Ignore(x => x.MyPropertyToIgnore);
+
+##### ETag and Timestamp
+
+The `ETag` property is mapped using the methods <code>ETag</code>, which takes a lambda expression that accesses the property on your entity that will be mapped.
+
+    ETag(x => x.MyETagProperty);
+
+The `Timestamp` property is mapped using the methods <code>Timestamp</code>, which takes a lambda expression that accesses the property on your entity that will be mapped.
+
+    Timestamp(x => x.MyTimestampProperty);
+
+#### Register custom mapping assembly 
+
+The `TableEntityConverter` class will try to find the mapping classes for your entities on the same assembly of the entitie, if you are using a different assembly for mappings classes you'll need to register this assembly by using the <code>RegisterAssembly</code> method from class <code>EntityTypeMap</code>. **ATTENTION: this method just need to be called once and before instantiating the <code>TableSet</code> class**. Below there is a sample of how we call the 
+
+    EntityTypeMap.RegisterAssembly(typeof(MyEntity).Assembly)
 
 ###Entities Management
 
@@ -109,7 +167,7 @@ Storage Extensions requires .NET Framework 4.0 or higher and [WindowsAzure.Stora
 
 ## Code Samples
 
-* Declaring a new POCO class:
+* Declaring a new POCO class and using attribute mapping:
 
 ```csharp
 public sealed class Country
@@ -121,6 +179,28 @@ public sealed class Country
     public long Population { get; set; }
     public double Area { get; set; }
     public DateTime Formed { get; set; }
+}
+```
+
+
+* Declaring a new POCO class and using fluent mapping:
+
+```csharp
+public sealed class Country
+{
+    public string Continent { get; set; }
+    public string Name { get; set; }
+    public long Population { get; set; }
+    public double Area { get; set; }
+    public DateTime Formed { get; set; }
+}
+
+public class CountryMapping : WindowsAzure.Table.EntityConverters.TypeData.EntityTypeMap<Country>
+{
+    public CountryMapping() {
+        this.PartitionKey(p => p.Continent)
+            .RowKey(p => p.Name);
+    }
 }
 ```
 

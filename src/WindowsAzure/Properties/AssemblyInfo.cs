@@ -22,18 +22,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("4a4de05a-19fa-463f-9501-de30ea89f226")]
 
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.7.7")]
-[assembly: AssemblyFileVersion("0.7.7")]
-[assembly: AssemblyInformationalVersion("0.7.7")]
 [assembly: InternalsVisibleTo("WindowsAzure.StorageExtensions.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

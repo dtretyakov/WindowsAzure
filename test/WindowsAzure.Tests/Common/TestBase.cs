@@ -1,11 +1,11 @@
-﻿using System;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using Microsoft.WindowsAzure.Storage;
+﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
+using System;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace WindowsAzure.Tests.Common
 {
@@ -16,7 +16,6 @@ namespace WindowsAzure.Tests.Common
         static TestBase()
         {
             CloudStorageAccount storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
-
             XDocument xDocument;
 
             try
@@ -28,7 +27,14 @@ namespace WindowsAzure.Tests.Common
                 xDocument = null;
             }
 
-            if (xDocument != null)
+            if (xDocument == null)
+            {
+#if !NOCLOUDSTORAGE
+                AzureEmulatorManager.Storage.Start();
+                storageAccount = CloudStorageAccount.Parse(AzureEmulatorManager.Storage.ConnectionString);
+#endif
+            }
+            else
             {
                 XElement xName = xDocument.XPathSelectElement("/account/name");
                 XElement xKey = xDocument.XPathSelectElement("/account/key");

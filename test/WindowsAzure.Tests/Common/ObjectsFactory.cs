@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.WindowsAzure.Storage;
+﻿using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using System;
+using System.Collections.Generic;
 using WindowsAzure.Tests.Samples;
 
 namespace WindowsAzure.Tests.Common
@@ -10,15 +10,14 @@ namespace WindowsAzure.Tests.Common
     {
         public static CloudTableClient GetCloudTableClient()
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.DevelopmentStorageAccount;
-            return storageAccount.CreateCloudTableClient();
+            return TestBase.GenerateCloudTableClient();
         }
 
         public static DynamicTableEntity GetCountryDynamicTableEntity()
         {
             return new DynamicTableEntity
             {
-                
+
                 PartitionKey = "Europe",
                 RowKey = "Spain",
                 Properties = new Dictionary<string, EntityProperty>()
@@ -34,13 +33,29 @@ namespace WindowsAzure.Tests.Common
             };
         }
 
+        public static Address GetAddress()
+        {
+            return new Address
+            {
+                Country = "Spain",
+                Street = "Alameda Spain",
+                Area = 505992,
+                District = "Europe",
+                TopSecretKey = new byte[] { 0xaa, 0xbb, 0xcc },
+                Formed = new DateTime(1812, 1, 1),
+                Id = Guid.NewGuid(),
+                IsExists = true,
+                PresidentsCount = 8
+            };
+        }
+
         public static Country GetCountry()
         {
             return new Country
                 {
                     Area = 505992,
                     Continent = "Europe",
-                    TopSecretKey = new byte[] {0xaa, 0xbb, 0xcc},
+                    TopSecretKey = new byte[] { 0xaa, 0xbb, 0xcc },
                     Formed = new DateTime(1812, 1, 1),
                     Id = Guid.NewGuid(),
                     IsExists = true,

@@ -55,7 +55,7 @@ namespace WindowsAzure.Table.Extensions
                 return TaskHelpers.FromResult(source.ToList());
             }
 
-            return tableQueryProvider.ExecuteAsync(predicate, cancellationToken)
+            return tableQueryProvider.ExecuteAsync(source.Where(predicate).Expression, cancellationToken)
                                      .Then(result => ((IEnumerable<T>)result).ToList(), cancellationToken);
         }
 
