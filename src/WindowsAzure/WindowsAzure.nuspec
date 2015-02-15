@@ -4,7 +4,7 @@
         <id>WindowsAzure.StorageExtensions</id>
         <version>$version$</version>
         <title>Windows Azure Storage Extensions</title>
-        <authors>$author$</authors>
+        <authors>Dmitry Tretyakov</authors>
         <owners>dtretyakov</owners>
         <licenseUrl>https://raw.github.com/dtretyakov/WindowsAzure/master/LICENSE.txt</licenseUrl>
         <projectUrl>https://github.com/dtretyakov/WindowsAzure</projectUrl>
@@ -13,7 +13,7 @@
         <description>$description$</description>
         <tags>Azure, Storage, Blob, Table, Async, Extensions, LINQ, IQueryable</tags>
         <dependencies>
-            <dependency id="WindowsAzure.Storage" version="2.0.6.1" />
+            <dependency id="WindowsAzure.Storage" version="4.3.0" />
         </dependencies>
     </metadata>
 </package>
