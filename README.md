@@ -4,7 +4,7 @@
 
 It's built on top of the **[Windows Azure Storage Client Library 2.0](https://github.com/WindowsAzure/azure-sdk-for-net)**, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and **LINQ to Azure Table** queries via `TableSet` context by using **POCO** entities.
 
-Latest project build: <a href="http://teamcity.codebetter.com/viewType.html?buildTypeId=bt986&guest=1"><img src="http://teamcity.codebetter.com/app/rest/builds/buildType:(id:bt986)/statusIcon" alt=""/></a>
+Latest project build: <a href="http://teamcity.codebetter.com/viewType.html?buildTypeId=wase_general&guest=1"><img src="http://teamcity.codebetter.com/app/rest/builds/buildType:(id:wase_general)/statusIcon" alt=""/></a>
 
 ## Table Of Contents
 * [Features](#features)
