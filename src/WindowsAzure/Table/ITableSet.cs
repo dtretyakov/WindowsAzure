@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table
 {
@@ -165,5 +166,11 @@ namespace WindowsAzure.Table
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Result.</returns>
         Task RemoveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///    Returns a reference to wrapped CloudTable instance.
+        /// </summary>
+        /// <returns>CloudTable instance</returns>
+        CloudTable Table();
     }
 }
