@@ -18,7 +18,6 @@ namespace WindowsAzure.Table
     public sealed class TableSet<TEntity> : Query<TEntity>, ITableSet<TEntity> where TEntity : class, new()
     {
         internal readonly TableRequestExecutorFactory<TEntity> RequestExecutorFactory;
-        internal readonly CloudTable CloudTableReference;
         internal ITableRequestExecutor<TEntity> RequestExecutor;
         private ExecutionMode _executionMode = ExecutionMode.Sequential;
 
@@ -48,24 +47,14 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("tableName");
             }
 
-            CloudTableReference = cloudTableClient.GetTableReference(tableName);
-            var cloudTableWrapper = new CloudTableWrapper(CloudTableReference);
+            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
+            var cloudTableWrapper = new CloudTableWrapper(cloudTable);
             var entityConverter = new TableEntityConverter<TEntity>();
 
             RequestExecutorFactory = new TableRequestExecutorFactory<TEntity>(cloudTableWrapper, entityConverter);
             Provider = new TableQueryProvider<TEntity>(cloudTableWrapper, entityConverter);
             RequestExecutor = RequestExecutorFactory.Create(_executionMode);
         }
-
-
-        /// <summary>
-        ///    Returns a reference to wrapped CloudTable instance.
-        /// </summary>
-        /// <returns>CloudTable instance</returns>
-        public CloudTable Table()
-        {
-            return CloudTableReference;
-        }        
 
         /// <summary>
         ///     Inserts a new entity.
