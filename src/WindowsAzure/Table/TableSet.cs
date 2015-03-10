@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using WindowsAzure.Table.EntityConverters;
@@ -7,6 +8,7 @@ using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.RequestExecutor;
 using WindowsAzure.Table.Wrappers;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table
@@ -20,6 +22,7 @@ namespace WindowsAzure.Table
         internal readonly TableRequestExecutorFactory<TEntity> RequestExecutorFactory;
         internal ITableRequestExecutor<TEntity> RequestExecutor;
         private ExecutionMode _executionMode = ExecutionMode.Sequential;
+        private readonly CloudTable _cloudTable;
 
         /// <summary>
         ///     Constructor.
@@ -47,8 +50,8 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("tableName");
             }
 
-            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
-            var cloudTableWrapper = new CloudTableWrapper(cloudTable);
+            _cloudTable = cloudTableClient.GetTableReference(tableName);
+            var cloudTableWrapper = new CloudTableWrapper(_cloudTable);
             var entityConverter = new TableEntityConverter<TEntity>();
 
             RequestExecutorFactory = new TableRequestExecutorFactory<TEntity>(cloudTableWrapper, entityConverter);
@@ -381,5 +384,66 @@ namespace WindowsAzure.Table
                 RequestExecutor = RequestExecutorFactory.Create(_executionMode);
             }
         }
+
+        /// <summary>
+        ///    Creates the table if it does not already exist.
+        /// </summary>      
+        /// <param name="requestOptions">A <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableRequestOptions"/> object that specifies additional options for the request.</param>
+        /// <param name="operationContext">An <see cref="T:Microsoft.WindowsAzure.Storage.OperationContext"/> object that represents the context for the current operation.</param>
+        /// <returns>
+        /// <c>true</c> if table was created; otherwise, <c>false</c>.
+        /// </returns>                  
+        public void CreateIfNotExists(TableRequestOptions requestOptions = null, OperationContext operationContext = null )
+        {
+            _cloudTable.CreateIfNotExists(requestOptions, operationContext);            
+        }
+
+        /// <summary>
+        ///     Initiates an asynchronous operation to create a table if it does not already exist.        
+        /// </summary>        
+        /// <returns>
+        /// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>bool</c> that represents the asynchronous operation.
+        /// </returns>        
+        public Task<bool> CreateIfNotExistsAsync()
+        {
+            return _cloudTable.CreateIfNotExistsAsync();
+        }
+
+        /// <summary>
+        ///     Initiates an asynchronous operation to create a table if it does not already exist.        
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for a task to complete.</param>
+        /// <returns>
+        /// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>bool</c> that represents the asynchronous operation.
+        /// </returns>
+        public Task<bool> CreateIfNotExistsAsync(CancellationToken cancellationToken)
+        {
+            return _cloudTable.CreateIfNotExistsAsync(cancellationToken);
+        }
+
+        /// <summary>
+        ///     Initiates an asynchronous operation to create a table if it does not already exist.        
+        /// </summary>
+        /// <param name="requestOptions">A <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableRequestOptions"/> object that specifies additional options for the request.</param>
+        /// <param name="operationContext">An <see cref="T:Microsoft.WindowsAzure.Storage.OperationContext"/> object that represents the context for the current operation.</param>
+        /// <returns>
+        /// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>bool</c> that represents the asynchronous operation.
+        /// </returns>
+        public Task<bool> CreateIfNotExistsAsync(TableRequestOptions requestOptions, OperationContext operationContext)
+        {
+            return _cloudTable.CreateIfNotExistsAsync(requestOptions, operationContext);
+        }
+
+        /// <summary>
+        ///     Initiates an asynchronous operation to create a table if it does not already exist.        
+        /// </summary>
+        /// <param name="requestOptions">A <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableRequestOptions"/> object that specifies additional options for the request.</param><param name="operationContext">An <see cref="T:Microsoft.WindowsAzure.Storage.OperationContext"/> object that represents the context for the current operation.</param><param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for a task to complete.</param>
+        /// <returns>
+        /// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>bool</c> that represents the asynchronous operation.
+        /// </returns>
+        public Task<bool> CreateIfNotExistsAsync(TableRequestOptions requestOptions, OperationContext operationContext, CancellationToken cancellationToken)
+        {
+            return _cloudTable.CreateIfNotExistsAsync(requestOptions, operationContext, cancellationToken);
+        }        
     }
 }
