@@ -176,14 +176,6 @@ namespace WindowsAzure.Table
 
         /// <summary>
         ///     Initiates an asynchronous operation to create a table if it does not already exist.        
-        /// </summary>        
-        /// <returns>
-        /// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>bool</c> that represents the asynchronous operation.
-        /// </returns>        
-        Task<bool> CreateIfNotExistsAsync();
-
-        /// <summary>
-        ///     Initiates an asynchronous operation to create a table if it does not already exist.        
         /// </summary>
         /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for a task to complete.</param>
         /// <returns>
