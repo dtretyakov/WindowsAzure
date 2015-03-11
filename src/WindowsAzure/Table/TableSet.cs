@@ -387,9 +387,7 @@ namespace WindowsAzure.Table
 
         /// <summary>
         ///    Creates the table if it does not already exist.
-        /// </summary>      
-        /// <param name="requestOptions">A <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableRequestOptions"/> object that specifies additional options for the request.</param>
-        /// <param name="operationContext">An <see cref="T:Microsoft.WindowsAzure.Storage.OperationContext"/> object that represents the context for the current operation.</param>
+        /// </summary>              
         /// <returns>
         /// <c>true</c> if table was created; otherwise, <c>false</c>.
         /// </returns>                  
