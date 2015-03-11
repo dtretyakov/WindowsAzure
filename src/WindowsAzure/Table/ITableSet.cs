@@ -167,20 +167,24 @@ namespace WindowsAzure.Table
         Task RemoveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        ///    Creates the table if it does not already exist.
-        /// </summary>      
+        ///     Creates the table if it does not already exist.
+        /// </summary>
         /// <returns>
-        /// <c>true</c> if table was created; otherwise, <c>false</c>.
-        /// </returns>                  
-        void CreateIfNotExists();
+        ///     <c>true</c> if table was created; otherwise, <c>false</c>.
+        /// </returns>
+        bool CreateIfNotExists();
 
         /// <summary>
-        ///     Initiates an asynchronous operation to create a table if it does not already exist.        
+        ///     Initiates an asynchronous operation to create a table if it does not already exist.
         /// </summary>
-        /// <param name="cancellationToken">A <see cref="T:System.Threading.CancellationToken"/> to observe while waiting for a task to complete.</param>
+        /// <param name="cancellationToken">
+        ///     A <see cref="T:System.Threading.CancellationToken" /> to observe while waiting for a
+        ///     task to complete.
+        /// </param>
         /// <returns>
-        /// A <see cref="T:System.Threading.Tasks.Task`1"/> object of type <c>bool</c> that represents the asynchronous operation.
+        ///     A <see cref="T:System.Threading.Tasks.Task`1" /> object of type <c>bool</c> that represents the asynchronous
+        ///     operation.
         /// </returns>
-        Task<bool> CreateIfNotExistsAsync(CancellationToken cancellationToken);
+        Task<bool> CreateIfNotExistsAsync(CancellationToken cancellationToken = default (CancellationToken));
     }
 }
