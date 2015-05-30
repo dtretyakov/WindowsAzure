@@ -1,8 +1,8 @@
 # Windows Azure Storage Extensions
 
-*Windows Azure Storage Extensions* is a .NET library aimed at managing and querying entities from [Windows Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
+*Windows Azure Storage Extensions* is a .NET library aimed at managing and querying entities from [Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
 
-It's built on top of the **[Windows Azure Storage Client Library 2.0](https://github.com/WindowsAzure/azure-sdk-for-net)**, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and **LINQ to Azure Table** queries via `TableSet` context by using **POCO** entities.
+It's built on top of the **[Azure .NET SDK](https://github.com/WindowsAzure/azure-sdk-for-net)**, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and **LINQ to Azure Table** queries via `TableSet` context by using **POCO** entities.
 
 Latest project build: <a href="http://teamcity.codebetter.com/viewType.html?buildTypeId=wase_general&guest=1"><img src="http://teamcity.codebetter.com/app/rest/builds/buildType:(id:wase_general)/statusIcon" alt=""/></a>
 
@@ -15,12 +15,11 @@ Latest project build: <a href="http://teamcity.codebetter.com/viewType.html?buil
 
 ## Features
 
-### POCO Objects
+### Attribute Mapping
 
-Entity's properties and fields should be marked by one or both of `PartitionKey` and `RowKey` attributes for defining composite table key.
-Also can be used `Timestamp`, `ETag`, `Property` and `Ignore` attributes.
+POCO properties and fields should be marked by one or both of `PartitionKey` and `RowKey` attributes for defining composite table key. Also can be used `Timestamp`, `ETag`, `Property` and `Ignore` attributes.
 
-### Fluent mapping
+### Fluent Mapping
 
 Fluent mapping is the namesake mapping style that we use as an alternative to the AttributeMapping. It's a fluent interface that allows you to map your entities completely in code, with all the compile-time safety and refactorability that brings.
 
@@ -267,6 +266,15 @@ var countryNames = new List<string> { "Germany", "Finland" };
 var countries = countryTable.Where(p => countryNames.Contains(p.Name)).ToList();
 ```
 
-## Sponsors
-* [JetBrains](http://www.jetbrains.com): [ReSharper](http://www.jetbrains.com/resharper/) and [TeamCity](http://www.jetbrains.com/teamcity/).
-* [CodeBetter](http://codebetter.com): [CodeBetter CI Server](http://codebetter.com/codebetter-ci/).
+## Contributors
+Great thanks to all of projects contributors. 
+* [Dmitry Tretyakov](dtretyakov) for project idea.
+* [Timothy Makarov](timothy-makarov) for performance optimizations.
+* [Gabriel Marquez](gblmarquez) for Fluent API mapping.
+* [Sebastian Betzin](sbetzin) for additional TableSet methods.
+* [Tom Dietrich](tdietrich513) for his contributions.
+* And [Community](https://github.com/dtretyakov/WindowsAzure/issues) for a valuable feedback.
+
+See complete list of [project contributors](https://github.com/dtretyakov/WindowsAzure/graphs/contributors).
+
+We appreciate all kinds of feedback, so please feel free to send a [PR](https://github.com/dtretyakov/WindowsAzure/pulls) or write an [issue](https://github.com/dtretyakov/WindowsAzure/issues).
