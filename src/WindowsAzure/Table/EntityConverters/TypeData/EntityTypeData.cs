@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -21,24 +21,24 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
         private static readonly Dictionary<Type, Func<MemberInfo, object, IDictionary<string, string>, IProperty<T>>> PropertyFactories =
             new Dictionary<Type, Func<MemberInfo, object, IDictionary<string, string>, IProperty<T>>>
-                {
-                    {typeof (ETagAttribute), CreateETagProperty},
-                    {typeof (IgnoreAttribute), (member, attribute, names) => null},
-                    {typeof (PartitionKeyAttribute), CreatePartitionKeyProperty},
-                    {typeof (PropertyAttribute), CreateNamedProperty},
-                    {typeof (RowKeyAttribute), CreateRowKeyProperty},
-                    {typeof (TimestampAttribute), CreateTimestampProperty}
-                };
+            {
+                {typeof (ETagAttribute), CreateETagProperty},
+                {typeof (IgnoreAttribute), (member, attribute, names) => null},
+                {typeof (PartitionKeyAttribute), CreatePartitionKeyProperty},
+                {typeof (PropertyAttribute), CreateNamedProperty},
+                {typeof (RowKeyAttribute), CreateRowKeyProperty},
+                {typeof (TimestampAttribute), CreateTimestampProperty}
+            };
 
         private readonly Dictionary<string, string> _nameChanges = new Dictionary<string, string>();
-        private readonly IProperty<T>[] _properties = new IProperty<T>[] {};
+        private readonly IProperty<T>[] _properties;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         internal EntityTypeData()
         {
-            Type entityType = typeof (T);
+            var entityType = typeof (T);
 
             // Retrieve class members
             var members = new List<MemberInfo>(entityType.GetFields(Flags));
@@ -51,60 +51,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             // Check whether entity's composite key completely defined
             if (!_nameChanges.ContainsValue(PartitionKey) && !_nameChanges.ContainsValue(RowKey))
             {
-                string message = string.Format(Resources.EntityTypeDataMissingKey, entityType);
+                var message = string.Format(Resources.EntityTypeDataMissingKey, entityType);
                 throw new InvalidOperationException(message);
             }
 
             _properties = properties.ToArray();
         }
-
-        // ReSharper disable ForCanBeConvertedToForeach
-
-        /// <summary>
-        ///     Converts <see cref="T:Microsoft.WindowsAzure.Storage.Table.DynamicTableEntity" /> into POCO.
-        /// </summary>
-        /// <param name="tableEntity">Table entity.</param>
-        /// <returns>POCO.</returns>
-        public T GetEntity(DynamicTableEntity tableEntity)
-        {
-            if (tableEntity == null)
-            {
-                throw new ArgumentNullException("tableEntity");
-            }
-
-            var result = new T();
-
-            for (int i = 0; i < _properties.Length; i++)
-            {
-                _properties[i].SetMemberValue(tableEntity, result);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        ///     Converts POCO into <see cref="T:Microsoft.WindowsAzure.Storage.Table.ITableEntity" />.
-        /// </summary>
-        /// <param name="entity">POCO entity.</param>
-        /// <returns>Table entity.</returns>
-        public ITableEntity GetEntity(T entity)
-        {
-            if (entity == null)
-            {
-                throw new ArgumentNullException("entity");
-            }
-
-            var result = new DynamicTableEntity(string.Empty, string.Empty) {ETag = "*"};
-
-            for (int i = 0; i < _properties.Length; i++)
-            {
-                _properties[i].GetMemberValue(entity, result);
-            }
-
-            return result;
-        }
-
-        // ReSharper restore ForCanBeConvertedToForeach
 
         /// <summary>
         ///     Gets a name changes for entity members.
@@ -148,7 +100,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <returns>Property.</returns>
         private static RegularProperty<T> CreateNamedProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
         {
-            string propertyName = ((PropertyAttribute) attribute).Name;
+            var propertyName = ((PropertyAttribute) attribute).Name;
             nameChanges.Add(member.Name, propertyName);
             return new RegularProperty<T>(member, propertyName);
         }
@@ -186,7 +138,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <returns>Property.</returns>
         private static IProperty<T> GetMemberProperty(MemberInfo member, IDictionary<string, string> nameChanges)
         {
-            IList<object> attributes = SelectMetadataAttributes(member.GetCustomAttributes(false));
+            var attributes = SelectMetadataAttributes(member.GetCustomAttributes(false));
 
             if (attributes.Count == 0)
             {
@@ -198,8 +150,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 return PropertyFactories[attributes[0].GetType()](member, attributes[0], nameChanges);
             }
 
-            string typeName = member.DeclaringType != null ? member.DeclaringType.Name : string.Empty;
-            string message = string.Format(Resources.EntityTypeDataShouldBeOneAttribute, member.Name, typeName);
+            var typeName = member.DeclaringType != null ? member.DeclaringType.Name : string.Empty;
+            var message = string.Format(Resources.EntityTypeDataShouldBeOneAttribute, member.Name, typeName);
 
             throw new InvalidOperationException(message);
         }
@@ -213,9 +165,9 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             var selectedAttributes = new List<object>();
 
-            for (int i = 0; i < attributes.Length; i++)
+            for (var i = 0; i < attributes.Length; i++)
             {
-                Type attributeType = attributes[i].GetType();
+                var attributeType = attributes[i].GetType();
 
                 if (!PropertyFactories.ContainsKey(attributeType))
                 {
@@ -227,5 +179,53 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             return selectedAttributes;
         }
+
+        // ReSharper disable ForCanBeConvertedToForeach
+
+        /// <summary>
+        ///     Converts <see cref="T:Microsoft.WindowsAzure.Storage.Table.DynamicTableEntity" /> into POCO.
+        /// </summary>
+        /// <param name="tableEntity">Table entity.</param>
+        /// <returns>POCO.</returns>
+        public T GetEntity(DynamicTableEntity tableEntity)
+        {
+            if (tableEntity == null)
+            {
+                throw new ArgumentNullException("tableEntity");
+            }
+
+            var result = new T();
+
+            for (var i = 0; i < _properties.Length; i++)
+            {
+                _properties[i].SetMemberValue(tableEntity, result);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        ///     Converts POCO into <see cref="T:Microsoft.WindowsAzure.Storage.Table.ITableEntity" />.
+        /// </summary>
+        /// <param name="entity">POCO entity.</param>
+        /// <returns>Table entity.</returns>
+        public ITableEntity GetEntity(T entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+
+            var result = new DynamicTableEntity(string.Empty, string.Empty) {ETag = "*"};
+
+            for (var i = 0; i < _properties.Length; i++)
+            {
+                _properties[i].GetMemberValue(entity, result);
+            }
+
+            return result;
+        }
+
+        // ReSharper restore ForCanBeConvertedToForeach
     }
 }

@@ -105,7 +105,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
         }
 
         [Fact]
-        public void ExecuteBatchesAsyncWithNullEntities()
+        public Task ExecuteBatchesAsyncWithNullEntities()
         {
             // Arrange
             Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
@@ -114,10 +114,10 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             var executor = new TableRequestSequentialExecutor<Country>(cloudTableMock.Object, entityConverterMock.Object, batchPartitionerMock.Object);
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => executor.ExecuteBatchesAsync(null, null, CancellationToken.None));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => executor.ExecuteBatchesAsync(null, null, CancellationToken.None));
         }
         [Fact]
-        public void ExecuteBatchesAsyncWithNullOperation()
+        public Task ExecuteBatchesAsyncWithNullOperation()
         {
             // Arrange
             Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
@@ -127,7 +127,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             var entities = ObjectsFactory.GetCountries();
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => executor.ExecuteBatchesAsync(entities, null, CancellationToken.None));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => executor.ExecuteBatchesAsync(entities, null, CancellationToken.None));
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
         }
 
         [Fact]
-        public void ExecuteBatchesWithoutResultAsyncWithNullEntities()
+        public Task ExecuteBatchesWithoutResultAsyncWithNullEntities()
         {
             // Arrange
             Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
@@ -203,10 +203,10 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             var executor = new TableRequestSequentialExecutor<Country>(cloudTableMock.Object, entityConverterMock.Object, batchPartitionerMock.Object);
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => executor.ExecuteBatchesWithoutResultAsync(null, null, CancellationToken.None));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => executor.ExecuteBatchesWithoutResultAsync(null, null, CancellationToken.None));
         }
         [Fact]
-        public void ExecuteBatchesWithoutResultAsyncWithNullOperation()
+        public Task ExecuteBatchesWithoutResultAsyncWithNullOperation()
         {
             // Arrange
             Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
@@ -216,7 +216,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             var entities = ObjectsFactory.GetCountries();
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => executor.ExecuteBatchesWithoutResultAsync(entities, null, CancellationToken.None));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => executor.ExecuteBatchesWithoutResultAsync(entities, null, CancellationToken.None));
         }
 
         [Fact]

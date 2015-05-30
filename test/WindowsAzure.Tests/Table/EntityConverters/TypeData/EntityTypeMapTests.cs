@@ -1,8 +1,7 @@
-﻿
-using Microsoft.WindowsAzure.Storage.Table;
-using System;
+﻿using System;
 using WindowsAzure.Table.EntityConverters.TypeData;
 using WindowsAzure.Tests.Samples;
+using Microsoft.WindowsAzure.Storage.Table;
 using Xunit;
 
 namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
@@ -12,31 +11,39 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         [Fact]
         public void RegisterClassMap_RowKeyIsNotString_ExceptionThrown()
         {
+            EntityTypeMap<Address> map = null;
+
             // Arrange & Act & Asset
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Country)
-                                                           .RowKey(p => p.Id));
+                map = new EntityTypeMap<Address>(e => 
+                    e.PartitionKey(p => p.Country).RowKey(p => p.Id));
             });
+
+            Assert.Null(map);
         }
 
         [Fact]
         public void RegisterClassMap_PartitionKeyIsNotString_ExceptionThrown()
         {
+            EntityTypeMap<Address> map = null;
+
             // Arrange & Act & Asset
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Id)
-                                                           .RowKey(p => p.Country));
+                map = new EntityTypeMap<Address>(e =>
+                    e.PartitionKey(p => p.Id).RowKey(p => p.Country));
             });
+
+            Assert.Null(map);
         }
 
         [Fact]
         public void RegisterClassMap_KeysAreValid()
         {
             // Arrange & Act
-            var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Country)
-                                                       .RowKey(p => p.Street));
+            var map = new EntityTypeMap<Address>(e => 
+                e.PartitionKey(p => p.Country).RowKey(p => p.Street));
 
             // Assert
             Assert.NotNull(map.NameChanges);
@@ -57,7 +64,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Equal("PartitionKey", map.NameChanges["Country"]);
             Assert.Equal("RowKey", map.NameChanges["Street"]);
 
-            var entity = (DynamicTableEntity)map.GetEntity(new Address());
+            var entity = (DynamicTableEntity) map.GetEntity(new Address());
             Assert.Equal(8, entity.Properties.Count);
         }
 
@@ -65,9 +72,10 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         public void GetEntityTypeData_IgnoreProperty()
         {
             // Arrange & Act
-            var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Country)
-                                                       .RowKey(p => p.Street)
-                                                       .Ignore(p => p.Area));
+            var map = new EntityTypeMap<Address>(e => 
+                e.PartitionKey(p => p.Country)
+                .RowKey(p => p.Street)
+                .Ignore(p => p.Area));
 
             // Assert
             Assert.NotNull(map.NameChanges);
@@ -75,7 +83,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Equal("PartitionKey", map.NameChanges["Country"]);
             Assert.Equal("RowKey", map.NameChanges["Street"]);
 
-            var entity = (DynamicTableEntity)map.GetEntity(new Address());
+            var entity = (DynamicTableEntity) map.GetEntity(new Address());
             Assert.Equal(7, entity.Properties.Count);
         }
 
@@ -85,8 +93,20 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             // Arrange & Act & Asset
             Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
-                var map = EntityTypeDataFactory.GetEntityTypeData<AddressInvalidMap>();
+                EntityTypeDataFactory.GetEntityTypeData<AddressInvalidMap>();
             });
+        }
+
+        [Fact]
+        public void CreateTypeMapWithOnlyOneKey()
+        {
+            // Arrange & Act
+            var map = new EntityTypeMap<Address>(e => e.PartitionKey(p => p.Country));
+
+            // Assert
+            Assert.NotNull(map.NameChanges);
+            Assert.Equal(1, map.NameChanges.Count);
+            Assert.Equal("PartitionKey", map.NameChanges["Country"]);
         }
     }
 }

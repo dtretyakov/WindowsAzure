@@ -1,8 +1,7 @@
 ﻿using System;
-using Moq;
+using System.Threading.Tasks;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable;
-using WindowsAzure.Table.Wrappers;
 using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -22,7 +21,7 @@ namespace WindowsAzure.Tests.Table.Queryable
         public void CreateTableQueryProviderWithNullEntityConverter()
         {
             // Arrange
-            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
+            var cloudTableMock = MocksFactory.GetCloudTableMock();
 
             // Act && Assert
             Assert.Throws<ArgumentNullException>(() => new TableQueryProvider<Country>(cloudTableMock.Object, null));
@@ -32,7 +31,7 @@ namespace WindowsAzure.Tests.Table.Queryable
         public void ExecuteWithNullExpression()
         {
             // Arrange
-            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
+            var cloudTableMock = MocksFactory.GetCloudTableMock();
             var converter = new TableEntityConverter<Country>();
             var provider = new TableQueryProvider<Country>(cloudTableMock.Object, converter);
 
@@ -41,15 +40,15 @@ namespace WindowsAzure.Tests.Table.Queryable
         }
 
         [Fact]
-        public void ExecuteAsyncWithNullExpression()
+        public Task ExecuteAsyncWithNullExpression()
         {
             // Arrange
-            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
+            var cloudTableMock = MocksFactory.GetCloudTableMock();
             var converter = new TableEntityConverter<Country>();
             var provider = new TableQueryProvider<Country>(cloudTableMock.Object, converter);
 
             // Act && Assert
-            Assert.Throws<ArgumentNullException>(() => provider.ExecuteAsync(null));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => provider.ExecuteAsync(null));
         }
     }
 }
