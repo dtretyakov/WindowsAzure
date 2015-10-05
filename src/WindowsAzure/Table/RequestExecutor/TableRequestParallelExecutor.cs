@@ -59,7 +59,8 @@ namespace WindowsAzure.Table.RequestExecutor
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
             IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
 
-            return batches.AsParallel().SelectMany(GetEntities);
+            // Force evaluation of the execution by calling ToArray()
+            return batches.AsParallel().SelectMany(GetEntities).ToArray();
         }
 
         /// <summary>

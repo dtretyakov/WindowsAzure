@@ -105,6 +105,24 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
         }
 
         [Fact]
+        public void ExecuteBatchesEvenWhenNotEvaluated()
+        {
+            // Arrange
+            Mock<ICloudTable> cloudTableMock = MocksFactory.GetCloudTableMock();
+            Mock<ITableEntityConverter<Country>> entityConverterMock = MocksFactory.GetTableEntityConverterMock<Country>();
+            Mock<ITableBatchPartitioner> batchPartitionerMock = MocksFactory.GetTableBatchPartitionerMock();
+            var executor = new TableRequestSequentialExecutor<Country>(cloudTableMock.Object, entityConverterMock.Object, batchPartitionerMock.Object);
+            var entities = ObjectsFactory.GetCountries();
+
+            // Act
+            // We don't evaluate the call as we're not interested in the resulting entities. This should still execute the operations.
+            executor.ExecuteBatches(entities, TableOperation.Insert);
+
+            // Assert
+            cloudTableMock.Verify(t => t.ExecuteBatch(It.IsAny<TableBatchOperation>()));
+        }
+
+        [Fact]
         public Task ExecuteBatchesAsyncWithNullEntities()
         {
             // Arrange

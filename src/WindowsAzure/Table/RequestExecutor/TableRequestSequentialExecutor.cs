@@ -59,9 +59,9 @@ namespace WindowsAzure.Table.RequestExecutor
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
             IEnumerable<TableBatchOperation> batches = _partitioner.GetBatches(tableEntities, operation);
 
-            return from batch in batches
-                   from result in _cloudTable.ExecuteBatch(batch)
-                   select _entityConverter.GetEntity((DynamicTableEntity) result.Result);
+            // Force evaluation of the execution by calling ToArray()
+            var results = batches.SelectMany(t => _cloudTable.ExecuteBatch(t)).ToArray();
+            return results.Select(t => _entityConverter.GetEntity((DynamicTableEntity) t.Result));
         }
 
         /// <summary>
