@@ -103,6 +103,7 @@
     <Compile Include="Samples\Countries.cs" />
     <Compile Include="Samples\EntityWithContructor.cs" />
     <Compile Include="Samples\EntityWithFields.cs" />
+    <Compile Include="Samples\EntityWithInvalidPropertyType.cs" />
     <Compile Include="Samples\EntityWithMultipleAttributes.cs" />
     <Compile Include="Samples\EntityWithoutCompositeKey.cs" />
     <Compile Include="Samples\EntityWithProperties.cs" />

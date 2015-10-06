@@ -108,5 +108,20 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.Equal(1, map.NameChanges.Count);
             Assert.Equal("PartitionKey", map.NameChanges["Country"]);
         }
+
+        [Fact]
+        public void GetEntityTypeData_IgnoreProperty_EvenWhenUnsupportedType()
+        {
+            // Arrange & Act
+            var map = new EntityTypeMap<EntityWithInvalidPropertyType>(e =>
+                e.PartitionKey(p => p.PKey)
+                .RowKey(p => p.RKey)
+                .Ignore(p => p.Country));
+
+            // Assert
+            Assert.NotNull(map.NameChanges);
+            Assert.DoesNotContain(map.NameChanges, t => t.Key == "Country");
+            Assert.Equal(2, map.NameChanges.Count);
+        }
     }
 }
