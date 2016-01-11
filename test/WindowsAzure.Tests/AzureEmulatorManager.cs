@@ -11,10 +11,8 @@ namespace WindowsAzure.Tests
 
     public class AzureStorageEmulatorManager
     {
-        private const string StorageEmulatorProcessNamev1 = "DSServiceLDB";
-        private const string StorageEmulatorProcessNamev2 = "WAStorageEmulator";
-        private const string EmulatorPathv1 = @"c:\program files\microsoft sdks\windows azure\emulator\csrun.exe";
-        private const string EmulatorPathv2 = @"c:\program files (x86)\microsoft sdks\azure\storage emulator\wastorageemulator.exe";
+        private const string StorageEmulatorProcessName = "AzureStorageEmulator";
+        private const string EmulatorPath = @"C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator\AzureStorageEmulator.exe";
 
         public readonly string ConnectionString = "UseDevelopmentStorage=true";
 
@@ -25,8 +23,7 @@ namespace WindowsAzure.Tests
 
         public Process GetProcess()
         {
-            return Process.GetProcessesByName(StorageEmulatorProcessNamev1).FirstOrDefault()
-                  ?? Process.GetProcessesByName(StorageEmulatorProcessNamev2).FirstOrDefault();
+            return Process.GetProcessesByName(StorageEmulatorProcessName).FirstOrDefault();
         }
 
         public bool IsRunning()
@@ -36,42 +33,32 @@ namespace WindowsAzure.Tests
 
         public void Start()
         {
-            if (!IsRunning())
+            if (IsRunning())
             {
-                try
+                return;
+            }
+
+            using (var process = Process.Start(EmulatorPath, "start"))
+            {
+                if (process != null)
                 {
-                    using (var process = Process.Start(EmulatorPathv1, "/devstore:start"))
-                    {
-                        process.WaitForExit();
-                    }
-                }
-                catch
-                {
-                    using (var process = Process.Start(EmulatorPathv2, "start"))
-                    {
-                        process.WaitForExit();
-                    }
+                    process.WaitForExit();
                 }
             }
         }
 
         public void Stop()
         {
-            if (IsRunning())
+            if (!IsRunning())
             {
-                try
+                return;
+            }
+
+            using (var process = Process.Start(EmulatorPath, "stop"))
+            {
+                if (process != null)
                 {
-                    using (var process = Process.Start(EmulatorPathv1, "/devstore:shutdown"))
-                    {
-                        process.WaitForExit();
-                    }
-                }
-                catch
-                {
-                    using (var process = Process.Start(EmulatorPathv2, "stop"))
-                    {
-                        process.WaitForExit();
-                    }
+                    process.WaitForExit();
                 }
             }
         }
@@ -105,9 +92,14 @@ namespace WindowsAzure.Tests
 
         public void Start()
         {
-            if (!IsRunning())
+            if (IsRunning())
             {
-                using (var process = Process.Start(ComputeEmulatorPath, "/devfabric:start"))
+                return;
+            }
+
+            using (var process = Process.Start(ComputeEmulatorPath, "/devfabric:start"))
+            {
+                if (process != null)
                 {
                     process.WaitForExit();
                 }
@@ -116,9 +108,14 @@ namespace WindowsAzure.Tests
 
         public void Stop()
         {
-            if (IsRunning())
+            if (!IsRunning())
             {
-                using (var process = Process.Start(ComputeEmulatorPath, "/devfabric:shutdown"))
+                return;
+            }
+
+            using (var process = Process.Start(ComputeEmulatorPath, "/devfabric:shutdown"))
+            {
+                if (process != null)
                 {
                     process.WaitForExit();
                 }

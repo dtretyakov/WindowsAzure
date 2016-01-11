@@ -17,9 +17,10 @@ namespace WindowsAzure.Table
     /// <typeparam name="TEntity">Entity type.</typeparam>
     public sealed class TableSet<TEntity> : Query<TEntity>, ITableSet<TEntity> where TEntity : class, new()
     {
+        private readonly CloudTable _cloudTable;
         internal readonly TableRequestExecutorFactory<TEntity> RequestExecutorFactory;
-        internal ITableRequestExecutor<TEntity> RequestExecutor;
         private ExecutionMode _executionMode = ExecutionMode.Sequential;
+        internal ITableRequestExecutor<TEntity> RequestExecutor;
 
         /// <summary>
         ///     Constructor.
@@ -47,8 +48,8 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException("tableName");
             }
 
-            CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
-            var cloudTableWrapper = new CloudTableWrapper(cloudTable);
+            _cloudTable = cloudTableClient.GetTableReference(tableName);
+            var cloudTableWrapper = new CloudTableWrapper(_cloudTable);
             var entityConverter = new TableEntityConverter<TEntity>();
 
             RequestExecutorFactory = new TableRequestExecutorFactory<TEntity>(cloudTableWrapper, entityConverter);
@@ -318,7 +319,6 @@ namespace WindowsAzure.Table
             RequestExecutor.ExecuteWithoutResult(entity, TableOperation.Delete);
         }
 
-
         /// <summary>
         ///     Removes an entity asynchronously.
         /// </summary>
@@ -380,6 +380,33 @@ namespace WindowsAzure.Table
 
                 RequestExecutor = RequestExecutorFactory.Create(_executionMode);
             }
+        }
+
+        /// <summary>
+        ///     Creates the table if it does not already exist.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if table was created; otherwise, <c>false</c>.
+        /// </returns>
+        public bool CreateIfNotExists()
+        {
+            return _cloudTable.CreateIfNotExists();
+        }
+
+        /// <summary>
+        ///     Initiates an asynchronous operation to create a table if it does not already exist.
+        /// </summary>
+        /// <param name="cancellationToken">
+        ///     A <see cref="T:System.Threading.CancellationToken" /> to observe while waiting for a
+        ///     task to complete.
+        /// </param>
+        /// <returns>
+        ///     A <see cref="T:System.Threading.Tasks.Task`1" /> object of type <c>bool</c> that represents the asynchronous
+        ///     operation.
+        /// </returns>
+        public Task<bool> CreateIfNotExistsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _cloudTable.CreateIfNotExistsAsync(cancellationToken);
         }
     }
 }

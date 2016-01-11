@@ -1,11 +1,11 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -14,6 +14,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     /// </summary>
     public class EntityTypeMap
     {
+        /// <summary>
+        ///     Performs registration of assemblies with type maps.
+        /// </summary>
+        /// <param name="assemblies">List of assemblies.</param>
         public static void RegisterAssembly(params Assembly[] assemblies)
         {
             EntityTypeDataFactory.RegisterMappingAssembly(assemblies);
@@ -26,21 +30,19 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
     /// <typeparam name="T">Entity type.</typeparam>
     public class EntityTypeMap<T> : IEntityTypeData<T> where T : class, new()
     {
-        private const BindingFlags AutoMapFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
         private const BindingFlags PropertyMapFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
         private const string PartitionKeyPropertyName = "PartitionKey";
         private const string RowKeyPropertyName = "RowKey";
-
-        private readonly Type _entityType = typeof(T);
+        private readonly Type _entityType = typeof (T);
         private readonly Dictionary<string, string> _nameChanges = new Dictionary<string, string>();
-        private readonly IDictionary<string, IProperty<T>> _properties = new Dictionary<string, IProperty<T>> { };
+        private readonly IDictionary<string, IProperty<T>> _properties;
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         public EntityTypeMap()
         {
-            _properties = this.AutoMap();
+            _properties = AutoMap();
         }
 
         /// <summary>
@@ -66,8 +68,6 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 throw new ArgumentNullException("tableEntity");
             }
 
-            CheckEntityMap();
-
             var result = new T();
 
             foreach (var prop in _properties)
@@ -90,9 +90,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 throw new ArgumentNullException("entity");
             }
 
-            CheckEntityMap();
-
-            var result = new DynamicTableEntity(string.Empty, string.Empty) { ETag = "*" };
+            var result = new DynamicTableEntity(string.Empty, string.Empty) {ETag = "*"};
 
             foreach (var prop in _properties)
             {
@@ -116,8 +114,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             var members = new List<MemberInfo>(_entityType.GetProperties(PropertyMapFlags).Where(p => p.CanRead && p.CanWrite));
 
             // Create properties for entity members
-            var properties = members.Select(member => new { Key = member.Name, Value = (IProperty<T>)new RegularProperty<T>(member) })
-                                    .Where(result => result != null && result.Value != null);
+            var properties = members.Select(member => new {Key = member.Name, Value = (IProperty<T>) new RegularProperty<T>(member)})
+                .Where(result => result != null && result.Value != null);
 
             return properties.ToDictionary(k => k.Key, e => e.Value);
         }
@@ -217,11 +215,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             switch (body.NodeType)
             {
                 case ExpressionType.MemberAccess:
-                    memberExpression = (MemberExpression)body;
+                    memberExpression = (MemberExpression) body;
                     break;
                 case ExpressionType.Convert:
-                    var convertExpression = (UnaryExpression)body;
-                    memberExpression = (MemberExpression)convertExpression.Operand;
+                    var convertExpression = (UnaryExpression) body;
+                    memberExpression = (MemberExpression) convertExpression.Operand;
                     break;
                 default:
                     throw new ArgumentException("Invalid lambda expression");
@@ -232,9 +230,9 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 case MemberTypes.Field:
                     break;
                 case MemberTypes.Property:
-                    if (memberInfo.DeclaringType.IsInterface)
+                    if (memberInfo.DeclaringType != null && memberInfo.DeclaringType.IsInterface)
                     {
-                        memberInfo = FindPropertyImplementation((PropertyInfo)memberInfo, typeof(T));
+                        memberInfo = FindPropertyImplementation((PropertyInfo) memberInfo, typeof (T));
                     }
                     break;
                 default:
@@ -257,6 +255,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         private static PropertyInfo FindPropertyImplementation(PropertyInfo interfacePropertyInfo, Type actualType)
         {
             var interfaceType = interfacePropertyInfo.DeclaringType;
+            if (interfaceType == null)
+            {
+                return null;
+            }
 
             // An interface map must be used because because there is no
             // other officially documented way to derive the explicitly
@@ -267,7 +269,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             var actualPropertyAccessors = interfacePropertyAccessors.Select(interfacePropertyAccessor =>
             {
-                var index = Array.IndexOf<MethodInfo>(interfaceMap.InterfaceMethods, interfacePropertyAccessor);
+                var index = Array.IndexOf(interfaceMap.InterfaceMethods, interfacePropertyAccessor);
 
                 return interfaceMap.TargetMethods[index];
             });
@@ -275,20 +277,20 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             // Binding must be done by accessor methods because interface
             // maps only map accessor methods and do not map properties.
             return actualType.GetProperties(PropertyMapFlags)
-                             .Single(propertyInfo =>
-                             {
-                                 // we are looking for a property that implements all the required accessors
-                                 var propertyAccessors = propertyInfo.GetAccessors(true);
-                                 return actualPropertyAccessors.All(x => propertyAccessors.Contains(x));
-                             });
+                .Single(propertyInfo =>
+                {
+                    // we are looking for a property that implements all the required accessors
+                    var propertyAccessors = propertyInfo.GetAccessors(true);
+                    return actualPropertyAccessors.All(x => propertyAccessors.Contains(x));
+                });
         }
 
         private void CheckEntityMap()
         {
             // Check whether entity's composite key completely defined
-            if (!_nameChanges.ContainsKey(PartitionKeyPropertyName) && !_nameChanges.ContainsValue(RowKeyPropertyName))
+            if (!_nameChanges.ContainsValue(PartitionKeyPropertyName) && !_nameChanges.ContainsValue(RowKeyPropertyName))
             {
-                string message = string.Format(Resources.EntityTypeDataMissingKey, _entityType);
+                var message = string.Format(Resources.EntityTypeDataMissingKey, _entityType);
                 throw new InvalidOperationException(message);
             }
         }

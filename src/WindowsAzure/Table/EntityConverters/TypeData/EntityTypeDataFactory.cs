@@ -14,12 +14,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <summary>
         ///     Assemblies to find entity type map.
         /// </summary>
-        private static Assembly[] _mappingAssemblies = new Assembly[] { };
+        private static Assembly[] _mappingAssemblies = {};
 
         /// <summary>
         ///     Entity type map definition.
         /// </summary>
-        private static readonly Type EntityTypeMap = typeof(EntityTypeMap<>);
+        private static readonly Type EntityTypeMap = typeof (EntityTypeMap<>);
 
         /// <summary>
         ///     Entity type data cache.
@@ -34,12 +34,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <returns>Entity type data.</returns>
         public static IEntityTypeData<T> GetEntityTypeData<T>() where T : class, new()
         {
-            var type = typeof(T);
-            var assemblies = _mappingAssemblies.Concat(new[] { type.Assembly })
-                                               .Distinct();
+            var type = typeof (T);
+            var assemblies = _mappingAssemblies.Concat(new[] {type.Assembly})
+                .Distinct();
 
-            return (IEntityTypeData<T>)TypesData.GetOrAdd(type,
-                                                          key => FindsEntityTypeMap(assemblies, type) ?? new EntityTypeData<T>());
+            return (IEntityTypeData<T>) TypesData.GetOrAdd(type,
+                key => FindsEntityTypeMap(assemblies, type) ?? new EntityTypeData<T>());
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <param name="entityTypeData">Entity type data.</param>
         public static void RegisterEntityTypeData<T>(IEntityTypeData<T> entityTypeData) where T : class, new()
         {
-            TypesData.GetOrAdd(typeof(T), type => entityTypeData);
+            TypesData.GetOrAdd(typeof (T), type => entityTypeData);
         }
 
         /// <summary>
@@ -71,15 +71,15 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         ///     Finds an entity type mapping.
         /// </summary>
         /// <param name="assembliesToSearch">Aseemblies to search mapping types.</param>
-        /// <param name="entityType">Entity type.</typeparam>
+        /// <param name="entityType">Entity type.</param>
         /// <returns>An instance of entity type mapping.</returns>
         private static object FindsEntityTypeMap(IEnumerable<Assembly> assembliesToSearch, Type entityType)
         {
             foreach (var assembly in assembliesToSearch)
             {
                 var types = assembly.GetExportedTypes()
-                                    .Where(IsMappingType)
-                                    .ToList();
+                    .Where(IsMappingType)
+                    .ToList();
 
                 foreach (var type in types)
                 {
@@ -97,10 +97,6 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                         {
                             throw ex.InnerException;
                         }
-                    }
-                    else
-                    {
-                        continue;
                     }
                 }
             }

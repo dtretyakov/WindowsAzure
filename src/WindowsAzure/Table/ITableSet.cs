@@ -165,5 +165,26 @@ namespace WindowsAzure.Table
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Result.</returns>
         Task RemoveAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        ///     Creates the table if it does not already exist.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if table was created; otherwise, <c>false</c>.
+        /// </returns>
+        bool CreateIfNotExists();
+
+        /// <summary>
+        ///     Initiates an asynchronous operation to create a table if it does not already exist.
+        /// </summary>
+        /// <param name="cancellationToken">
+        ///     A <see cref="T:System.Threading.CancellationToken" /> to observe while waiting for a
+        ///     task to complete.
+        /// </param>
+        /// <returns>
+        ///     A <see cref="T:System.Threading.Tasks.Task`1" /> object of type <c>bool</c> that represents the asynchronous
+        ///     operation.
+        /// </returns>
+        Task<bool> CreateIfNotExistsAsync(CancellationToken cancellationToken = default (CancellationToken));
     }
 }
