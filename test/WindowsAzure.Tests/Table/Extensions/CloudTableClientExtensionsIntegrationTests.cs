@@ -61,11 +61,14 @@ namespace WindowsAzure.Tests.Table.Extensions
         public async Task CloudTableClientGetAllTablesTest()
         {
             // Act
-            List<CloudTable> allTables = await _tableClient.ListTablesAsync();
+            var allTables = await _tableClient.ListTablesAsync();
 
             // Assert
             Assert.NotNull(allTables);
-            Assert.True(_tableNames.All(allTables.Select(p => p.Name).Contains));
+
+            var tableNames = allTables.Select(p => p.Name).ToList();
+
+            Assert.True(tableNames.All(name => _tableNames.Contains(name)));
         }
 
         [IntegrationFact]
