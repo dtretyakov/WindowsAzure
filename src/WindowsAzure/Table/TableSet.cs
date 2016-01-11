@@ -39,12 +39,12 @@ namespace WindowsAzure.Table
         {
             if (cloudTableClient == null)
             {
-                throw new ArgumentNullException("cloudTableClient");
+                throw new ArgumentNullException(nameof(cloudTableClient));
             }
 
             if (string.IsNullOrEmpty(tableName))
             {
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             }
 
             CloudTable cloudTable = cloudTableClient.GetTableReference(tableName);
