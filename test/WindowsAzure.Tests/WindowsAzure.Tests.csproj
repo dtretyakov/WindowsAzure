@@ -99,6 +99,7 @@
     <Compile Include="Common\MocksFactory.cs" />
     <Compile Include="Common\ObjectsFactory.cs" />
     <Compile Include="Common\TestBase.cs" />
+    <Compile Include="Extensions\PredicateExtensions.cs" />
     <Compile Include="Samples\Address.cs" />
     <Compile Include="Samples\Countries.cs" />
     <Compile Include="Samples\EntityWithContructor.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Table\EntityConverters\Properties\RowKeyPropertyTests.cs" />
     <Compile Include="Table\EntityConverters\Properties\PartitionKeyPropertyTests.cs" />
     <Compile Include="Table\EntityConverters\TypeData\EntityTypeMapTests.cs" />
+    <Compile Include="Table\Queryable\Integration\ExpressionTests.cs" />
     <Compile Include="Table\Queryable\Integration\ContainsTests.cs" />
     <Compile Include="Table\Queryable\Integration\SingleTests.cs" />
     <Compile Include="Table\Queryable\Integration\SingleOrDefaultTests.cs" />
