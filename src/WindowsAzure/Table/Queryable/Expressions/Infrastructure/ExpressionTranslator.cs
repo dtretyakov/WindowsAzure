@@ -70,30 +70,32 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
             _result.AddPostProcesing(Expression.Lambda(call, parameter));
         }
 
-        private static String TrimString(StringBuilder builder)
+        //Taken from http://stackoverflow.com/a/18884516 by pkuderov
+        private static string TrimString(StringBuilder builder)
         {
-            int i = 0;
-            int j = builder.Length - 1;
+            string initialString = builder.ToString();
+            char[] s = new char[initialString.Length];
+            char toRemove = '$';
+            Stack<int> stack = new Stack<int>();
 
-            // Trim spaces
-            while (i < j && builder[i] == ' ')
+            for (int i = 0; i < s.Length; i++)
             {
-                i++;
+                s[i] = initialString[i];
+                if (s[i] == '(')
+                    stack.Push(i);
+                else if (s[i] == ')')
+                {
+                    int start = stack.Pop();
+                    var endParanthesis = start == 0 && i == s.Length - 1;
+                    var middleParanthesis = start != 0 && s[start - 1] == '(' && s[i + 1] == ')';
+                    if (endParanthesis || middleParanthesis)
+                    {
+                        s[start] = s[i] = toRemove;
+                    }
+                }
             }
-
-            while (j > i && builder[j] == ' ')
-            {
-                j--;
-            }
-
-            // Remove Parentheses
-            while (j - i > 2 && builder[i] == '(' && builder[j] == ')')
-            {
-                i++;
-                j--;
-            }
-
-            return builder.ToString(i, j - i + 1);
+            var newString = new string((from c in s where c != toRemove select c).ToArray());
+            return newString.Trim();
         }
 
         public static Expression StripQuotes(Expression expression)
