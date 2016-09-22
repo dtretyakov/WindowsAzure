@@ -599,5 +599,141 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         #endregion
+
+        #region EnumInt64
+
+        [Fact]
+        public void PropertyValueAccessorSetInt64EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("Int64Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            var entity = new EntityWithProperties { Int64Enum = MyInt64Enum.A };
+            const MyInt64Enum newValue = MyInt64Enum.B;
+
+            // Act
+            valueAccessor.SetValue(entity, new EntityProperty((Int64)newValue));
+
+            // Assert
+            Assert.Equal(newValue, entity.Int64Enum);
+        }
+
+        [Fact]
+        public void PropertyValueAccessorGetInt64EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("Int64Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            const MyInt64Enum value = MyInt64Enum.A;
+            var user = new EntityWithProperties { Int64Enum = value };
+
+            // Act
+            EntityProperty entityProperty = valueAccessor.GetValue(user);
+
+            // Assert
+            Assert.Equal((Int64)value, entityProperty.Int64Value);
+        }
+
+        [Fact]
+        public void PropertyValueAccessorSetNullableInt64EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("NullableInt64Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            var entity = new EntityWithProperties { NullableInt64Enum = null };
+            MyInt64Enum? newValue = MyInt64Enum.NA;
+
+            // Act
+            valueAccessor.SetValue(entity, new EntityProperty((Int64?)newValue));
+
+            // Assert
+            Assert.Equal(newValue, entity.NullableInt64Enum);
+        }
+
+        [Fact]
+        public void PropertyValueAccessorGetNullableInt64EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("NullableInt64Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            MyInt64Enum? value = MyInt64Enum.NB;
+            var user = new EntityWithProperties { NullableInt64Enum = value };
+
+            // Act
+            EntityProperty entityProperty = valueAccessor.GetValue(user);
+
+            // Assert
+            Assert.Equal((Int64?)value, entityProperty.Int64Value);
+        }
+
+        #endregion
+
+        #region EnumInt32
+
+        [Fact]
+        public void PropertyValueAccessorSetInt32EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("Int32Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            var entity = new EntityWithProperties { Int32Enum = MyInt32Enum.A };
+            const MyInt32Enum newValue = MyInt32Enum.B;
+
+            // Act
+            valueAccessor.SetValue(entity, new EntityProperty((Int32)newValue));
+
+            // Assert
+            Assert.Equal(newValue, entity.Int32Enum);
+        }
+
+        [Fact]
+        public void PropertyValueAccessorGetInt32EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("Int32Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            const MyInt32Enum value = MyInt32Enum.A;
+            var user = new EntityWithProperties { Int32Enum = value };
+
+            // Act
+            EntityProperty entityProperty = valueAccessor.GetValue(user);
+
+            // Assert
+            Assert.Equal((Int32)value, entityProperty.Int32Value);
+        }
+
+        [Fact]
+        public void PropertyValueAccessorSetNullableInt32EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("NullableInt32Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            var entity = new EntityWithProperties { NullableInt32Enum = null };
+            MyInt32Enum? newValue = MyInt32Enum.NA;
+
+            // Act
+            valueAccessor.SetValue(entity, new EntityProperty((Int32?)newValue));
+
+            // Assert
+            Assert.Equal(newValue, entity.NullableInt32Enum);
+        }
+
+        [Fact]
+        public void PropertyValueAccessorGetNullableInt32EnumTest()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(EntityWithProperties).GetProperty("NullableInt32Enum");
+            var valueAccessor = new PropertyValueAccessor<EntityWithProperties>(propertyInfo);
+            MyInt32Enum? value = MyInt32Enum.NB;
+            var user = new EntityWithProperties { NullableInt32Enum = value };
+
+            // Act
+            EntityProperty entityProperty = valueAccessor.GetValue(user);
+
+            // Assert
+            Assert.Equal((Int32?)value, entityProperty.Int32Value);
+        }
+
+        #endregion
     }
 }
