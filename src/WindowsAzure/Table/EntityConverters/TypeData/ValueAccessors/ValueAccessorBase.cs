@@ -41,19 +41,37 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         {
             Expression argumentExpression = memberExpression;
 
+            // override type if is an enum
+            Type baseType = Type;
+            bool isEnum = Type.IsEnum;
+
             // Get base type name
             string typeName = Type.Name;
             if (Type.IsValueType)
             {
-                Type baseType = Nullable.GetUnderlyingType(Type);
-                if (baseType != null)
+                Type nullableType = Nullable.GetUnderlyingType(Type);
+                if (nullableType != null)
                 {
-                    typeName = baseType.Name;
+                    typeName = nullableType.Name;
+                    isEnum = nullableType.IsEnum; // We set this variable to use bellow
+                    if (isEnum)
+                    {
+                        Type = nullableType;
+                    }
                 }
-                else
+
+                // Override the member type to use the Enum base type
+                if (isEnum)
                 {
-                    // EntityProperty contains only nullable ctors for value types
-                    Type nullableType = typeof (Nullable<>).MakeGenericType(new[] {Type});
+                    Type = Enum.GetUnderlyingType(Type);
+                    typeName = Type.Name;
+                }
+
+                // As EntityProperty contains only nullable ctors for value types
+                // we must convert the type to a nullable base type
+                if (isEnum || nullableType == null)
+                {                    
+                    nullableType = typeof(Nullable<>).MakeGenericType(new[] { Type });
                     argumentExpression = Expression.Convert(memberExpression, nullableType);
                 }
             }
@@ -94,6 +112,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
             }
 
             UnaryExpression convertType = Expression.Convert(entityPropertyValue, Type);
+
+            // We need an additional conversion if the property is an enum
+            if (isEnum)
+            {
+                convertType = Expression.Convert(convertType, baseType);
+            }
 
             GetValue = (Func<T, EntityProperty>) Expression.Lambda(
                 newEntityProperty, instanceExpression).Compile();

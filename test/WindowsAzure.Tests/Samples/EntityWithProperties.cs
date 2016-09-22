@@ -37,5 +37,29 @@ namespace WindowsAzure.Tests.Samples
         public Int64? NullableInt64 { get; set; }
 
         public Single Single { get; set; }
+
+        public MyInt32Enum Int32Enum { get; set; }
+
+        public MyInt64Enum Int64Enum { get; set; }
+        
+        public MyInt32Enum? NullableInt32Enum { get; set; }
+
+        public MyInt64Enum? NullableInt64Enum { get; set; }
+    }
+
+    public enum MyInt64Enum : long
+    {
+        NA = -9223372036854775801L,
+        NB = -9223372036854775802L,
+        A = 9223372036854775801L,
+        B = 9223372036854775802L
+    }
+
+    public enum MyInt32Enum : int
+    {
+        NA = -2147483641,
+        NB = -2147483642,
+        A = 2147483641,
+        B = 2147483642
     }
 }
