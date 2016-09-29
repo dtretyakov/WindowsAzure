@@ -21,6 +21,38 @@ namespace WindowsAzure.Tests.Samples
         }
     }
 
+    public class AddressInvalidPropertyMapping : EntityTypeMap<AddressInvalidProperty>
+    {
+        public AddressInvalidPropertyMapping()
+        {
+            PartitionKey(e => e.Country);
+            RowKey(e => e.Street);
+        }
+    }
+
+    public class AddressWithIgnoreMapping : EntityTypeMap<AddressIgnoreProperties>
+    {
+        public AddressWithIgnoreMapping()
+        {
+            PartitionKey(e => e.Country);
+            RowKey(e => e.Street);
+            Ignore(e => e.IgnoreOne);
+            Ignore(e => e.IgnoreTwo);
+        }
+    }
+
+    public class AddressIgnoreProperties : Address
+    {
+        public Address IgnoreOne { get; set; }
+        public Country IgnoreTwo { get; set; }
+    }
+
+    public sealed class AddressInvalidProperty : Address
+    {
+        public Address InvalidOne { get; set; }
+        public Country InvalidTwo { get; set; }
+    }
+
     public sealed class AddressInvalidMap : Address
     {
     }

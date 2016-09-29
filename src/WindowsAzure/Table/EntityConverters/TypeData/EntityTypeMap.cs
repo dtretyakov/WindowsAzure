@@ -22,27 +22,33 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             EntityTypeDataFactory.RegisterMappingAssembly(assemblies);
         }
+
+        /// <summary>
+        ///     Auto map all properties
+        /// </summary>
+        internal virtual void AutoMap()
+        { }
     }
 
     /// <summary>
     ///     Maps an entity type data.
     /// </summary>
     /// <typeparam name="T">Entity type.</typeparam>
-    public class EntityTypeMap<T> : IEntityTypeData<T> where T : class, new()
+    public class EntityTypeMap<T> : EntityTypeMap, IEntityTypeData<T> where T : class, new()
     {
         private const BindingFlags PropertyMapFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
         private const string PartitionKeyPropertyName = "PartitionKey";
         private const string RowKeyPropertyName = "RowKey";
-        private readonly Type _entityType = typeof (T);
+        private readonly Type _entityType = typeof(T);
         private readonly Dictionary<string, string> _nameChanges = new Dictionary<string, string>();
-        private readonly IDictionary<string, IProperty<T>> _properties;
+        private readonly IDictionary<string, IProperty<T>> _properties = new Dictionary<string, IProperty<T>>();
+        private readonly HashSet<string> _propertiesToIgnore = new HashSet<string>();
 
         /// <summary>
         ///     Constructor.
         /// </summary>
         public EntityTypeMap()
         {
-            _properties = AutoMap();
         }
 
         /// <summary>
@@ -50,10 +56,9 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// </summary>
         /// <param name="classMapInitializer">The class map initializer.</param>
         public EntityTypeMap(Action<EntityTypeMap<T>> classMapInitializer)
-            : this()
         {
             classMapInitializer(this);
-            CheckEntityMap();
+            AutoMap();
         }
 
         /// <summary>
@@ -90,7 +95,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 throw new ArgumentNullException("entity");
             }
 
-            var result = new DynamicTableEntity(string.Empty, string.Empty) {ETag = "*"};
+            var result = new DynamicTableEntity(string.Empty, string.Empty) { ETag = "*" };
 
             foreach (var prop in _properties)
             {
@@ -108,16 +113,32 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             get { return _nameChanges; }
         }
 
-        internal IDictionary<string, IProperty<T>> AutoMap()
+        /// <summary>
+        /// Auto map all properties that can be read and write
+        /// </summary>
+        internal override void AutoMap()
         {
             // Retrieve class members
-            var members = new List<MemberInfo>(_entityType.GetProperties(PropertyMapFlags).Where(p => p.CanRead && p.CanWrite));
+            var members = _entityType.GetProperties(PropertyMapFlags).Where(p => p.CanRead && p.CanWrite);
 
             // Create properties for entity members
-            var properties = members.Select(member => new {Key = member.Name, Value = (IProperty<T>) new RegularProperty<T>(member)})
-                .Where(result => result != null && result.Value != null);
+            foreach (var member in members)
+            {
+                var name = member.Name;
+                if (_propertiesToIgnore.Contains(name) == false
+                    && _properties.ContainsKey(name) == false)
+                {
+                    _properties.Add(member.Name, new RegularProperty<T>(member));
+                }
+            }
 
-            return properties.ToDictionary(k => k.Key, e => e.Value);
+            // Check whether entity's composite key completely defined
+            if (!_nameChanges.ContainsValue(PartitionKeyPropertyName) 
+                && !_nameChanges.ContainsValue(RowKeyPropertyName))
+            {
+                var message = string.Format(Resources.EntityTypeDataMissingKey, _entityType);
+                throw new InvalidOperationException(message);
+            }
         }
 
         /// <summary>
@@ -146,6 +167,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             var member = GetMemberInfoFromLambda(propertyLambda);
             _nameChanges.Remove(member.Name);
             _properties.Remove(member.Name);
+            _propertiesToIgnore.Add(member.Name);
             return this;
         }
 
@@ -283,16 +305,6 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                     var propertyAccessors = propertyInfo.GetAccessors(true);
                     return actualPropertyAccessors.All(x => propertyAccessors.Contains(x));
                 });
-        }
-
-        private void CheckEntityMap()
-        {
-            // Check whether entity's composite key completely defined
-            if (!_nameChanges.ContainsValue(PartitionKeyPropertyName) && !_nameChanges.ContainsValue(RowKeyPropertyName))
-            {
-                var message = string.Format(Resources.EntityTypeDataMissingKey, _entityType);
-                throw new InvalidOperationException(message);
-            }
         }
     }
 }

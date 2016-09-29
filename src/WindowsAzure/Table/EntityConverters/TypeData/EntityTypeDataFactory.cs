@@ -39,7 +39,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 .Distinct();
 
             return (IEntityTypeData<T>) TypesData.GetOrAdd(type,
-                key => FindsEntityTypeMap(assemblies, type) ?? new EntityTypeData<T>());
+               key => FindsEntityTypeMap(assemblies, type) ?? new EntityTypeData<T>());
         }
 
         /// <summary>
@@ -62,6 +62,10 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             TypesData.GetOrAdd(entityType, type => entityTypeData);
         }
 
+        /// <summary>
+        ///     Registers an assembly with entity type mappings.
+        /// </summary>
+        /// <param name="assemblies"></param>
         public static void RegisterMappingAssembly(params Assembly[] assemblies)
         {
             _mappingAssemblies = assemblies;
@@ -90,7 +94,15 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                         try
                         {
                             var entityTypeData = Activator.CreateInstance(type);
+
+                            var e = entityTypeData as EntityTypeMap;
+                            if (e != null)
+                            {
+                                e.AutoMap();
+                            }
+
                             RegisterEntityTypeData(entityType, entityTypeData);
+
                             return entityTypeData;
                         }
                         catch (TargetInvocationException ex)
