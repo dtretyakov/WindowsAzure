@@ -69,6 +69,32 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         }
 
         [Fact]
+        public void GetEntityTypeData_IgnorePropertyMap()
+        {
+            // Arrange & Act
+            var map = EntityTypeDataFactory.GetEntityTypeData<AddressIgnoreProperties>();
+
+            // Assert
+            Assert.NotNull(map.NameChanges);
+            Assert.Equal(2, map.NameChanges.Count);
+            Assert.Equal("PartitionKey", map.NameChanges["Country"]);
+            Assert.Equal("RowKey", map.NameChanges["Street"]);
+
+            var entity = (DynamicTableEntity)map.GetEntity(new AddressIgnoreProperties());
+            Assert.Equal(8, entity.Properties.Count);
+        }
+
+        [Fact]
+        public void GetEntityTypeData_InvalidPropertyMap()
+        {
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() =>
+            {
+                var map = EntityTypeDataFactory.GetEntityTypeData<AddressInvalidProperty>();
+            });
+        }
+
+        [Fact]
         public void GetEntityTypeData_IgnoreProperty()
         {
             // Arrange & Act
@@ -107,6 +133,21 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.NotNull(map.NameChanges);
             Assert.Equal(1, map.NameChanges.Count);
             Assert.Equal("PartitionKey", map.NameChanges["Country"]);
+        }
+
+        [Fact]
+        public void GetEntityTypeData_IgnoreProperty_EvenWhenUnsupportedType()
+        {
+            // Arrange & Act
+            var map = new EntityTypeMap<EntityWithInvalidPropertyType>(e =>
+                e.PartitionKey(p => p.PKey)
+                .RowKey(p => p.RKey)
+                .Ignore(p => p.Country));
+
+            // Assert
+            Assert.NotNull(map.NameChanges);
+            Assert.DoesNotContain(map.NameChanges, t => t.Key == "Country");
+            Assert.Equal(2, map.NameChanges.Count);
         }
     }
 }
