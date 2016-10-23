@@ -1,10 +1,10 @@
 # Windows Azure Storage Extensions
 
+<a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=wase_general&branch_WindowsAzureStorageExtensions=%3Cdefault%3E&guest=1"><img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:wase_general),branch:(name:master)/statusIcon.svg" alt=""/></a>
+
 *Windows Azure Storage Extensions* is a .NET library aimed at managing and querying entities from [Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
 
 It's built on top of the **[Azure .NET SDK](https://github.com/WindowsAzure/azure-sdk-for-net)**, provides **async interfaces** ([Task-based Asynchronous Pattern](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) and **LINQ to Azure Table** queries via `TableSet` context by using **POCO** entities.
-
-Latest project build: <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=wase_general&guest=1"><img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:wase_general)/statusIcon.svg" alt=""/></a>
 
 ## Table Of Contents
 * [Features](#features)
