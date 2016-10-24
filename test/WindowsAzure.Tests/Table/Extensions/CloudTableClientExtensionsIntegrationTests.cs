@@ -65,7 +65,7 @@ namespace WindowsAzure.Tests.Table.Extensions
 
             // Assert
             Assert.NotNull(allTables);
-            Assert.True(_tableNames.All(allTables.Select(p => p.Name).Contains));
+            Assert.True(_tableNames.All(s => allTables.Select(p => p.Name).Contains(s)));
         }
 
         [IntegrationFact]
