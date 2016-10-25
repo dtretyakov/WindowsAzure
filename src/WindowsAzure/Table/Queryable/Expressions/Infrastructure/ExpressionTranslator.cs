@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -379,7 +379,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                 if (result.NodeType != ExpressionType.Constant)
                 {
                     string message = String.Format(Resources.TranslatorUnableToEvaluateExpression, node);
-                    throw new InvalidExpressionException(message);
+                    throw new InvalidDataException(message);
                 }
 
                 node = result;

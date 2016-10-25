@@ -19,7 +19,7 @@ namespace WindowsAzure.Table.Wrappers
         {
             if (tableQuery == null)
             {
-                throw new ArgumentNullException("tableQuery");
+                throw new ArgumentNullException(nameof(tableQuery));
             }
 
             _tableQuery = tableQuery;

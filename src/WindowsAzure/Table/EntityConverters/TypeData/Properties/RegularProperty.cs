@@ -33,12 +33,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         {
             if (member == null)
             {
-                throw new ArgumentNullException("member");
+                throw new ArgumentNullException(nameof(member));
             }
 
             if (string.IsNullOrEmpty(name))
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
 
             IValueAccessor<T> accessor = ValueAccessorFactory.Create<T>(member);

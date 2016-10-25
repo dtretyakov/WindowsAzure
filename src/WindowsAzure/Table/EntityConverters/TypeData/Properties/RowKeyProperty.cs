@@ -14,7 +14,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
     {
         private readonly Func<T, EntityProperty> _getValue;
         private readonly Action<T, EntityProperty> _setValue;
-        private readonly Type _stringType = typeof (String);
+        private readonly Type _stringType = typeof (string);
 
         /// <summary>
         ///     Constructor.
@@ -24,14 +24,14 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         {
             if (member == null)
             {
-                throw new ArgumentNullException("member");
+                throw new ArgumentNullException(nameof(member));
             }
 
             IValueAccessor<T> accessor = ValueAccessorFactory.Create<T>(member);
 
             if (accessor.Type != _stringType)
             {
-                throw new ArgumentOutOfRangeException(Resources.PropertyRowKeyInvalidType);
+                throw new ArgumentOutOfRangeException(nameof(member), Resources.PropertyRowKeyInvalidType);
             }
 
             _getValue = accessor.GetValue;

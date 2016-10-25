@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.Queryable.Expressions.Infrastructure;
 
@@ -24,17 +25,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             _nameChanges = nameChanges;
         }
 
-        public string Name
-        {
-            get { return MethodName; }
-        }
+        public string Name => MethodName;
 
         public void Translate(MethodCallExpression method, ITranslationResult result)
         {
             if (method.Method.Name != MethodName || method.Arguments.Count != 2)
             {
                 var message = string.Format(Resources.TranslatorMethodNotSupported, method.Method.Name);
-                throw new ArgumentOutOfRangeException("method", message);
+                throw new ArgumentOutOfRangeException(nameof(method), message);
             }
 
             var lambda = (LambdaExpression) ExpressionTranslator.StripQuotes(method.Arguments[1]);

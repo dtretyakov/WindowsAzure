@@ -33,12 +33,12 @@ namespace WindowsAzure.Table.Queryable
         {
             if (cloudTable == null)
             {
-                throw new ArgumentNullException("cloudTable");
+                throw new ArgumentNullException(nameof(cloudTable));
             }
 
             if (entityConverter == null)
             {
-                throw new ArgumentNullException("entityConverter");
+                throw new ArgumentNullException(nameof(entityConverter));
             }
 
             _cloudTable = cloudTable;
@@ -55,7 +55,7 @@ namespace WindowsAzure.Table.Queryable
         {
             if (expression == null)
             {
-                throw new ArgumentNullException("expression");
+                throw new ArgumentNullException(nameof(expression));
             }
 
             var result = new TranslationResult();
@@ -79,7 +79,7 @@ namespace WindowsAzure.Table.Queryable
         {
             if (expression == null)
             {
-                throw new ArgumentNullException("expression");
+                throw new ArgumentNullException(nameof(expression));
             }
 
             var result = new TranslationResult();

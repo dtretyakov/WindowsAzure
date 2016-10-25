@@ -22,7 +22,7 @@ namespace WindowsAzure.Table.Queryable.Base
 
             try
             {
-                return (IQueryable) Activator.CreateInstance(queryType, new object[] {this, expression});
+                return (IQueryable) Activator.CreateInstance(queryType, this, expression);
             }
             catch (TargetInvocationException tie)
             {

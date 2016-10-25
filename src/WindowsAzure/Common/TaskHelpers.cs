@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 
 namespace System.Threading.Tasks
 {
@@ -11,7 +11,7 @@ namespace System.Threading.Tasks
     /// </summary>
     internal static class TaskHelpers
     {
-        private static readonly Task _defaultCompleted = FromResult<AsyncVoid>(default(AsyncVoid));
+        private static readonly Task _defaultCompleted = FromResult(default(AsyncVoid));
 
         private static readonly Task<object> _completedTaskReturningNull = FromResult<object>(null);
 
@@ -103,7 +103,7 @@ namespace System.Threading.Tasks
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "The exception is propagated in a Task.")]
         internal static Task Iterate(IEnumerable<Task> asyncIterator, CancellationToken cancellationToken = default(CancellationToken), bool disposeEnumerator = true)
         {
-            Contract.Assert(asyncIterator != null);
+            Debug.Assert(asyncIterator != null);
 
             IEnumerator<Task> enumerator = null;
             try
@@ -391,6 +391,18 @@ namespace System.Threading.Tasks
                 tcs.SetCanceled();
                 return tcs.Task;
             }
+        }
+
+        /// <summary>
+        /// Executes task synchronously.
+        /// </summary>
+        /// <typeparam name="T">Return type.</typeparam>
+        /// <param name="task">Task.</param>
+        /// <returns>Result.</returns>
+        public static T ExecuteSynchronously<T>(this Task<T> task)
+        {
+            task.RunSynchronously();
+            return task.Result;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using WindowsAzure.Common;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -70,7 +71,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             if (tableEntity == null)
             {
-                throw new ArgumentNullException("tableEntity");
+                throw new ArgumentNullException(nameof(tableEntity));
             }
 
             var result = new T();
@@ -92,7 +93,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             var result = new DynamicTableEntity(string.Empty, string.Empty) { ETag = "*" };
@@ -108,10 +109,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <summary>
         ///     Gets a name changes for entity members.
         /// </summary>
-        public IDictionary<string, string> NameChanges
-        {
-            get { return _nameChanges; }
-        }
+        public IDictionary<string, string> NameChanges => _nameChanges;
 
         /// <summary>
         /// Auto map all properties that can be read and write
@@ -247,12 +245,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                     throw new ArgumentException("Invalid lambda expression");
             }
             var memberInfo = memberExpression.Member;
-            switch (memberInfo.MemberType)
+            switch (memberInfo.MemberType())
             {
                 case MemberTypes.Field:
                     break;
                 case MemberTypes.Property:
-                    if (memberInfo.DeclaringType != null && memberInfo.DeclaringType.IsInterface)
+                    if (memberInfo.DeclaringType != null && memberInfo.DeclaringType.GetTypeInfo().IsInterface)
                     {
                         memberInfo = FindPropertyImplementation((PropertyInfo) memberInfo, typeof (T));
                     }

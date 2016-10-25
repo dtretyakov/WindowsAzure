@@ -23,10 +23,7 @@ namespace WindowsAzure.Table.EntityConverters
         /// <summary>
         ///     Gets an entity property name maping connection.
         /// </summary>
-        public IDictionary<string, string> NameChanges
-        {
-            get { return _typeData.NameChanges; }
-        }
+        public IDictionary<string, string> NameChanges => _typeData.NameChanges;
 
         /// <summary>
         ///     Creates an ITableEntity by TEntity.

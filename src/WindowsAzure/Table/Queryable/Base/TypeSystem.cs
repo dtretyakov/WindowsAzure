@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using WindowsAzure.Common;
 
 namespace WindowsAzure.Table.Queryable.Base
 {
@@ -28,7 +30,7 @@ namespace WindowsAzure.Table.Queryable.Base
                 return EnumerableType.MakeGenericType(seqType.GetElementType());
             }
 
-            if (seqType.IsGenericType)
+            if (seqType.GetTypeInfo().IsGenericType)
             {
                 foreach (Type arg in seqType.GetGenericArguments())
                 {
@@ -53,9 +55,10 @@ namespace WindowsAzure.Table.Queryable.Base
                 }
             }
 
-            if (seqType.BaseType != null && seqType.BaseType != ObjectType)
+            var baseType = seqType.GetTypeInfo().BaseType;
+            if (baseType != null && baseType != ObjectType)
             {
-                return FindIEnumerable(seqType.BaseType);
+                return FindIEnumerable(baseType);
             }
 
             return null;

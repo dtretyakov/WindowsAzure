@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.EntityConverters
@@ -13,7 +12,7 @@ namespace WindowsAzure.Table.EntityConverters
         /// <summary>
         ///     Gets an entity property name maping connection.
         /// </summary>
-        IDictionary<String, String> NameChanges { get; }
+        IDictionary<string, string> NameChanges { get; }
 
         /// <summary>
         ///     Converts an entity to table entity.

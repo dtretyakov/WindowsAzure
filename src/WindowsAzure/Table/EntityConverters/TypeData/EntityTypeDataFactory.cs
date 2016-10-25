@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using WindowsAzure.Common;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -35,7 +36,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         public static IEntityTypeData<T> GetEntityTypeData<T>() where T : class, new()
         {
             var type = typeof (T);
-            var assemblies = _mappingAssemblies.Concat(new[] {type.Assembly})
+            var assemblies = _mappingAssemblies.Concat(new[] {type.GetTypeInfo().Assembly})
                 .Distinct();
 
             return (IEntityTypeData<T>) TypesData.GetOrAdd(type,
@@ -96,10 +97,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                             var entityTypeData = Activator.CreateInstance(type);
 
                             var e = entityTypeData as EntityTypeMap;
-                            if (e != null)
-                            {
-                                e.AutoMap();
-                            }
+                            e?.AutoMap();
 
                             RegisterEntityTypeData(entityType, entityTypeData);
 
@@ -107,7 +105,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                         }
                         catch (TargetInvocationException ex)
                         {
-                            throw ex.InnerException;
+                            throw ex.InnerException ?? ex;
                         }
                     }
                 }
@@ -118,7 +116,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
         private static bool IsMappingType(Type mappingType)
         {
-            if (!mappingType.IsClass || mappingType.IsAbstract)
+            if (mappingType.IsAbstractType())
             {
                 return false;
             }
@@ -133,7 +131,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             while (mappingType != null)
             {
-                if (mappingType.IsGenericType)
+                var typeInfo = mappingType.GetTypeInfo();
+                if (typeInfo.IsGenericType)
                 {
                     var definationType = mappingType.GetGenericTypeDefinition();
                     if (matcher(definationType))
@@ -143,7 +142,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                     }
                 }
 
-                mappingType = mappingType.BaseType;
+                mappingType = typeInfo.BaseType;
             }
 
             return false;

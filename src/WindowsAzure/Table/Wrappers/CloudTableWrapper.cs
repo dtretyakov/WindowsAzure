@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.Extensions;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace WindowsAzure.Table.Wrappers
 {
@@ -22,7 +22,7 @@ namespace WindowsAzure.Table.Wrappers
         {
             if (cloudTable == null)
             {
-                throw new ArgumentNullException("cloudTable");
+                throw new ArgumentNullException(nameof(cloudTable));
             }
 
             _cloudTable = cloudTable;
@@ -95,7 +95,7 @@ namespace WindowsAzure.Table.Wrappers
         /// </returns>
         public Task<TableResult> ExecuteAsync(TableOperation operation, CancellationToken cancellationToken)
         {
-            return _cloudTable.ExecuteAsync(operation, cancellationToken);
+            return _cloudTable.ExecuteAsync(operation, null, null, cancellationToken);
         }
 
         /// <summary>
@@ -129,16 +129,13 @@ namespace WindowsAzure.Table.Wrappers
         /// </returns>
         public Task<IList<TableResult>> ExecuteBatchAsync(TableBatchOperation tableBatchOperation, CancellationToken cancellationToken)
         {
-            return _cloudTable.ExecuteBatchAsync(tableBatchOperation, cancellationToken);
+            return _cloudTable.ExecuteBatchAsync(tableBatchOperation, null, null, cancellationToken);
         }
 
         /// <summary>
         ///     Gets the table name.
         /// </summary>
         /// <value> The table name. </value>
-        public string Name
-        {
-            get { return _cloudTable.Name; }
-        }
+        public string Name => _cloudTable.Name;
     }
 }

@@ -77,7 +77,7 @@ namespace WindowsAzure.Tests.Table.RequestExecutor
             ITableRequestExecutor<Country> executor = null;
 
             // Act
-            Assert.Throws<InvalidEnumArgumentException>(() => executor = executorFactory.Create((ExecutionMode) 2));
+            Assert.Throws<ArgumentOutOfRangeException>(() => executor = executorFactory.Create((ExecutionMode) 2));
 
             // Assert
             Assert.Null(executor);

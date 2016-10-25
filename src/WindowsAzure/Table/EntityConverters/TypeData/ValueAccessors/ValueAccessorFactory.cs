@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using WindowsAzure.Common;
 using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
@@ -19,20 +20,21 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         {
             if (memberInfo == null)
             {
-                throw new ArgumentNullException("memberInfo");
+                throw new ArgumentNullException(nameof(memberInfo));
             }
 
-            if (memberInfo.MemberType == MemberTypes.Field)
+            var memberType = memberInfo.MemberType();
+            if (memberType == MemberTypes.Field)
             {
                 return new FieldValueAccessor<T>((FieldInfo) memberInfo);
             }
 
-            if (memberInfo.MemberType == MemberTypes.Property)
+            if (memberType == MemberTypes.Property)
             {
                 return new PropertyValueAccessor<T>((PropertyInfo) memberInfo);
             }
 
-            var message = string.Format(Resources.ValueAccessorFactoryNotSupportedType, memberInfo.MemberType);
+            var message = string.Format(Resources.ValueAccessorFactoryNotSupportedType, memberType);
             throw new NotSupportedException(message);
         }
     }
