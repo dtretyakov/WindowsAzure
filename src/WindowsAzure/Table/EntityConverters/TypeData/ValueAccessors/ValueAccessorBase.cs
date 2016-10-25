@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Common;
 using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
@@ -43,17 +44,19 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
 
             // override type if is an enum
             Type baseType = Type;
-            bool isEnum = Type.IsEnum;
+            var typeInfo = Type.GetTypeInfo();
+            bool isEnum = typeInfo.IsEnum;
 
             // Get base type name
             string typeName = Type.Name;
-            if (Type.IsValueType)
+            if (typeInfo.IsValueType)
             {
                 Type nullableType = Nullable.GetUnderlyingType(Type);
                 if (nullableType != null)
                 {
                     typeName = nullableType.Name;
-                    isEnum = nullableType.IsEnum; // We set this variable to use bellow
+                    var nullableTypeInfo = nullableType.GetTypeInfo();
+                    isEnum = nullableTypeInfo.IsEnum; // We set this variable to use bellow
                     if (isEnum)
                     {
                         Type = nullableType;
@@ -71,7 +74,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
                 // we must convert the type to a nullable base type
                 if (isEnum || nullableType == null)
                 {                    
-                    nullableType = typeof(Nullable<>).MakeGenericType(new[] { Type });
+                    nullableType = typeof(Nullable<>).MakeGenericType(Type);
                     argumentExpression = Expression.Convert(memberExpression, nullableType);
                 }
             }
@@ -80,7 +83,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
             ConstructorInfo constructorInfo = _entityPropertyType.GetConstructor(new[] {Type});
             if (constructorInfo == null)
             {
-                string message = String.Format(Resources.ExpressionValueAccessorInvalidMemberType, Type);
+                string message = string.Format(Resources.ExpressionValueAccessorInvalidMemberType, Type);
                 throw new ArgumentException(message);
             }
 
@@ -108,7 +111,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
             }
             else
             {
-                entityPropertyValue = Expression.Property(entityPropertyParameter, string.Format("{0}Value", typeName));
+                entityPropertyValue = Expression.Property(entityPropertyParameter, $"{typeName}Value");
             }
 
             UnaryExpression convertType = Expression.Convert(entityPropertyValue, Type);

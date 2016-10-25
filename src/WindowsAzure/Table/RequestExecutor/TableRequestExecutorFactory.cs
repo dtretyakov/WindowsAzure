@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Wrappers;
@@ -24,12 +23,12 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (cloudTable == null)
             {
-                throw new ArgumentNullException("cloudTable");
+                throw new ArgumentNullException(nameof(cloudTable));
             }
 
             if (entityConverter == null)
             {
-                throw new ArgumentNullException("entityConverter");
+                throw new ArgumentNullException(nameof(entityConverter));
             }
 
             CloudTable = cloudTable;
@@ -58,7 +57,7 @@ namespace WindowsAzure.Table.RequestExecutor
             }
 
             string message = string.Format(Resources.TableRequestExecutorInvalidMode, executionMode);
-            throw new InvalidEnumArgumentException(message, (int) executionMode, typeof (ExecutionMode));
+            throw new ArgumentOutOfRangeException(message);
         }
     }
 }

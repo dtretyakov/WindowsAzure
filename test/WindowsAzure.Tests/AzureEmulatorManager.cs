@@ -40,10 +40,7 @@ namespace WindowsAzure.Tests
 
             using (var process = Process.Start(EmulatorPath, "start"))
             {
-                if (process != null)
-                {
-                    process.WaitForExit();
-                }
+                process?.WaitForExit();
             }
         }
 
@@ -56,20 +53,14 @@ namespace WindowsAzure.Tests
 
             using (var process = Process.Start(EmulatorPath, "stop"))
             {
-                if (process != null)
-                {
-                    process.WaitForExit();
-                }
+                process?.WaitForExit();
             }
         }
 
         public void Kill()
         {
             var process = GetProcess();
-            if (process != null)
-            {
-                process.Kill();
-            }
+            process?.Kill();
         }
     }
 
@@ -99,10 +90,7 @@ namespace WindowsAzure.Tests
 
             using (var process = Process.Start(ComputeEmulatorPath, "/devfabric:start"))
             {
-                if (process != null)
-                {
-                    process.WaitForExit();
-                }
+                process?.WaitForExit();
             }
         }
 
@@ -115,20 +103,14 @@ namespace WindowsAzure.Tests
 
             using (var process = Process.Start(ComputeEmulatorPath, "/devfabric:shutdown"))
             {
-                if (process != null)
-                {
-                    process.WaitForExit();
-                }
+                process?.WaitForExit();
             }
         }
 
         public void Kill()
         {
             var process = GetProcess();
-            if (process != null)
-            {
-                process.Kill();
-            }
+            process?.Kill();
         }
     }
 }

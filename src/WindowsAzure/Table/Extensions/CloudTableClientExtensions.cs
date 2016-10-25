@@ -13,6 +13,7 @@ namespace WindowsAzure.Table.Extensions
     /// </summary>
     public static class CloudTableClientExtensions
     {
+#if NET40
         /// <summary>
         ///     Gets the properties of the table service asynchronously.
         /// </summary>
@@ -208,5 +209,19 @@ namespace WindowsAzure.Table.Extensions
                         return TaskHelpers.FromResult(cloudTables);
                     });
         }
+#endif
+
+#if NETCORE
+        /// <summary>
+        ///     Creates the table if it does not already exist.
+        /// </summary>
+        /// <returns>
+        ///     <c>true</c> if table was created; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool CreateIfNotExists(this CloudTable table)
+        {
+            return table.CreateIfNotExistsAsync().ExecuteSynchronously();
+        }
+#endif
     }
 }

@@ -20,18 +20,12 @@ namespace WindowsAzure.Table.Queryable.Expressions
         /// <summary>
         ///     Gets a TableQuery.
         /// </summary>
-        public ITableQuery TableQuery
-        {
-            get { return _tableQuery; }
-        }
+        public ITableQuery TableQuery => _tableQuery;
 
         /// <summary>
         ///     Gets a post processing handler.
         /// </summary>
-        public Delegate PostProcessing
-        {
-            get { return MergeLambdasAndCompile(_expressions); }
-        }
+        public Delegate PostProcessing => MergeLambdasAndCompile(_expressions);
 
         /// <summary>
         ///     Adds a filter expression.
@@ -41,7 +35,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         {
             if (string.IsNullOrEmpty(filter))
             {
-                throw new ArgumentNullException("filter");
+                throw new ArgumentNullException(nameof(filter));
             }
 
             if (_filtersCount == 0)
@@ -90,7 +84,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         {
             if (top <= 0)
             {
-                throw new ArgumentOutOfRangeException("top");
+                throw new ArgumentOutOfRangeException(nameof(top));
             }
 
             _tableQuery.TakeCount = top;
@@ -104,7 +98,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         {
             if (string.IsNullOrEmpty(column))
             {
-                throw new ArgumentNullException("column");
+                throw new ArgumentNullException(nameof(column));
             }
 
             if (_tableQuery.SelectColumns == null)
@@ -123,7 +117,7 @@ namespace WindowsAzure.Table.Queryable.Expressions
         {
             if (lambda == null)
             {
-                throw new ArgumentNullException("lambda");
+                throw new ArgumentNullException(nameof(lambda));
             }
 
             _expressions.Add(lambda);

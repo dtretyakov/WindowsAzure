@@ -30,7 +30,7 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (partitioner == null)
             {
-                throw new ArgumentNullException("partitioner");
+                throw new ArgumentNullException(nameof(partitioner));
             }
 
             _cloudTable = cloudTable;
@@ -48,12 +48,12 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             if (operation == null)
             {
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
             }
 
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
@@ -73,12 +73,12 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             if (operation == null)
             {
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
             }
 
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
@@ -101,12 +101,12 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             if (operation == null)
             {
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
             }
 
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));
@@ -134,12 +134,12 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             if (operation == null)
             {
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
             }
 
             IEnumerable<ITableEntity> tableEntities = entities.Select(p => _entityConverter.GetEntity(p));

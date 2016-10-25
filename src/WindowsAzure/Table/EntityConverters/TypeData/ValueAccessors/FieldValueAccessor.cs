@@ -18,7 +18,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         {
             if (fieldInfo == null)
             {
-                throw new ArgumentNullException("fieldInfo");
+                throw new ArgumentNullException(nameof(fieldInfo));
             }
 
             Name = fieldInfo.Name;

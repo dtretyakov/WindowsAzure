@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using WindowsAzure.Table.EntityConverters;
+using WindowsAzure.Table.Extensions;
 using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.RequestExecutor;
@@ -40,12 +41,12 @@ namespace WindowsAzure.Table
         {
             if (cloudTableClient == null)
             {
-                throw new ArgumentNullException("cloudTableClient");
+                throw new ArgumentNullException(nameof(cloudTableClient));
             }
 
             if (string.IsNullOrEmpty(tableName))
             {
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             }
 
             _cloudTable = cloudTableClient.GetTableReference(tableName);
@@ -66,7 +67,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.Execute(entity, TableOperation.Insert);
@@ -82,7 +83,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.ExecuteAsync(entity, TableOperation.Insert, cancellationToken);
@@ -97,7 +98,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatches(entities, TableOperation.Insert);
@@ -113,7 +114,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.Insert, cancellationToken);
@@ -128,7 +129,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.Execute(entity, TableOperation.InsertOrReplace);
@@ -144,7 +145,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.ExecuteAsync(entity, TableOperation.InsertOrReplace, cancellationToken);
@@ -159,7 +160,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatches(entities, TableOperation.InsertOrReplace);
@@ -175,7 +176,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.InsertOrReplace, cancellationToken);
@@ -190,7 +191,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.Execute(entity, TableOperation.InsertOrMerge);
@@ -206,7 +207,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.ExecuteAsync(entity, TableOperation.InsertOrMerge, cancellationToken);
@@ -221,7 +222,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatches(entities, TableOperation.InsertOrMerge);
@@ -237,7 +238,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.InsertOrMerge, cancellationToken);
@@ -252,7 +253,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.Execute(entity, TableOperation.Replace);
@@ -268,7 +269,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.ExecuteAsync(entity, TableOperation.Replace, cancellationToken);
@@ -283,7 +284,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatches(entities, TableOperation.Replace);
@@ -299,7 +300,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatchesAsync(entities, TableOperation.Replace, cancellationToken);
@@ -313,7 +314,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             RequestExecutor.ExecuteWithoutResult(entity, TableOperation.Delete);
@@ -328,7 +329,7 @@ namespace WindowsAzure.Table
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             return RequestExecutor.ExecuteWithoutResultAsync(entity, TableOperation.Delete, cancellationToken);
@@ -342,7 +343,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             RequestExecutor.ExecuteBatchesWithoutResult(entities, TableOperation.Delete);
@@ -357,7 +358,7 @@ namespace WindowsAzure.Table
         {
             if (entities == null)
             {
-                throw new ArgumentNullException("entities");
+                throw new ArgumentNullException(nameof(entities));
             }
 
             return RequestExecutor.ExecuteBatchesWithoutResultAsync(entities, TableOperation.Delete, cancellationToken);
@@ -406,7 +407,7 @@ namespace WindowsAzure.Table
         /// </returns>
         public Task<bool> CreateIfNotExistsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _cloudTable.CreateIfNotExistsAsync(cancellationToken);
+            return _cloudTable.CreateIfNotExistsAsync(null, null, cancellationToken);
         }
     }
 }

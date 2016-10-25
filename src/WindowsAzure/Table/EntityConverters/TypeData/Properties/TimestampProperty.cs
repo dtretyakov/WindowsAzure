@@ -31,14 +31,14 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         {
             if (member == null)
             {
-                throw new ArgumentNullException("member");
+                throw new ArgumentNullException(nameof(member));
             }
 
             IValueAccessor<T> accessor = ValueAccessorFactory.Create<T>(member);
 
             if (!_timestampTypes.Contains(accessor.Type))
             {
-                throw new ArgumentOutOfRangeException(Resources.PropertyTimestampInvalidType);
+                throw new ArgumentOutOfRangeException(nameof(member), Resources.PropertyTimestampInvalidType);
             }
 
             _setValue = accessor.SetValue;

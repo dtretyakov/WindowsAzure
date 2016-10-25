@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -514,6 +514,7 @@ namespace System.Threading.Tasks
             {
                 Func<Exception, Exception> prepForRemoting = null;
 
+#if (NET40)
                 try
                 {
                     if (AppDomain.CurrentDomain.IsFullyTrusted)
@@ -531,6 +532,7 @@ namespace System.Threading.Tasks
                 catch
                 {
                 } // If delegate creation fails (medium trust) we will simply throw the base exception.
+#endif
 
                 return task =>
                 {
@@ -562,7 +564,7 @@ namespace System.Threading.Tasks
         [SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "unused", Justification = "We only call the property getter for its side effect; we don't care about the value.")]
         private static void MarkExceptionsObserved(this Task task)
         {
-            Contract.Assert(task.IsCompleted);
+            Debug.Assert(task.IsCompleted);
 
             Exception unused = task.Exception;
         }
@@ -843,7 +845,7 @@ namespace System.Threading.Tasks
 
         protected CatchInfoBase(TTask task)
         {
-            Contract.Assert(task != null);
+            Debug.Assert(task != null);
             _task = task;
             _exception = _task.Exception.GetBaseException();  // Observe the exception early, to prevent tasks tearing down the app domain
         }

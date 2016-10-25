@@ -22,12 +22,12 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (cloudTable == null)
             {
-                throw new ArgumentNullException("cloudTable");
+                throw new ArgumentNullException(nameof(cloudTable));
             }
 
             if (entityConverter == null)
             {
-                throw new ArgumentNullException("entityConverter");
+                throw new ArgumentNullException(nameof(entityConverter));
             }
 
             _cloudTable = cloudTable;

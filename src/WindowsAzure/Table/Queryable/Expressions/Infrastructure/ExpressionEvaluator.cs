@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
+using WindowsAzure.Common;
 using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
@@ -37,7 +38,7 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
                             throw new InvalidCastException(invalidCast);
                         }
 
-                        object value = convertable.ToType(node.Type, Thread.CurrentThread.CurrentCulture);
+                        object value = convertable.ToType(node.Type, CultureInfo.InvariantCulture);
                         return Expression.Constant(value, value.GetType());
                     }
             }
@@ -135,17 +136,18 @@ namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure
         {
             object value;
 
-            if (node.Member.MemberType == MemberTypes.Field)
+            var memberType = node.Member.MemberType();
+            if (memberType == MemberTypes.Field)
             {
                 value = GetFieldValue(node);
             }
-            else if (node.Member.MemberType == MemberTypes.Property)
+            else if (memberType == MemberTypes.Property)
             {
                 value = GetPropertyValue(node);
             }
             else
             {
-                throw new NotSupportedException(string.Format("Invalid member type: {0}", node.Member.MemberType));
+                throw new NotSupportedException(string.Format("Invalid member type: {0}", memberType));
             }
 
             return Expression.Constant(value, node.Type);

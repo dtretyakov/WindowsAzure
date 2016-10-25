@@ -19,17 +19,14 @@ namespace WindowsAzure.Table.Queryable.Expressions.Methods
             _nameChanges = nameChanges;
         }
 
-        public string Name
-        {
-            get { return MethodName; }
-        }
+        public string Name => MethodName;
 
         public void Translate(MethodCallExpression method, ITranslationResult result)
         {
             if (method.Method.Name != MethodName)
             {
                 var message = string.Format(Resources.TranslatorMemberNotSupported, method.NodeType);
-                throw new ArgumentOutOfRangeException("method", message);
+                throw new ArgumentOutOfRangeException(nameof(method), message);
             }
 
             var expressionTranslator = new ExpressionTranslator(_nameChanges);

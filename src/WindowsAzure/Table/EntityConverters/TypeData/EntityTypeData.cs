@@ -61,10 +61,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <summary>
         ///     Gets a name changes for entity members.
         /// </summary>
-        public IDictionary<string, string> NameChanges
-        {
-            get { return _nameChanges; }
-        }
+        public IDictionary<string, string> NameChanges => _nameChanges;
 
         /// <summary>
         ///     Creates a new timestamp property.
@@ -138,7 +135,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         /// <returns>Property.</returns>
         private static IProperty<T> GetMemberProperty(MemberInfo member, IDictionary<string, string> nameChanges)
         {
-            var attributes = SelectMetadataAttributes(member.GetCustomAttributes(false));
+            var customAttributes = member.GetCustomAttributes(false).ToArray();
+            var attributes = SelectMetadataAttributes(customAttributes);
 
             if (attributes.Count == 0)
             {
@@ -191,7 +189,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             if (tableEntity == null)
             {
-                throw new ArgumentNullException("tableEntity");
+                throw new ArgumentNullException(nameof(tableEntity));
             }
 
             var result = new T();
@@ -213,7 +211,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             if (entity == null)
             {
-                throw new ArgumentNullException("entity");
+                throw new ArgumentNullException(nameof(entity));
             }
 
             var result = new DynamicTableEntity(string.Empty, string.Empty) {ETag = "*"};

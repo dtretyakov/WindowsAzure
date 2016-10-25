@@ -22,12 +22,12 @@ namespace WindowsAzure.Table.RequestExecutor
         {
             if (tableEntities == null)
             {
-                throw new ArgumentNullException("tableEntities");
+                throw new ArgumentNullException(nameof(tableEntities));
             }
 
             if (operation == null)
             {
-                throw new ArgumentNullException("operation");
+                throw new ArgumentNullException(nameof(operation));
             }
 
             var batches = new Dictionary<string, TableBatchOperation>();

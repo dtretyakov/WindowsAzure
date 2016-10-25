@@ -12,6 +12,7 @@ namespace WindowsAzure.Table.Extensions
     /// </summary>
     public static class CloudTableExtensions
     {
+#if NET40
         /// <summary>
         ///     Creates a table asynchronously.
         /// </summary>
@@ -405,5 +406,89 @@ namespace WindowsAzure.Table.Extensions
                         cloudTable.EndSetPermissions(result);
                     });
         }
+#endif
+
+#if NETCORE
+        /// <summary>
+        ///     Executes the operation on a table.
+        /// </summary>
+        /// <param name="table">Target table.</param>
+        /// <param name="operation">
+        ///     A <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableOperation" /> object that represents the operation to perform.
+        /// </param>
+        /// <returns>
+        ///     A <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableResult" /> containing the result of executing the operation on the table.
+        /// </returns>
+        public static TableResult Execute(this CloudTable table, TableOperation operation)
+        {
+            return table.ExecuteAsync(operation).ExecuteSynchronously();
+        }
+
+        /// <summary>
+        ///     Executes a batch operation on a table as an atomic operation.
+        /// </summary>
+        /// <param name="table">Target table.</param>
+        /// <param name="batch">
+        ///     The <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableBatchOperation" /> object representing the operations to execute on the table.
+        /// </param>
+        /// <returns>
+        ///     An enumerable collection of <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableResult" /> objects that contains the results, in order, of each operation in the
+        ///     <see
+        ///         cref="T:Microsoft.WindowsAzure.Storage.Table.TableBatchOperation" />
+        ///     on the table.
+        /// </returns>
+        public static IList<TableResult> ExecuteBatch(this CloudTable table, TableBatchOperation batch)
+        {
+            return table.ExecuteBatchAsync(batch).ExecuteSynchronously();
+        }
+
+        /// <summary>
+        ///     Executes a query on a table.
+        /// </summary>
+        /// <param name="table">Target table.</param>
+        /// <param name="tableQuery">
+        ///     A <see cref="TableQuery" /> representing the query to execute.
+        /// </param>
+        /// <returns>
+        ///     An enumerable collection of <see cref="T:Microsoft.WindowsAzure.Storage.Table.DynamicTableEntity" /> objects, representing table entities returned by the query.
+        /// </returns>
+        public static IEnumerable<DynamicTableEntity> ExecuteQuery(this CloudTable table, TableQuery tableQuery)
+        {
+            return table.ExecuteQueryAsync(tableQuery).ExecuteSynchronously();
+        }
+
+        /// <summary>
+        ///     Executes a query on a table asynchronously.
+        /// </summary>
+        /// <param name="cloudTable">Cloud table.</param>
+        /// <param name="tableQuery">Table query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>
+        ///     An enumerable collection of <see cref="T:Microsoft.WindowsAzure.Storage.Table.DynamicTableEntity" /> objects, representing table entities returned by the query.
+        /// </returns>
+        public static async Task<IEnumerable<DynamicTableEntity>> ExecuteQueryAsync(
+            this CloudTable cloudTable,
+            TableQuery tableQuery,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var tableEntities = new List<DynamicTableEntity>();
+            TableContinuationToken token = null;
+
+            do
+            {
+                var result = await cloudTable.ExecuteQuerySegmentedAsync(tableQuery, token, null, null, cancellationToken);
+
+                // Checks whether TakeCount entities has been received
+                if (tableQuery.TakeCount.HasValue && tableEntities.Count >= tableQuery.TakeCount.Value)
+                {
+                    return tableEntities.Take(tableQuery.TakeCount.Value).ToList();
+                }
+
+                token = result.ContinuationToken;
+            } while (token != null);
+
+            return tableEntities;
+        }
+#endif
     }
 }
