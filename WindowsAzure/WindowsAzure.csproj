@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Azure Storage Extensions is a .NET library aimed for managing and querying entities from Microsoft Azure Storage.
+            It's built on top of Azure Storage Client Library, provides LINQ to Azure Tables queries and async interfaces.</Description>
+        <AssemblyTitle>Azure Storage Extensions</AssemblyTitle>
+        <Authors>Dmitry Tretyakov</Authors>
+        <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+        <AssemblyName>WindowsAzure.StorageExtensions</AssemblyName>
+        <PackageId>WindowsAzure</PackageId>
+        <PackageTags>Azure;Storage;Blob;Table;Async;Extensions;LINQ;IQueryable</PackageTags>
+        <PackageProjectUrl>https://github.com/dtretyakov/WindowsAzure</PackageProjectUrl>
+        <PackageLicenseUrl>https://raw.github.com/dtretyakov/WindowsAzure/master/LICENSE.txt</PackageLicenseUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/dtretyakov/WindowsAzure</RepositoryUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="App.config" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+        <PackageReference Include="WindowsAzure.Storage" Version="8.5.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <Reference Include="System.Xml" />
+        <Reference Include="System" />
+        <Reference Include="Microsoft.CSharp" />
+    </ItemGroup>
+
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
+        <DefineConstants>$(DefineConstants);NET45</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+        <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+        <PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
+        <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+        <PackageReference Include="System.Reflection" Version="4.3.0" />
+        <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+        <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
+    </ItemGroup>
+
+</Project>

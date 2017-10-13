@@ -6,6 +6,10 @@ build.properties.ps1
 [Bb]in/
 [Oo]bj/
 
+# IntelliJ
+.idea/
+*.iml
+
 # mstest test results
 TestResults
 

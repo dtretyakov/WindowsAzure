@@ -1,7 +1,7 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26114.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".scripts", ".scripts", "{4AA7D406-B158-4FCA-97BE-B3CE4B9ED1AA}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,9 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{F729740C-2
 		scripts\libs\psake_ext.ps1 = scripts\libs\psake_ext.ps1
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "WindowsAzure", "src\WindowsAzure\WindowsAzure.xproj", "{489A3BD0-35AF-4E8E-939F-6597125603B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsAzure", "WindowsAzure\WindowsAzure.csproj", "{489A3BD0-35AF-4E8E-939F-6597125603B7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "WindowsAzure.Tests", "test\WindowsAzure.Tests\WindowsAzure.Tests.xproj", "{47178F90-F9A5-4413-8C34-607451F893D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsAzure.Tests", "WindowsAzure.Tests\WindowsAzure.Tests.csproj", "{47178F90-F9A5-4413-8C34-607451F893D5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{489A3BD0-35AF-4E8E-939F-6597125603B7} = {489A3BD0-35AF-4E8E-939F-6597125603B7}
 	EndProjectSection
@@ -45,8 +45,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{F729740C-2635-49A7-9342-2A2A7158992D} = {4AA7D406-B158-4FCA-97BE-B3CE4B9ED1AA}
 	EndGlobalSection
 EndGlobal
