@@ -7,11 +7,19 @@ namespace WindowsAzure.Tests.Attributes
     /// </summary>
     public sealed class IntegrationFactAttribute : FactAttribute
     {
-#if NOCLOUDSTORAGE
+        private string _skip = "Skipped integration test";
+        
+#if CLOUDSTORAGE
         public IntegrationFactAttribute()
         {
-            Skip = "Skipped integration test";
+            _skip = null
         }
 #endif
+        
+        public override string Skip
+        {
+            get { return _skip; }
+            set { _skip = value; }
+        }
     }
 }
