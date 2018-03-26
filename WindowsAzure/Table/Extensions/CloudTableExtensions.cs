@@ -477,6 +477,7 @@ namespace WindowsAzure.Table.Extensions
             do
             {
                 var result = await cloudTable.ExecuteQuerySegmentedAsync(tableQuery, token, null, null, cancellationToken);
+                tableEntities.AddRange(result.Results);
 
                 // Checks whether TakeCount entities has been received
                 if (tableQuery.TakeCount.HasValue && tableEntities.Count >= tableQuery.TakeCount.Value)
