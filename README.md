@@ -1,6 +1,7 @@
 # Windows Azure Storage Extensions
 
-<a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=wase_general&branch_WindowsAzureStorageExtensions=%3Cdefault%3E&guest=1"><img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:wase_general),branch:(name:master)/statusIcon.svg" alt=""/></a>
+[<img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:wase_general),branch:(name:master)/statusIcon.svg"/>](http://teamcity.jetbrains.com/viewType.html?buildTypeId=wase_general&branch_WindowsAzureStorageExtensions=%3Cdefault%3E&guest=1)
+[![NuGet WindowsAzure.StorageExtensions](https://buildstats.info/nuget/WindowsAzure.StorageExtensions?includePreReleases=false)](https://www.nuget.org/packages/WindowsAzure.StorageExtensions)
 
 *Windows Azure Storage Extensions* is a .NET library aimed at managing and querying entities from [Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
 
@@ -77,7 +78,7 @@ The `TableEntityConverter` class will try to find the mapping classes for your e
 
     EntityTypeMap.RegisterAssembly(typeof(MyEntity).Assembly)
 
-###Entities Management
+### Entities Management
 
 Generic `TableSet` context provides a synchronous & asynchronous ([TAP](http://msdn.microsoft.com/en-us/library/hh873175.aspx)) methods for managing entities:
 
@@ -90,7 +91,7 @@ To avoid [restrictions of group operations](http://msdn.microsoft.com/en-us/libr
 
 Default ExecutionMode is Sequential.
 
-###LINQ Queries
+### LINQ Queries
 
 `TableSet` context implements `IQueryable` interface for using [LINQ Expressions](http://msdn.microsoft.com/en-us/library/vstudio/bb397926.aspx). Provider supports next synchronous LINQ methods:
 * First
@@ -109,7 +110,7 @@ Also you can use [**Contains** method](http://msdn.microsoft.com/en-us/library/m
 
 **NOTE**: For creating a custom queries you should take a look at next article: [Mixing LINQ Providers and LINQ to Objects](http://msdn.microsoft.com/en-us/vstudio/ff963710.aspx). 
 
-###Asynchronous LINQ Queries
+### Asynchronous LINQ Queries
 
 In addition `TableSet` can be used for **asynchronous queries** powered by LINQ extensions (TAP) in [EF 6 Async style](http://weblogs.asp.net/scottgu/archive/2012/12/11/entity-framework-6-alpha2-now-available.aspx).
 
@@ -121,11 +122,11 @@ Available methods:
 * TakeAsync
 * ToListAsync
 
-###LINQ Projections
+### LINQ Projections
 
 LINQ Projections supported with a limitation - projection class should be a reference type.
 
-###TAP-based Extensions
+### TAP-based Extensions
 
 Library contains TAP-based extensions for following Azure Storage Library classes:
 * CloudBlobClient
@@ -140,7 +141,7 @@ blobs = cloudBlobContainer.ListBlobs();
 blobs = await cloudBlobContainer.ListBlobsAsync();
 ```
 
-###Task Cancellation
+### Task Cancellation
 
 All of TAP-based methods accepts optional `CancellationToken` parameter for [Task Cancellation](http://msdn.microsoft.com/en-us/library/dd997396.aspx).
 
