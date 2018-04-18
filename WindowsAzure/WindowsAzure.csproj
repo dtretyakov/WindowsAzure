@@ -7,7 +7,7 @@
     <Authors>Dmitry Tretyakov</Authors>
     <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
     <AssemblyName>WindowsAzure.StorageExtensions</AssemblyName>
-    <PackageId>WindowsAzure</PackageId>
+    <PackageId>WindowsAzure.StorageExtensions</PackageId>
     <PackageTags>Azure;Storage;Blob;Table;Async;Extensions;LINQ;IQueryable</PackageTags>
     <PackageProjectUrl>https://github.com/dtretyakov/WindowsAzure</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.github.com/dtretyakov/WindowsAzure/master/LICENSE.txt</PackageLicenseUrl>
