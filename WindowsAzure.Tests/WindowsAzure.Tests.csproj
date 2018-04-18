@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
     <AssemblyName>WindowsAzure.StorageExtensions.Tests</AssemblyName>
     <PackageId>WindowsAzure.Tests</PackageId>
     <IsPackable>false</IsPackable>
