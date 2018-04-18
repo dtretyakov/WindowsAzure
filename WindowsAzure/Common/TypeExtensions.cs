@@ -3,16 +3,6 @@ using System.Reflection;
 
 namespace WindowsAzure.Common
 {
-#if NETCORE
-    internal enum MemberTypes
-    {
-        Property = 0,
-        Field = 1,
-        Event = 2,
-        Method = 3,
-        Other = 4
-    }
-#endif
 
     /// <summary>
     /// Reflection utilities.
@@ -29,6 +19,8 @@ namespace WindowsAzure.Common
         {
 #if NET45
             return memberInfo.MemberType;
+        }
+    }
 #else
             if (memberInfo is PropertyInfo)
             {
@@ -50,14 +42,21 @@ namespace WindowsAzure.Common
             {
                 return MemberTypes.Other;
             }
-#endif
         }
 
-#if NETCORE
         public static InterfaceMapping GetInterfaceMap(this Type type, Type interfaceType)
         {
             return type.GetTypeInfo().GetRuntimeInterfaceMap(interfaceType);
         }
-#endif
     }
+    
+    internal enum MemberTypes
+    {
+        Property = 0,
+        Field = 1,
+        Event = 2,
+        Method = 3,
+        Other = 4
+    }
+#endif
 }

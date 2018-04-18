@@ -406,9 +406,9 @@ namespace WindowsAzure.Table.Extensions
                         cloudTable.EndSetPermissions(result);
                     });
         }
-#endif
 
-#if NETCORE
+#else
+
         /// <summary>
         ///     Executes the operation on a table.
         /// </summary>

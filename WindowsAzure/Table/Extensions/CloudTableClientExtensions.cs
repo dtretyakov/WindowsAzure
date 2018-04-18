@@ -108,7 +108,7 @@ namespace WindowsAzure.Table.Extensions
                     });
         }
 
-#if NETCORE
+#if !NET45
         /// <summary>
         ///     Creates the table if it does not already exist.
         /// </summary>
