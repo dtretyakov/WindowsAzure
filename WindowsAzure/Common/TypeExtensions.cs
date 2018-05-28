@@ -17,7 +17,7 @@ namespace WindowsAzure.Common
 
         public static MemberTypes MemberType(this MemberInfo memberInfo)
         {
-#if NET45
+#if NET452
             return memberInfo.MemberType;
         }
     }
