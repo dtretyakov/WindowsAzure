@@ -18,6 +18,7 @@ namespace WindowsAzure.Table
     /// <typeparam name="TEntity">Entity type.</typeparam>
     public sealed class TableSet<TEntity> : Query<TEntity>, ITableSet<TEntity> where TEntity : class, new()
     {
+        private readonly string _tableName;
         private readonly CloudTable _cloudTable;
         internal readonly TableRequestExecutorFactory<TEntity> RequestExecutorFactory;
         private ExecutionMode _executionMode = ExecutionMode.Sequential;
@@ -37,7 +38,9 @@ namespace WindowsAzure.Table
         /// </summary>
         /// <param name="cloudTableClient">Cloud table client.</param>
         /// <param name="tableName">Table name.</param>
-        public TableSet(CloudTableClient cloudTableClient, string tableName)
+        public TableSet(
+            CloudTableClient cloudTableClient, 
+            string tableName)
         {
             if (cloudTableClient == null)
             {
@@ -49,6 +52,7 @@ namespace WindowsAzure.Table
                 throw new ArgumentNullException(nameof(tableName));
             }
 
+            _tableName = tableName;
             _cloudTable = cloudTableClient.GetTableReference(tableName);
             var cloudTableWrapper = new CloudTableWrapper(_cloudTable);
             var entityConverter = new TableEntityConverter<TEntity>();
@@ -362,6 +366,14 @@ namespace WindowsAzure.Table
             }
 
             return RequestExecutor.ExecuteBatchesWithoutResultAsync(entities, TableOperation.Delete, cancellationToken);
+        }
+
+        /// <summary>
+        ///     Gets the table name.
+        /// </summary>
+        public string Name
+        {
+            get { return _tableName; }
         }
 
         /// <summary>

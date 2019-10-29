@@ -12,6 +12,11 @@ namespace WindowsAzure.Table
     public interface ITableSet<TEntity> : IOrderedQueryable<TEntity> where TEntity : class, new()
     {
         /// <summary>
+        ///     Gets the table name.
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         ///     Gets or sets a value indicating request execution mode.
         /// </summary>
         ExecutionMode ExecutionMode { get; set; }
