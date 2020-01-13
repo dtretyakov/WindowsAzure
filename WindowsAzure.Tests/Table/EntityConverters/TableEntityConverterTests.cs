@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -179,6 +180,32 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(entity.Id, tableEntity.PartitionKey);
             Assert.Null(tableEntity.RowKey);
             Assert.Equal(entity.Message, tableEntity.Properties["OldMessage"].StringValue);
+        }
+
+        [Fact]
+        public void ConvertFromEntityWithSerializeMapping()
+        {
+            // Arrange
+            var converter = new TableEntityConverter<EntityWithSerializableProperty>();
+            var entity = new EntityWithSerializableProperty
+            {
+                SerializableEntity = new SerializableEntity
+                {
+                    IntValue = 4,
+                },
+            };
+
+            var context = new OperationContext();
+
+            // Act
+            ITableEntity tableEntity = converter.GetEntity(entity);
+            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(context);
+
+            // Assert
+            Assert.NotNull(properties["NestedEntityRaw"].StringValue);
+
+            var deserialized = JsonConvert.DeserializeObject<SerializableEntity>(properties["NestedEntityRaw"].StringValue);
+            Assert.Equal(entity.SerializableEntity.IntValue, deserialized.IntValue);
         }
     }
 }
