@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using System.Reflection;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 using WindowsAzure.Tests.Samples;
 using Xunit;
@@ -14,7 +15,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         {
             // Arrange
             PropertyInfo propertyInfo = typeof(EntityWithSerializableProperty).GetProperty(nameof(EntityWithSerializableProperty.SerializableEntity));
-            var valueAccessor = new SerializablePropertyValueAccessor<EntityWithSerializableProperty>(propertyInfo);
+            var valueAccessor = new SerializablePropertyValueAccessor<EntityWithSerializableProperty>(propertyInfo, SerializationSettings.Instance.Default);
             var entity = new EntityWithSerializableProperty {  };
 
             // Act
@@ -27,9 +28,9 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         [Fact]
         public void PropertyValueAccessorGetComplexTest()
         {
-            // Arrange
+            //Arrange
             PropertyInfo propertyInfo = typeof(EntityWithSerializableProperty).GetProperty(nameof(EntityWithSerializableProperty.SerializableEntity));
-            var valueAccessor = new SerializablePropertyValueAccessor<EntityWithSerializableProperty>(propertyInfo);
+            var valueAccessor = new SerializablePropertyValueAccessor<EntityWithSerializableProperty>(propertyInfo, SerializationSettings.Instance.Default);
             var user = new EntityWithSerializableProperty { SerializableEntity = new SerializableEntity() { IntValue = 2 } };
 
             // Act

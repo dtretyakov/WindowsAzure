@@ -6,7 +6,7 @@ namespace WindowsAzure.Tests.Samples
     {
         public string Pk { get; set; }
         public string Rk { get; set; }
-        public SerializableEntity SerializableEntity { get; set; }
+        public SerializableEntity SerializableEntity { get; set; }        
     }
 
     public class SerializableEntity
@@ -20,7 +20,7 @@ namespace WindowsAzure.Tests.Samples
         {
             PartitionKey(x=> x.Pk)
             .RowKey(x=> x.Rk)
-            .JsonSerialize(x => x.SerializableEntity, "NestedEntityRaw");
+            .Serialize(x => x.SerializableEntity, "NestedEntityRaw");
         }
     }
 }

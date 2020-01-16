@@ -27,7 +27,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 {typeof (PartitionKeyAttribute), CreatePartitionKeyProperty},
                 {typeof (PropertyAttribute), CreateNamedProperty},
                 {typeof (RowKeyAttribute), CreateRowKeyProperty},
-                {typeof (TimestampAttribute), CreateTimestampProperty}
+                {typeof (TimestampAttribute), CreateTimestampProperty},
+                {typeof (SerializeAttribute), CreateJsonSerializableProperty},
             };
 
         private readonly Dictionary<string, string> _nameChanges = new Dictionary<string, string>();
@@ -73,6 +74,16 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         private static TimestampProperty<T> CreateTimestampProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
         {
             return new TimestampProperty<T>(member);
+        }
+
+        private static SerializableProperty<T> CreateJsonSerializableProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
+        {
+            var propertyName = ((SerializeAttribute)attribute).Name;
+            if (!string.IsNullOrEmpty(propertyName))
+            {
+                nameChanges.Add(member.Name, propertyName);
+            }
+            return new SerializableProperty<T>(member, propertyName);
         }
 
         /// <summary>

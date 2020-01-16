@@ -193,19 +193,40 @@ namespace WindowsAzure.Tests.Table.EntityConverters
                 {
                     IntValue = 4,
                 },
-            };
-
-            var context = new OperationContext();
+            };            
 
             // Act
             ITableEntity tableEntity = converter.GetEntity(entity);
-            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(context);
+            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(new OperationContext());
 
             // Assert
             Assert.NotNull(properties["NestedEntityRaw"].StringValue);
 
             var deserialized = JsonConvert.DeserializeObject<SerializableEntity>(properties["NestedEntityRaw"].StringValue);
             Assert.Equal(entity.SerializableEntity.IntValue, deserialized.IntValue);
+        }
+
+        [Fact]
+        public void ConvertFromEntityWithSerializeAttribute()
+        {
+            // Arrange
+            var converter = new TableEntityConverter<EntityWithSerializableAttribute>();
+            var entity = new EntityWithSerializableAttribute
+            {
+                Nested = new EntityWithSerializableAttribute.NestedEntity
+                {
+                    DecimalValue = 10,
+                },
+            };
+
+            // Act
+            ITableEntity tableEntity = converter.GetEntity(entity);
+            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(new OperationContext());
+            var deserialized = JsonConvert.DeserializeObject<EntityWithSerializableAttribute.NestedEntity>(properties["NestedSerialized"].StringValue);
+
+            // Assert
+            Assert.NotNull(properties["NestedSerialized"].StringValue);
+            Assert.Equal(entity.Nested.DecimalValue, deserialized.DecimalValue);
         }
     }
 }

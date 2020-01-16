@@ -1,6 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Reflection;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
@@ -37,7 +38,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 throw new ArgumentNullException(nameof(name));
             }
 
-            IValueAccessor<T> accessor = new SerializablePropertyValueAccessor<T>((PropertyInfo)member);
+            IValueAccessor<T> accessor = new SerializablePropertyValueAccessor<T>((PropertyInfo)member, SerializationSettings.Instance.Default);
 
             _getValue = accessor.GetValue;
             _setValue = accessor.SetValue;

@@ -1,24 +1,28 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
 {
     internal class SerializablePropertyValueAccessor<T> : ValueAccessorBase<T>
     {
+        private readonly Type _serializerType;
+
         /// <summary>
         /// Creates a serializable property value accessor.
         /// </summary>
         /// <param name="propertyInfo">Property info.</param>
-        public SerializablePropertyValueAccessor(PropertyInfo propertyInfo)
+        internal SerializablePropertyValueAccessor(PropertyInfo propertyInfo, ISerializer serializer)
         {
             if (propertyInfo == null)
             {
                 throw new ArgumentNullException(nameof(propertyInfo));
             }
+
+            _serializerType = serializer.GetType() ?? throw new ArgumentNullException(nameof(serializer));
 
             Name = propertyInfo.Name;
             Type = propertyInfo.PropertyType;
@@ -35,47 +39,54 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
             ParameterExpression entityPropertyParameter = Expression.Parameter(_entityPropertyType);
             Expression entityPropertyStringValue = Expression.Property(entityPropertyParameter, nameof(EntityProperty.StringValue));
 
-            var methodInfo = typeof(JsonConvert).GetMethods()
-               .Single(x =>
-                   x.IsStatic
-                   && x.IsPublic
-                   && x.Name == nameof(JsonConvert.DeserializeObject)    
-                   && x.IsGenericMethodDefinition
-                   && x.GetParameters().Length == 1)
-                .MakeGenericMethod(memberExpression.Type);
+            var deserializeMethod = CreateDeserializeMethod(memberExpression.Type);
 
-            var deserialzieCall = Expression.Call(methodInfo, entityPropertyStringValue);
+            var serializerInstanceExpression = Expression.New(_serializerType);
+            var deserialzieCall = Expression.Call(serializerInstanceExpression, deserializeMethod, entityPropertyStringValue);
 
             SetValue = Expression.Lambda<Action<T, EntityProperty>>(
                Expression.Assign(memberExpression, deserialzieCall),
                instanceExpression, entityPropertyParameter).Compile();
         }
 
-        protected void CreateGetter(ParameterExpression instanceExpression, MemberExpression memberExpression)
+        private void CreateGetter(ParameterExpression instanceExpression, MemberExpression memberExpression)
         {
             Expression argumentExpression = memberExpression;
-            Type = typeof(string);
 
-            argumentExpression = Serialize(argumentExpression);
+            var serializeMethod = CreateSerializeMethod();
             
-            ConstructorInfo constructorInfo = _entityPropertyType.GetConstructor(new[] { Type });
+            var convertedExpression = Expression.Convert(argumentExpression, typeof(object));
+
+            var serializerInstanceExpression = Expression.New(_serializerType);
+            argumentExpression = Expression.Call(serializerInstanceExpression, serializeMethod, convertedExpression);
+            
+            var constructorInfo = _entityPropertyType.GetConstructor(new[] { typeof(string) });
             NewExpression newEntityProperty = Expression.New(constructorInfo, argumentExpression);
 
             GetValue = (Func<T, EntityProperty>)Expression.Lambda(
                 newEntityProperty, instanceExpression).Compile();
         }
 
-        protected virtual Expression Serialize(Expression argumentExpression)
+        private MethodInfo CreateDeserializeMethod(Type deserializeType)
         {
-            var methodInfo = typeof(JsonConvert).GetMethods()
-               .Single(x => 
-                   x.IsStatic 
-                   && x.IsPublic 
-                   && x.Name == nameof(JsonConvert.SerializeObject) 
-                   && x.GetParameters().Length == 1);
-            var convertedExpression = Expression.Convert(argumentExpression, typeof(object));
+            return GetSerializerMethod(x => x.Name == nameof(ISerializer.Deserialize)
+                            && x.IsGenericMethodDefinition)
+                .MakeGenericMethod(deserializeType);
+        }
 
-            return Expression.Call(methodInfo, convertedExpression);
+        private MethodInfo CreateSerializeMethod()
+        {
+            return GetSerializerMethod(x => x.Name == nameof(ISerializer.Serialize));
+        }
+
+        private MethodInfo GetSerializerMethod(Func<MethodInfo, bool> predicate)
+        {
+            return _serializerType
+                .GetMethods()
+                .Single(x =>
+                   x.IsPublic
+                   && x.GetParameters().Length == 1
+                   && predicate(x));
         }
     }
 }
