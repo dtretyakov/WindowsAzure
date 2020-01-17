@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Table.EntityConverters.TypeData;
-using WindowsAzure.Tests.Common;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
@@ -129,14 +127,14 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         public void CreateEntityTypeDataWithSerializableAttribute()
         {
             // Arrange
-            var entityTypeData = new EntityTypeData<EntityWithSerializableAttribute>();
+            var entityTypeData = new EntityTypeData<EntityWithSerializeAttribute>();
             
             // Assert
             Assert.NotNull(entityTypeData);
             Assert.NotNull(entityTypeData.NameChanges);
-            Assert.Equal("PartitionKey", entityTypeData.NameChanges["Pk"]);
-            Assert.Equal("RowKey", entityTypeData.NameChanges["Rk"]);
-            Assert.Equal("NestedSerialized", entityTypeData.NameChanges["Nested"]);
+            Assert.Equal("PartitionKey", entityTypeData.NameChanges[nameof(EntityWithSerializeAttribute.Pk)]);
+            Assert.Equal("RowKey", entityTypeData.NameChanges[nameof(EntityWithSerializeAttribute.Rk)]);
+            Assert.Equal("NestedSerialized", entityTypeData.NameChanges[nameof(EntityWithSerializeAttribute.Nested)]);
         }
     }
 }

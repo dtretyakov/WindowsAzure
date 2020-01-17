@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
 using WindowsAzure.Table.EntityConverters;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
@@ -180,49 +180,27 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(entity.Id, tableEntity.PartitionKey);
             Assert.Null(tableEntity.RowKey);
             Assert.Equal(entity.Message, tableEntity.Properties["OldMessage"].StringValue);
-        }
-
-        [Fact]
-        public void ConvertFromEntityWithSerializeMapping()
-        {
-            // Arrange
-            var converter = new TableEntityConverter<EntityWithSerializableProperty>();
-            var entity = new EntityWithSerializableProperty
-            {
-                SerializableEntity = new SerializableEntity
-                {
-                    IntValue = 4,
-                },
-            };            
-
-            // Act
-            ITableEntity tableEntity = converter.GetEntity(entity);
-            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(new OperationContext());
-
-            // Assert
-            Assert.NotNull(properties["NestedEntityRaw"].StringValue);
-
-            var deserialized = JsonConvert.DeserializeObject<SerializableEntity>(properties["NestedEntityRaw"].StringValue);
-            Assert.Equal(entity.SerializableEntity.IntValue, deserialized.IntValue);
-        }
+        }       
 
         [Fact]
         public void ConvertFromEntityWithSerializeAttribute()
         {
             // Arrange
-            var converter = new TableEntityConverter<EntityWithSerializableAttribute>();
-            var entity = new EntityWithSerializableAttribute
+            var serializer = SerializationSettings.Instance.Default;
+
+            var converter = new TableEntityConverter<EntityWithSerializeAttribute>();
+            var entity = new EntityWithSerializeAttribute
             {
-                Nested = new EntityWithSerializableAttribute.NestedEntity
+                Nested = new EntityWithSerializeAttribute.NestedEntity
                 {
                     DecimalValue = 10,
                 },
             };
 
             // Act
-            ITableEntity tableEntity = converter.GetEntity(entity);
-            IDictionary<string, EntityProperty> properties = tableEntity.WriteEntity(new OperationContext());
-            var deserialized = JsonConvert.DeserializeObject<EntityWithSerializableAttribute.NestedEntity>(properties["NestedSerialized"].StringValue);
+            var tableEntity = converter.GetEntity(entity);
+            var properties = tableEntity.WriteEntity(new OperationContext());
+            var deserialized = serializer.Deserialize<EntityWithSerializeAttribute.NestedEntity>(properties["NestedSerialized"].StringValue);
 
             // Assert
             Assert.NotNull(properties["NestedSerialized"].StringValue);

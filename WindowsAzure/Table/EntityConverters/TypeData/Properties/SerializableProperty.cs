@@ -25,12 +25,38 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         ///     Constructor.
         /// </summary>
         /// <param name="member">Entity member.</param>
+        /// <param name="serializer">Serializer.</param>
+        public SerializableProperty(MemberInfo member, ISerializer serializer)
+            : this(member, member?.Name, serializer)
+        {
+        }
+
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
         /// <param name="name">Member name.</param>
         internal SerializableProperty(MemberInfo member, string name)
+            : this(member, name, SerializationSettings.Instance.Default)
+        {            
+        }       
+
+        /// <summary>
+        ///     Constructor.
+        /// </summary>
+        /// <param name="member">Entity member.</param>
+        /// <param name="name">Member name.</param>
+        /// <param name="serializer">Serializer.</param>
+        internal SerializableProperty(MemberInfo member, string name, ISerializer serializer)
         {
             if (member == null)
             {
                 throw new ArgumentNullException(nameof(member));
+            }
+
+            if (serializer == null)
+            {
+                throw new ArgumentNullException(nameof(serializer));
             }
 
             if (string.IsNullOrEmpty(name))
@@ -38,7 +64,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 throw new ArgumentNullException(nameof(name));
             }
 
-            IValueAccessor<T> accessor = new SerializablePropertyValueAccessor<T>((PropertyInfo)member, SerializationSettings.Instance.Default);
+            IValueAccessor<T> accessor = new SerializablePropertyValueAccessor<T>((PropertyInfo)member, serializer);
 
             _getValue = accessor.GetValue;
             _setValue = accessor.SetValue;

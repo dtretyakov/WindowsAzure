@@ -1,6 +1,4 @@
-﻿using WindowsAzure.Table.EntityConverters.TypeData;
-
-namespace WindowsAzure.Tests.Samples
+﻿namespace WindowsAzure.Tests.Samples
 {
     public class EntityWithSerializableProperty
     {
@@ -11,16 +9,6 @@ namespace WindowsAzure.Tests.Samples
 
     public class SerializableEntity
     {
-        public int IntValue { get; set; }
-    }
-
-    public class EntityWithSerializablePropertyMapping : EntityTypeMap<EntityWithSerializableProperty>
-    {
-        public EntityWithSerializablePropertyMapping()
-        {
-            PartitionKey(x=> x.Pk)
-            .RowKey(x=> x.Rk)
-            .Serialize(x => x.SerializableEntity, "NestedEntityRaw");
-        }
-    }
+        public decimal DecimalValue { get; set; }
+    }    
 }

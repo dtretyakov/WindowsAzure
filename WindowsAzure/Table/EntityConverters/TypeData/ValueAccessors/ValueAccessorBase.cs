@@ -38,7 +38,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         /// <summary>
         ///     Initializes a value accessor.
         /// </summary>
-        protected void CreateValueAccessors(ParameterExpression instanceExpression, MemberExpression memberExpression)
+        protected virtual void CreateValueAccessors(ParameterExpression instanceExpression, MemberExpression memberExpression)
         {
             Expression argumentExpression = memberExpression;
 

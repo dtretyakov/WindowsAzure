@@ -2,7 +2,7 @@
 
 namespace WindowsAzure.Tests.Samples
 {
-    public class EntityWithSerializableAttribute
+    public class EntityWithSerializeAttribute
     {
         [Serialize(Name =  "NestedSerialized")]
         public NestedEntity Nested { get; set; }

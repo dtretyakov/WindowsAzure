@@ -3,11 +3,13 @@ using WindowsAzure.Table.EntityConverters.TypeData;
 using WindowsAzure.Tests.Samples;
 using Microsoft.WindowsAzure.Storage.Table;
 using Xunit;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 
 namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
 {
-    public sealed class EntityTypeMapTests
-    {
+    public sealed class EntityTypeMapTests 
+    {      
+
         [Fact]
         public void RegisterClassMap_RowKeyIsNotString_ExceptionThrown()
         {
@@ -148,6 +150,36 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             Assert.NotNull(map.NameChanges);
             Assert.DoesNotContain(map.NameChanges, t => t.Key == "Country");
             Assert.Equal(2, map.NameChanges.Count);
+        }
+
+        [Fact]
+        public void ConvertFromEntityWithSerializeMapping()
+        {
+            // Arrange
+            var serializer = SerializationSettings.Instance.Default;
+
+            var map = new EntityTypeMap<EntityWithSerializableProperty>(e =>
+                 e.PartitionKey(x => x.Pk)
+                .RowKey(x => x.Rk)
+                .Serialize(x => x.SerializableEntity, "NestedEntityRaw")
+            );
+
+            var entity = new EntityWithSerializableProperty
+            {
+                SerializableEntity = new SerializableEntity
+                {
+                    DecimalValue = 4,
+                },
+            };
+
+            // Act
+            var tableEntity = (DynamicTableEntity)map.GetEntity(entity);
+
+            // Assert
+            Assert.NotNull(tableEntity.Properties["NestedEntityRaw"].StringValue);
+
+            var deserialized = serializer.Deserialize<SerializableEntity>(tableEntity.Properties["NestedEntityRaw"].StringValue);
+            Assert.Equal(entity.SerializableEntity.DecimalValue, deserialized.DecimalValue);
         }
     }
 }

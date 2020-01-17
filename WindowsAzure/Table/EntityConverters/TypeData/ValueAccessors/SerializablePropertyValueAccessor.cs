@@ -7,14 +7,15 @@ using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
 {
-    internal class SerializablePropertyValueAccessor<T> : ValueAccessorBase<T>
+    internal sealed class SerializablePropertyValueAccessor<T> : ValueAccessorBase<T>
     {
-        private readonly Type _serializerType;
+        private readonly ISerializer _serializer;
 
         /// <summary>
         /// Creates a serializable property value accessor.
         /// </summary>
         /// <param name="propertyInfo">Property info.</param>
+        /// <param name="serializer">Serializer.</param>
         internal SerializablePropertyValueAccessor(PropertyInfo propertyInfo, ISerializer serializer)
         {
             if (propertyInfo == null)
@@ -22,7 +23,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
                 throw new ArgumentNullException(nameof(propertyInfo));
             }
 
-            _serializerType = serializer.GetType() ?? throw new ArgumentNullException(nameof(serializer));
+            _serializer = serializer;
 
             Name = propertyInfo.Name;
             Type = propertyInfo.PropertyType;
@@ -30,6 +31,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
             ParameterExpression instanceExpression = Expression.Parameter(typeof(T), "instance");
             MemberExpression memberExpression = Expression.Property(instanceExpression, propertyInfo);
 
+            CreateValueAccessors(instanceExpression, memberExpression);
+        }
+
+        protected override void CreateValueAccessors(ParameterExpression instanceExpression, MemberExpression memberExpression)
+        {
             CreateGetter(instanceExpression, memberExpression);
             CreateSetter(instanceExpression, memberExpression);
         }
@@ -39,10 +45,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
             ParameterExpression entityPropertyParameter = Expression.Parameter(_entityPropertyType);
             Expression entityPropertyStringValue = Expression.Property(entityPropertyParameter, nameof(EntityProperty.StringValue));
 
-            var deserializeMethod = CreateDeserializeMethod(memberExpression.Type);
-
-            var serializerInstanceExpression = Expression.New(_serializerType);
-            var deserialzieCall = Expression.Call(serializerInstanceExpression, deserializeMethod, entityPropertyStringValue);
+            var deserialzieCall = Expression.Call(Expression.Constant(_serializer), CreateDeserializeMethod(Type), entityPropertyStringValue);
 
             SetValue = Expression.Lambda<Action<T, EntityProperty>>(
                Expression.Assign(memberExpression, deserialzieCall),
@@ -52,41 +55,35 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         private void CreateGetter(ParameterExpression instanceExpression, MemberExpression memberExpression)
         {
             Expression argumentExpression = memberExpression;
-
-            var serializeMethod = CreateSerializeMethod();
             
             var convertedExpression = Expression.Convert(argumentExpression, typeof(object));
 
-            var serializerInstanceExpression = Expression.New(_serializerType);
-            argumentExpression = Expression.Call(serializerInstanceExpression, serializeMethod, convertedExpression);
+            argumentExpression = Expression.Call(Expression.Constant(_serializer), CreateSerializeMethod(_serializer.Serialize), convertedExpression);
             
             var constructorInfo = _entityPropertyType.GetConstructor(new[] { typeof(string) });
             NewExpression newEntityProperty = Expression.New(constructorInfo, argumentExpression);
 
             GetValue = (Func<T, EntityProperty>)Expression.Lambda(
                 newEntityProperty, instanceExpression).Compile();
-        }
+        }        
 
         private MethodInfo CreateDeserializeMethod(Type deserializeType)
         {
-            return GetSerializerMethod(x => x.Name == nameof(ISerializer.Deserialize)
-                            && x.IsGenericMethodDefinition)
-                .MakeGenericMethod(deserializeType);
-        }
-
-        private MethodInfo CreateSerializeMethod()
-        {
-            return GetSerializerMethod(x => x.Name == nameof(ISerializer.Serialize));
-        }
-
-        private MethodInfo GetSerializerMethod(Func<MethodInfo, bool> predicate)
-        {
-            return _serializerType
-                .GetMethods()
+           return _serializer
+                .GetType()
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
                 .Single(x =>
-                   x.IsPublic
-                   && x.GetParameters().Length == 1
-                   && predicate(x));
+                {
+                    var parameters = x.GetParameters();
+
+                    return x.Name == nameof(ISerializer.Deserialize)
+                                   && parameters.Length == 1
+                                   && (parameters[0]).ParameterType == typeof(string)
+                                   && x.IsGenericMethodDefinition;
+                })                   
+                .MakeGenericMethod(deserializeType);               
         }
+
+        private MethodInfo CreateSerializeMethod(Func<object, string> serializeMethod) => serializeMethod.GetMethodInfo();               
     }
 }
