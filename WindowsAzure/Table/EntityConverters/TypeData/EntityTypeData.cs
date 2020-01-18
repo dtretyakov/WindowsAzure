@@ -6,6 +6,8 @@ using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Table.Extensions;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -78,11 +80,18 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
         private static SerializableProperty<T> CreateSerializableProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
         {
-            var propertyName = ((SerializeAttribute)attribute).Name;
+            if (!(attribute is SerializeAttribute serializableAttribute)) 
+            {
+                throw new ArgumentException(nameof(attribute));
+            };
+
+            var propertyName = serializableAttribute?.Name;
+
             if (!string.IsNullOrEmpty(propertyName))
             {
                 nameChanges.Add(member.Name, propertyName);
             }
+
             return new SerializableProperty<T>(member, propertyName);
         }
 
@@ -148,11 +157,20 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             var customAttributes = member.GetCustomAttributes(false).ToArray();
             var attributes = SelectMetadataAttributes(customAttributes);
-
+            
             if (attributes.Count == 0)
             {
+                var isSupportedType = (member is PropertyInfo propInfo)
+                ? propInfo.PropertyType.IsSupportedEntityPropertyType()
+                : true;
+
+                if (SerializationSettings.Instance.SerializeComplexTypes && !isSupportedType)
+                {
+                    return new SerializableProperty<T>(member);
+                }
+
                 return new RegularProperty<T>(member);
-            }
+            }           
 
             if (attributes.Count == 1)
             {

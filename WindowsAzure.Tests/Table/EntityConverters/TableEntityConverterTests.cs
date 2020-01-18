@@ -206,5 +206,39 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.NotNull(properties["NestedSerialized"].StringValue);
             Assert.Equal(entity.Nested.DecimalValue, deserialized.DecimalValue);
         }
+
+        [Fact]
+        public void ConvertFromEntityWithWithGlobalSerializationSettings()
+        {
+            // Arrange
+            var serializer = SerializationSettings.Instance.Default;
+            SerializationSettings.Instance.SerializeComplexTypes = true;
+
+            var converter = new TableEntityConverter<EntityWithMultipleUnsuportedTypes>();
+            var entity = new EntityWithMultipleUnsuportedTypes
+            {
+                DecimalValue = 26,
+                NestedValue = new EntityWithMultipleUnsuportedTypes.Nested
+                {
+                    TimeSpanValue = TimeSpan.FromHours(1),
+                },
+            };
+
+            // Act
+            var tableEntity = converter.GetEntity(entity);
+            var properties = tableEntity.WriteEntity(new OperationContext());
+
+            var deserializedNested = serializer.Deserialize<EntityWithMultipleUnsuportedTypes.Nested>(
+                properties[nameof(EntityWithMultipleUnsuportedTypes.NestedValue)].StringValue);
+
+            var deserializedDecimal = serializer.Deserialize<decimal>(
+                properties[nameof(EntityWithMultipleUnsuportedTypes.DecimalValue)].StringValue);
+
+            // Assert
+            Assert.NotNull(properties[nameof(EntityWithMultipleUnsuportedTypes.NestedValue)].StringValue);
+            Assert.NotNull(properties[nameof(EntityWithMultipleUnsuportedTypes.NestedValue)].StringValue);
+            Assert.Equal(entity.DecimalValue, deserializedDecimal);
+            Assert.Equal(entity.NestedValue.TimeSpanValue, deserializedNested.TimeSpanValue);
+        }
     }
 }

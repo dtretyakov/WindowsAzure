@@ -2,12 +2,17 @@
 
 namespace WindowsAzure.Table.Attributes
 {
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    /// <summary>
+    /// Defines whether property should be serialized
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class SerializeAttribute : Attribute
     {
+        /// <summary>
+        /// New name of target property
+        /// </summary>
         public string Name { get; set; }
 
-        public Type SerializerType { get; }
 
         public SerializeAttribute()
         {
@@ -16,12 +21,6 @@ namespace WindowsAzure.Table.Attributes
         public SerializeAttribute(string name)
         {
             Name = name;
-        }        
-
-        public SerializeAttribute(Type serializerType, string targetName = null)
-            : this(targetName)
-        {
-            SerializerType = serializerType;
-        }        
+        }            
     }
 }
