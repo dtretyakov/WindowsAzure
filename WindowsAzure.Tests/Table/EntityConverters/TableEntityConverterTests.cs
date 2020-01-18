@@ -236,7 +236,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
 
             // Assert
             Assert.NotNull(properties[nameof(EntityWithMultipleUnsuportedTypes.NestedValue)].StringValue);
-            Assert.NotNull(properties[nameof(EntityWithMultipleUnsuportedTypes.NestedValue)].StringValue);
+            Assert.NotNull(properties[nameof(EntityWithMultipleUnsuportedTypes.DecimalValue)].StringValue);
             Assert.Equal(entity.DecimalValue, deserializedDecimal);
             Assert.Equal(entity.NestedValue.TimeSpanValue, deserializedNested.TimeSpanValue);
         }
