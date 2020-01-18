@@ -23,7 +23,7 @@ namespace WindowsAzure.Table.Extensions
         {
             if (type.GetTypeInfo().IsEnum)
             {
-                return _supportedEntityPropertyTypes.Contains(type);
+                return _supportedEntityPropertyTypes.Contains(Enum.GetUnderlyingType(type));
             }
 
             return _supportedEntityPropertyTypes.Contains(type)
