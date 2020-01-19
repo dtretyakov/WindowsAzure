@@ -86,12 +86,16 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             var propertyName = serializableAttribute?.Name;
 
-            if (!string.IsNullOrEmpty(serializableAttribute?.Name))
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                propertyName = member.Name;
+            }
+            else
             {
                 nameChanges.Add(member.Name, propertyName);
             }
 
-            return new SerializableProperty<T>(member, propertyName ?? member.Name);
+            return new SerializableProperty<T>(member, propertyName);
         }
 
         /// <summary>
