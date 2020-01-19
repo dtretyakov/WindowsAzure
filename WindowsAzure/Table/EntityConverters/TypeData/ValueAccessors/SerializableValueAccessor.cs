@@ -7,7 +7,7 @@ using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
 {
-    internal sealed class SerializablePropertyValueAccessor<T> : ValueAccessorBase<T>
+    internal sealed class SerializableValueAccessor<T> : ValueAccessorBase<T>
     {
         private readonly ISerializer _serializer;
 
@@ -16,29 +16,25 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         /// </summary>
         /// <param name="propertyInfo">Property info.</param>
         /// <param name="serializer">Serializer.</param>
-        internal SerializablePropertyValueAccessor(PropertyInfo propertyInfo, ISerializer serializer)
+        internal SerializableValueAccessor(MemberInfo memberInfo, ISerializer serializer)
         {
-            if (propertyInfo == null)
+            if (memberInfo == null)
             {
-                throw new ArgumentNullException(nameof(propertyInfo));
+                throw new ArgumentNullException(nameof(memberInfo));
             }
 
-            _serializer = serializer;
-
-            Name = propertyInfo.Name;
-            Type = propertyInfo.PropertyType;
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
 
             ParameterExpression instanceExpression = Expression.Parameter(typeof(T), "instance");
-            MemberExpression memberExpression = Expression.Property(instanceExpression, propertyInfo);
 
-            CreateValueAccessors(instanceExpression, memberExpression);
-        }
+            CreateValueAccessors(instanceExpression, CreateMemberExpression(memberInfo, instanceExpression));
+        }        
 
         protected override void CreateValueAccessors(ParameterExpression instanceExpression, MemberExpression memberExpression)
         {
             CreateGetter(instanceExpression, memberExpression);
             CreateSetter(instanceExpression, memberExpression);
-        }
+        }       
 
         private void CreateSetter(ParameterExpression instanceExpression, MemberExpression memberExpression)
         {
@@ -84,6 +80,23 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
                 .MakeGenericMethod(deserializeType);               
         }
 
-        private MethodInfo CreateSerializeMethod(Func<object, string> serializeMethod) => serializeMethod.GetMethodInfo();               
+        private MethodInfo CreateSerializeMethod(Func<object, string> serializeMethod) => serializeMethod.GetMethodInfo();
+
+        private MemberExpression CreateMemberExpression(MemberInfo memberInfo, ParameterExpression instanceExpression)
+        {
+            if (memberInfo is PropertyInfo propertyInfo)
+            {
+                Type = propertyInfo.PropertyType;
+                return Expression.Property(instanceExpression, propertyInfo);
+            }
+
+            else if (memberInfo is FieldInfo fieldInfo)
+            {
+                Type = fieldInfo.FieldType;
+                return Expression.Field(instanceExpression, fieldInfo);
+            }
+
+            throw new ArgumentException(nameof(memberInfo));
+        }
     }
 }

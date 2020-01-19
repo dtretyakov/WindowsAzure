@@ -6,8 +6,7 @@ using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 using Microsoft.WindowsAzure.Storage.Table;
-using WindowsAzure.Table.Extensions;
-using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
+using WindowsAzure.Common;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -42,7 +41,6 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         internal EntityTypeData()
         {
             var entityType = typeof (T);
-
             // Retrieve class members
             var members = new List<MemberInfo>(entityType.GetFields(Flags));
             members.AddRange(entityType.GetProperties(Flags).Where(p => p.CanRead && p.CanWrite));
@@ -59,7 +57,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             }
 
             _properties = properties.ToArray();
-        }
+        }        
 
         /// <summary>
         ///     Gets a name changes for entity members.
@@ -160,11 +158,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             
             if (attributes.Count == 0)
             {
-                var isSupportedType = (member is PropertyInfo propInfo)
-                ? propInfo.PropertyType.IsSupportedEntityPropertyType()
-                : true;
-
-                if (SerializationSettings.Instance.SerializeComplexTypes && !isSupportedType)
+                if (!member.GetMemberType().IsSupportedEntityPropertyType())
                 {
                     return new SerializableProperty<T>(member);
                 }

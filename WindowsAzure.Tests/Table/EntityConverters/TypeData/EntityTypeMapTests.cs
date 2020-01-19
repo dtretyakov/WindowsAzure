@@ -156,7 +156,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
         public void ConvertFromEntityWithSerializeMapping()
         {
             // Arrange
-            var serializer = SerializationSettings.Instance.Default;
+            var serializer = new NewtonsoftJsonSerializer();
 
             var map = new EntityTypeMap<EntityWithSerializableProperty>(e =>
                  e.PartitionKey(x => x.Pk)

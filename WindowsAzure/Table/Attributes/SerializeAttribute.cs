@@ -5,7 +5,7 @@ namespace WindowsAzure.Table.Attributes
     /// <summary>
     /// Defines whether property should be serialized
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class SerializeAttribute : Attribute
     {
         /// <summary>

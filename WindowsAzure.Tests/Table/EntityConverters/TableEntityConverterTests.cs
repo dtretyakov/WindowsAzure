@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Moq;
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 using WindowsAzure.Tests.Samples;
@@ -186,7 +187,7 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         public void ConvertFromEntityWithSerializeAttribute()
         {
             // Arrange
-            var serializer = SerializationSettings.Instance.Default;
+            var serializer = SerializationSettings.Instance.DefaultSerializer;
 
             var converter = new TableEntityConverter<EntityWithSerializeAttribute>();
             var entity = new EntityWithSerializeAttribute
@@ -208,37 +209,31 @@ namespace WindowsAzure.Tests.Table.EntityConverters
         }
 
         [Fact]
-        public void ConvertFromEntityWithWithGlobalSerializationSettings()
+        public void ConvertToEntityWithSerializeAttribute()
         {
             // Arrange
-            var serializer = SerializationSettings.Instance.Default;
-            SerializationSettings.Instance.SerializeComplexTypes = true;
+            var serializer = SerializationSettings.Instance.DefaultSerializer;
 
-            var converter = new TableEntityConverter<EntityWithMultipleUnsuportedTypes>();
-            var entity = new EntityWithMultipleUnsuportedTypes
+            var converter = new TableEntityConverter<EntityWithSerializeAttribute>();
+            var tableEntity = new DynamicTableEntity
             {
-                DecimalValue = 26,
-                NestedValue = new EntityWithMultipleUnsuportedTypes.Nested
-                {
-                    TimeSpanValue = TimeSpan.FromHours(1),
-                },
-            };
+                PartitionKey = "Pk",
+                Properties = new Dictionary<string, EntityProperty>
+                        {
+                            {"NestedSerialized", new EntityProperty("{DecimalValue: 10}")}
+                        }
+            };            
 
             // Act
-            var tableEntity = converter.GetEntity(entity);
-            var properties = tableEntity.WriteEntity(new OperationContext());
-
-            var deserializedNested = serializer.Deserialize<EntityWithMultipleUnsuportedTypes.Nested>(
-                properties[nameof(EntityWithMultipleUnsuportedTypes.NestedValue)].StringValue);
-
-            var deserializedDecimal = serializer.Deserialize<decimal>(
-                properties[nameof(EntityWithMultipleUnsuportedTypes.DecimalValue)].StringValue);
+            var entity = converter.GetEntity(tableEntity);
 
             // Assert
-            Assert.NotNull(properties[nameof(EntityWithMultipleUnsuportedTypes.NestedValue)].StringValue);
-            Assert.NotNull(properties[nameof(EntityWithMultipleUnsuportedTypes.DecimalValue)].StringValue);
-            Assert.Equal(entity.DecimalValue, deserializedDecimal);
-            Assert.Equal(entity.NestedValue.TimeSpanValue, deserializedNested.TimeSpanValue);
-        }
+            Assert.Equal(entity.Pk, tableEntity.PartitionKey);
+            Assert.Null(tableEntity.RowKey);
+            Assert.Equal(
+                entity.Nested.DecimalValue, 
+                serializer.Deserialize<EntityWithSerializeAttribute.NestedEntity>(
+                    tableEntity.Properties["NestedSerialized"].StringValue).DecimalValue);
+        }       
     }
 }

@@ -37,7 +37,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         /// <param name="member">Entity member.</param>
         /// <param name="name">Member name.</param>
         internal SerializableProperty(MemberInfo member, string name)
-            : this(member, name, SerializationSettings.Instance.Default)
+            : this(member, name, SerializationSettings.Instance.DefaultSerializer)
         {            
         }       
 
@@ -64,7 +64,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
                 throw new ArgumentNullException(nameof(name));
             }
 
-            IValueAccessor<T> accessor = new SerializablePropertyValueAccessor<T>((PropertyInfo)member, serializer);
+            IValueAccessor<T> accessor = new SerializableValueAccessor<T>(member, serializer);
 
             _getValue = accessor.GetValue;
             _setValue = accessor.SetValue;
@@ -78,9 +78,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Properties
         /// <param name="entity">POCO entity.</param>
         public void SetMemberValue(DynamicTableEntity tableEntity, T entity)
         {
-            EntityProperty entityProperty;
-
-            if (tableEntity.Properties.TryGetValue(_memberName, out entityProperty))
+            if (tableEntity.Properties.TryGetValue(_memberName, out EntityProperty entityProperty))
             {
                 _setValue(entity, entityProperty);
             }

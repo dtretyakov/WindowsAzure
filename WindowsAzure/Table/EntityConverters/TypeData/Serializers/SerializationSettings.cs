@@ -10,7 +10,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Serializers
         private static readonly Lazy<SerializationSettings> instance = new Lazy<SerializationSettings>(
             () => new SerializationSettings
             {
-                Default = new NewtonsoftJsonSerializer(),
+                DefaultSerializer = new NewtonsoftJsonSerializer(),
             });
 
         private SerializationSettings()
@@ -37,6 +37,6 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.Serializers
         /// <summary>
         /// Default serializer
         /// </summary>
-        public ISerializer Default { get; set; }
+        public ISerializer DefaultSerializer { get; set; }
     }
 }
