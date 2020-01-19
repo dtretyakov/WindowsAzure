@@ -7,6 +7,7 @@ using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 using Microsoft.WindowsAzure.Storage.Table;
 using WindowsAzure.Common;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -85,12 +86,12 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
             var propertyName = serializableAttribute?.Name;
 
-            if (!string.IsNullOrEmpty(propertyName))
+            if (!string.IsNullOrEmpty(serializableAttribute?.Name))
             {
                 nameChanges.Add(member.Name, propertyName);
             }
 
-            return new SerializableProperty<T>(member, propertyName);
+            return new SerializableProperty<T>(member, propertyName ?? member.Name);
         }
 
         /// <summary>
@@ -158,7 +159,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             
             if (attributes.Count == 0)
             {
-                if (!member.GetMemberType().IsSupportedEntityPropertyType())
+                if (SerializationSettings.Instance.SerializeComplexTypes && !member.GetMemberType().IsSupportedEntityPropertyType())
                 {
                     return new SerializableProperty<T>(member);
                 }

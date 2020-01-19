@@ -171,8 +171,13 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
 
         public EntityTypeMap<T> Serialize<TMember>(Expression<Func<T, TMember>> propertyLambda, string propertyName = null)
         {
+            if (propertyLambda == null)
+            {
+                throw new ArgumentNullException(nameof(propertyLambda));
+            }
+
             var member = GetMemberInfoFromLambda(propertyLambda);
-            if (string.IsNullOrEmpty(propertyName))
+            if (!string.IsNullOrEmpty(propertyName))
             {
                 _nameChanges.Add(member.Name, propertyName);
             }

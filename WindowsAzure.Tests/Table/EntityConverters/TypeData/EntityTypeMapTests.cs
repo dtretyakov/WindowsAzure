@@ -4,6 +4,7 @@ using WindowsAzure.Tests.Samples;
 using Microsoft.WindowsAzure.Storage.Table;
 using Xunit;
 using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
+using System.Linq.Expressions;
 
 namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
 {
@@ -35,6 +36,23 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             {
                 map = new EntityTypeMap<Address>(e =>
                     e.PartitionKey(p => p.Id).RowKey(p => p.Country));
+            });
+
+            Assert.Null(map);
+        }
+
+        [Fact]
+        public void RegisterSerializeClassMap_SerializeExpressIsNull_ExceptionThrown()
+        {
+            // Arrange
+            Expression<Func<EntityWithSerializableProperty, SerializableEntity>> expression = null;
+            EntityTypeMap<EntityWithSerializableProperty> map = null;
+
+            //Act & Asset
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                map = new EntityTypeMap<EntityWithSerializableProperty>(e =>
+                e.Serialize(expression));
             });
 
             Assert.Null(map);
