@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionPrefix>1.3.0</VersionPrefix>
     <Description>Azure Storage Extensions is a .NET library aimed for managing and querying entities from Microsoft Azure Storage.
             It's built on top of Azure Storage Client Library, provides LINQ to Azure Tables queries and async interfaces.</Description>
     <AssemblyTitle>Azure Storage Extensions</AssemblyTitle>
@@ -15,8 +15,8 @@
     <RepositoryUrl>https://github.com/dtretyakov/WindowsAzure</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="WindowsAzure.Storage" Version="8.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="WindowsAzure.Storage" Version="9.3.2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System.Xml" />
