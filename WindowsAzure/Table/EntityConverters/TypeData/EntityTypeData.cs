@@ -6,6 +6,8 @@ using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
 using Microsoft.WindowsAzure.Storage.Table;
+using WindowsAzure.Common;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -27,7 +29,8 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 {typeof (PartitionKeyAttribute), CreatePartitionKeyProperty},
                 {typeof (PropertyAttribute), CreateNamedProperty},
                 {typeof (RowKeyAttribute), CreateRowKeyProperty},
-                {typeof (TimestampAttribute), CreateTimestampProperty}
+                {typeof (TimestampAttribute), CreateTimestampProperty},
+                {typeof (SerializeAttribute), CreateSerializableProperty},
             };
 
         private readonly Dictionary<string, string> _nameChanges = new Dictionary<string, string>();
@@ -39,7 +42,6 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         internal EntityTypeData()
         {
             var entityType = typeof (T);
-
             // Retrieve class members
             var members = new List<MemberInfo>(entityType.GetFields(Flags));
             members.AddRange(entityType.GetProperties(Flags).Where(p => p.CanRead && p.CanWrite));
@@ -56,7 +58,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             }
 
             _properties = properties.ToArray();
-        }
+        }        
 
         /// <summary>
         ///     Gets a name changes for entity members.
@@ -73,6 +75,27 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         private static TimestampProperty<T> CreateTimestampProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
         {
             return new TimestampProperty<T>(member);
+        }
+
+        private static SerializableProperty<T> CreateSerializableProperty(MemberInfo member, object attribute, IDictionary<string, string> nameChanges)
+        {
+            if (!(attribute is SerializeAttribute serializableAttribute)) 
+            {
+                throw new ArgumentException(nameof(attribute));
+            };
+
+            var propertyName = serializableAttribute?.Name;
+
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                propertyName = member.Name;
+            }
+            else
+            {
+                nameChanges.Add(member.Name, propertyName);
+            }
+
+            return new SerializableProperty<T>(member, propertyName);
         }
 
         /// <summary>
@@ -137,11 +160,16 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
         {
             var customAttributes = member.GetCustomAttributes(false).ToArray();
             var attributes = SelectMetadataAttributes(customAttributes);
-
+            
             if (attributes.Count == 0)
             {
+                if (SerializationSettings.Instance.SerializeComplexTypes && !member.GetMemberType().IsSupportedEntityPropertyType())
+                {
+                    return new SerializableProperty<T>(member);
+                }
+
                 return new RegularProperty<T>(member);
-            }
+            }           
 
             if (attributes.Count == 1)
             {

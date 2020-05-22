@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Moq;
 using WindowsAzure.Table.EntityConverters;
+using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 using WindowsAzure.Tests.Samples;
 using Xunit;
 
@@ -179,6 +181,59 @@ namespace WindowsAzure.Tests.Table.EntityConverters
             Assert.Equal(entity.Id, tableEntity.PartitionKey);
             Assert.Null(tableEntity.RowKey);
             Assert.Equal(entity.Message, tableEntity.Properties["OldMessage"].StringValue);
+        }       
+
+        [Fact]
+        public void ConvertFromEntityWithSerializeAttribute()
+        {
+            // Arrange
+            var serializer = SerializationSettings.Instance.DefaultSerializer;
+
+            var converter = new TableEntityConverter<EntityWithSerializeAttribute>();
+            var entity = new EntityWithSerializeAttribute
+            {
+                Nested = new EntityWithSerializeAttribute.NestedEntity
+                {
+                    DecimalValue = 10,
+                },
+            };
+
+            // Act
+            var tableEntity = converter.GetEntity(entity);
+            var properties = tableEntity.WriteEntity(new OperationContext());
+            var deserialized = serializer.Deserialize<EntityWithSerializeAttribute.NestedEntity>(properties["NestedSerialized"].StringValue);
+
+            // Assert
+            Assert.NotNull(properties["NestedSerialized"].StringValue);
+            Assert.Equal(entity.Nested.DecimalValue, deserialized.DecimalValue);
         }
+
+        [Fact]
+        public void ConvertToEntityWithSerializeAttribute()
+        {
+            // Arrange
+            var serializer = SerializationSettings.Instance.DefaultSerializer;
+
+            var converter = new TableEntityConverter<EntityWithSerializeAttribute>();
+            var tableEntity = new DynamicTableEntity
+            {
+                PartitionKey = "Pk",
+                Properties = new Dictionary<string, EntityProperty>
+                        {
+                            {"NestedSerialized", new EntityProperty("{DecimalValue: 10}")}
+                        }
+            };            
+
+            // Act
+            var entity = converter.GetEntity(tableEntity);
+
+            // Assert
+            Assert.Equal(entity.Pk, tableEntity.PartitionKey);
+            Assert.Null(tableEntity.RowKey);
+            Assert.Equal(
+                entity.Nested.DecimalValue, 
+                serializer.Deserialize<EntityWithSerializeAttribute.NestedEntity>(
+                    tableEntity.Properties["NestedSerialized"].StringValue).DecimalValue);
+        }       
     }
 }

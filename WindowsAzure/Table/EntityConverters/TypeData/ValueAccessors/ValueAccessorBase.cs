@@ -13,17 +13,17 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
     /// <typeparam name="T">Entity type.</typeparam>
     internal abstract class ValueAccessorBase<T> : IValueAccessor<T>
     {
-        private readonly Type _entityPropertyType = typeof (EntityProperty);
+        protected readonly Type _entityPropertyType = typeof (EntityProperty);
 
         /// <summary>
         ///     Gets an entity member accessor.
         /// </summary>
-        public Func<T, EntityProperty> GetValue { get; private set; }
+        public Func<T, EntityProperty> GetValue { get; protected set; }
 
         /// <summary>
         ///     Sets an entity member mutator.
         /// </summary>
-        public Action<T, EntityProperty> SetValue { get; private set; }
+        public Action<T, EntityProperty> SetValue { get; protected set; }
 
         /// <summary>
         ///     Gets a member type.
@@ -38,7 +38,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors
         /// <summary>
         ///     Initializes a value accessor.
         /// </summary>
-        protected void CreateValueAccessors(ParameterExpression instanceExpression, MemberExpression memberExpression)
+        protected virtual void CreateValueAccessors(ParameterExpression instanceExpression, MemberExpression memberExpression)
         {
             Expression argumentExpression = memberExpression;
 
