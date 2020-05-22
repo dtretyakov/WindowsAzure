@@ -169,6 +169,22 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             return this;
         }
 
+        public EntityTypeMap<T> Serialize<TMember>(Expression<Func<T, TMember>> propertyLambda, string propertyName = null)
+        {
+            if (propertyLambda == null)
+            {
+                throw new ArgumentNullException(nameof(propertyLambda));
+            }
+
+            var member = GetMemberInfoFromLambda(propertyLambda);
+            if (!string.IsNullOrEmpty(propertyName))
+            {
+                _nameChanges.Add(member.Name, propertyName);
+            }
+            _properties[member.Name] = new SerializableProperty<T>(member, propertyName);
+            return this;
+        }
+
         /// <summary>
         ///     Maps a row key property.
         /// </summary>

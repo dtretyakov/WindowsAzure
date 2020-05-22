@@ -122,5 +122,19 @@ namespace WindowsAzure.Tests.Table.EntityConverters.TypeData
             // Assert
             Assert.Null(typeData);
         }
+
+        [Fact]
+        public void CreateEntityTypeDataWithSerializableAttribute()
+        {
+            // Arrange
+            var entityTypeData = new EntityTypeData<EntityWithSerializeAttribute>();
+            
+            // Assert
+            Assert.NotNull(entityTypeData);
+            Assert.NotNull(entityTypeData.NameChanges);
+            Assert.Equal("PartitionKey", entityTypeData.NameChanges[nameof(EntityWithSerializeAttribute.Pk)]);
+            Assert.Equal("RowKey", entityTypeData.NameChanges[nameof(EntityWithSerializeAttribute.Rk)]);
+            Assert.Equal("NestedSerialized", entityTypeData.NameChanges[nameof(EntityWithSerializeAttribute.Nested)]);
+        }
     }
 }
