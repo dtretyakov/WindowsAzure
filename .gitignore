@@ -21,6 +21,11 @@ TestResults
 *.user
 *.sln.docstates
 
+# Build related
+tools/**
+.dotnet/**
+!tools/packages.config
+
 # Build results
 [Dd]ebug/
 [Rr]elease/
