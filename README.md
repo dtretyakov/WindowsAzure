@@ -267,6 +267,90 @@ var countryNames = new List<string> { "Germany", "Finland" };
 var countries = countryTable.Where(p => countryNames.Contains(p.Name)).ToList();
 ```
 
+## Build script
+
+We create a build script using [Cake](https://cakebuild.net).
+
+### Files of interest
+
+We need somes files for a build script work.
+
+- `build.ps1`, `build.sh` and `build.cmd` (an alias to `build.ps1`)
+
+These are bootstrapper scripts that ensure you have Cake and other required dependencies installed. The bootstrapper scripts are also responsible for invoking Cake. These files are optional, and not a hard requirement. If you would prefer not to use these scripts you can invoke Cake directly from the command line, once you have downloaded and extracted it.
+
+- `tools/` folder and `tools/packages.config`
+
+This is the package configuration that tells the bootstrapper script what NuGet packages to install in the tools folder. An example of this is Cake itself or additional tools such as unit test runners, ILMerge etc.
+
+- `build.cake`
+
+This is the actual build script, it doesn't have to be named this but this will be found by default and we keeped. Our build script executes on base of two list of projects:
+- List of projects to build and when needed package and publish
+- List of projects to build, test and when needed collect code coverage
+
+Because of that the build needs two main [file glob arguments](https://en.wikipedia.org/wiki/Glob_(programming)), that are used to find the projects that matches this glob pattern, more about the argument bellow.
+
+### Build Script Arguments
+
+More arguments can be found on the `build.cake` script.
+
+- `--Project` file glob pattern for the projects to build, package and publish.
+- `--Tests` file glob pattern for the projects to build, test and collect code coverage.
+- `--Target` defines the actions/task to be executed.
+- `--Configuration` defines the build configuration to be used on projects.
+- `--PackageVersion` defines the version to bump into the project before build, package and publish
+- `--NugetSource` nuget source api URL
+- `--NugetApiKey` nuget source api key
+
+#### Build samples
+
+This sample we'll only build the foundation project.
+
+For Windows
+
+` .\build.cmd --Target=Build --Projects="./WindowsAzure/*.csproj"`
+
+For MacOS / Linux
+
+` .\build.sh --Target=Build --Projects="./WindowsAzure/*.csproj"`
+
+### Build and Test sample
+
+This sample we'll only build the foundation project.
+
+For Windows
+
+` .\build.cmd --Target=Test --Projects="./WindowsAzure/*.csproj" --Tests="./WindowsAzure.Tests/*.csproj"`
+
+For MacOS / Linux
+
+` .\build.sh --Target=Test --Projects="./WindowsAzure/*.csproj" --Tests="./WindowsAzure.Tests/*.csproj"`
+
+### Build, Test and Collect Code Coverage sample
+
+This sample we'll only build the foundation project.
+
+For Windows
+
+` .\build.cmd --Target=TestCoverage --Projects="./WindowsAzure/*.csproj" --Tests="./WindowsAzure.Tests/*.csproj"`
+
+For MacOS / Linux
+
+` .\build.sh --Target=TestCoverage --Projects="./WindowsAzure/*.csproj" --Tests="./WindowsAzure.Tests/*.csproj"`
+
+### Build, Test and Publish to Visual Studio NuGet
+
+This sample we'll only build the foundation project.
+
+For Windows
+
+` .\build.cmd --Target=Publish --PackageVersion=1.6.0 --Projects="./WindowsAzure/*.csproj" --Tests="./WindowsAzure.Tests/*.csproj" --NugetApiKey={the nuget apikey come here}`
+
+For MacOS / Linux
+
+` .\build.sh --Target=Publish --PackageVersion=1.6.0 --Projects="./WindowsAzure/*.csproj" --Tests="./WindowsAzure.Tests/*.csproj" --NugetApiKey={the nuget apikey come here}`
+
 ## Contributors
 Great thanks to all of projects contributors. 
 * [Dmitry Tretyakov](dtretyakov) for project idea.
