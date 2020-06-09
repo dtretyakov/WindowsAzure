@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 using WindowsAzure.Table.Wrappers;
 
 namespace WindowsAzure.Table.Queryable.Expressions

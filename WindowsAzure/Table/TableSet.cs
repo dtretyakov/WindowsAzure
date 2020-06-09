@@ -8,7 +8,11 @@ using WindowsAzure.Table.Queryable;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.RequestExecutor;
 using WindowsAzure.Table.Wrappers;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 
 namespace WindowsAzure.Table
 {

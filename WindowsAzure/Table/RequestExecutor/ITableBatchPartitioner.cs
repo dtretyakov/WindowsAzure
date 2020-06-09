@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 
 namespace WindowsAzure.Table.RequestExecutor
 {

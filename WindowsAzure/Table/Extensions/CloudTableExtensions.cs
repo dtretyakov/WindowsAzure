@@ -2,8 +2,12 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 
 namespace WindowsAzure.Table.Extensions
 {
@@ -201,7 +205,7 @@ namespace WindowsAzure.Table.Extensions
         /// <param name="tableBatchOperation">
         ///     The <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableBatchOperation" /> object representing the operations to execute on the table.
         /// </param>
-        /// <param name="cancellationToken">Cancalltion token.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>
         ///     An enumerable collection of <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableResult" /> objects that contains the results, in order, of each operation in the
         ///     <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableBatchOperation" />

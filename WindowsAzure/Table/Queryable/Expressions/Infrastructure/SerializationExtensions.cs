@@ -4,7 +4,11 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
 using System.Xml;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 using WindowsAzure.Properties;
 
 namespace WindowsAzure.Table.Queryable.Expressions.Infrastructure

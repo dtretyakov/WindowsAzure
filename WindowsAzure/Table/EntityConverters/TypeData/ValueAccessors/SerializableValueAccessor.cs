@@ -1,4 +1,8 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿#if WINDOWSAZURE
+using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 using System;
 using System.Linq;
 using System.Linq.Expressions;

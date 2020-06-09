@@ -5,7 +5,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 using WindowsAzure.Table.EntityConverters;
 using WindowsAzure.Table.Queryable.Base;
 using WindowsAzure.Table.Queryable.Expressions;

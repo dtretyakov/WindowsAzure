@@ -6,7 +6,11 @@ using System.Reflection;
 using WindowsAzure.Common;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 
 namespace WindowsAzure.Table.EntityConverters.TypeData
 {
@@ -131,7 +135,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             }
 
             // Check whether entity's composite key completely defined
-            if (!_nameChanges.ContainsValue(PartitionKeyPropertyName) 
+            if (!_nameChanges.ContainsValue(PartitionKeyPropertyName)
                 && !_nameChanges.ContainsValue(RowKeyPropertyName))
             {
                 var message = string.Format(Resources.EntityTypeDataMissingKey, _entityType);
@@ -251,11 +255,11 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
             switch (body.NodeType)
             {
                 case ExpressionType.MemberAccess:
-                    memberExpression = (MemberExpression) body;
+                    memberExpression = (MemberExpression)body;
                     break;
                 case ExpressionType.Convert:
-                    var convertExpression = (UnaryExpression) body;
-                    memberExpression = (MemberExpression) convertExpression.Operand;
+                    var convertExpression = (UnaryExpression)body;
+                    memberExpression = (MemberExpression)convertExpression.Operand;
                     break;
                 default:
                     throw new ArgumentException("Invalid lambda expression");
@@ -268,7 +272,7 @@ namespace WindowsAzure.Table.EntityConverters.TypeData
                 case MemberTypes.Property:
                     if (memberInfo.DeclaringType != null && memberInfo.DeclaringType.GetTypeInfo().IsInterface)
                     {
-                        memberInfo = FindPropertyImplementation((PropertyInfo) memberInfo, typeof (T));
+                        memberInfo = FindPropertyImplementation((PropertyInfo)memberInfo, typeof(T));
                     }
                     break;
                 default:

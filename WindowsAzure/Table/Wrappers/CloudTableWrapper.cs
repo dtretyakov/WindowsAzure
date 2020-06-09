@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WindowsAzure.Table.Extensions;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 
 namespace WindowsAzure.Table.Wrappers
 {
@@ -40,11 +45,11 @@ namespace WindowsAzure.Table.Wrappers
         public IEnumerable<DynamicTableEntity> ExecuteQuery(ITableQuery tableQuery)
         {
             var query = new TableQuery
-                {
-                    FilterString = tableQuery.FilterString,
-                    SelectColumns = tableQuery.SelectColumns,
-                    TakeCount = tableQuery.TakeCount
-                };
+            {
+                FilterString = tableQuery.FilterString,
+                SelectColumns = tableQuery.SelectColumns,
+                TakeCount = tableQuery.TakeCount
+            };
 
             return _cloudTable.ExecuteQuery(query);
         }
@@ -60,11 +65,11 @@ namespace WindowsAzure.Table.Wrappers
         public Task<IEnumerable<DynamicTableEntity>> ExecuteQueryAsync(ITableQuery tableQuery, CancellationToken cancellationToken)
         {
             var query = new TableQuery
-                {
-                    FilterString = tableQuery.FilterString,
-                    SelectColumns = tableQuery.SelectColumns,
-                    TakeCount = tableQuery.TakeCount
-                };
+            {
+                FilterString = tableQuery.FilterString,
+                SelectColumns = tableQuery.SelectColumns,
+                TakeCount = tableQuery.TakeCount
+            };
 
             return _cloudTable.ExecuteQueryAsync(query, cancellationToken);
         }
@@ -121,16 +126,24 @@ namespace WindowsAzure.Table.Wrappers
         /// <param name="tableBatchOperation">
         ///     The <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableBatchOperation" /> object representing the operations to execute on the table.
         /// </param>
-        /// <param name="cancellationToken">Cancalltion token.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>
         ///     An enumerable collection of <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableResult" /> objects that contains the results, in order, of each operation in the
         ///     <see cref="T:Microsoft.WindowsAzure.Storage.Table.TableBatchOperation" />
         ///     on the table.
         /// </returns>
+#if WINDOWSAZURE
         public Task<IList<TableResult>> ExecuteBatchAsync(TableBatchOperation tableBatchOperation, CancellationToken cancellationToken)
         {
             return _cloudTable.ExecuteBatchAsync(tableBatchOperation, null, null, cancellationToken);
         }
+#else
+        public async Task<IList<TableResult>> ExecuteBatchAsync(TableBatchOperation tableBatchOperation, CancellationToken cancellationToken)
+        {
+            var batchResult = await _cloudTable.ExecuteBatchAsync(tableBatchOperation, null, null, cancellationToken);
+            return batchResult.ToList();
+        }
+#endif
 
         /// <summary>
         ///     Gets the table name.

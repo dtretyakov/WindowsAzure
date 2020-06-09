@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsAzure.Tests", "Windo
 		{489A3BD0-35AF-4E8E-939F-6597125603B7} = {489A3BD0-35AF-4E8E-939F-6597125603B7}
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftAzureCosmos.TableExtensions", "MicrosoftAzureCosmos.TableExtensions\MicrosoftAzureCosmos.TableExtensions.csproj", "{CD2F7DDC-1DE8-43C5-A6B1-31D98BE16B3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{47178F90-F9A5-4413-8C34-607451F893D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47178F90-F9A5-4413-8C34-607451F893D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47178F90-F9A5-4413-8C34-607451F893D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD2F7DDC-1DE8-43C5-A6B1-31D98BE16B3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD2F7DDC-1DE8-43C5-A6B1-31D98BE16B3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD2F7DDC-1DE8-43C5-A6B1-31D98BE16B3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD2F7DDC-1DE8-43C5-A6B1-31D98BE16B3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
