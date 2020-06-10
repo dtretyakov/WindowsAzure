@@ -8,8 +8,8 @@
     <AssemblyTitle>Microsoft Azure Cosmos Table Extensions</AssemblyTitle>
     <Authors>Dmitry Tretyakov</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>MicrosoftAzureCosmos.TableExtensions</AssemblyName>
-    <PackageId>MicrosoftAzureCosmos.TableExtensions</PackageId>
+    <AssemblyName>MicrosoftAzureCosmosTable.Extensions</AssemblyName>
+    <PackageId>MicrosoftAzureCosmosTable.Extensions</PackageId>
     <PackageTags>Azure;Storage;Blob;Table;Async;Extensions;LINQ;IQueryable</PackageTags>
     <PackageProjectUrl>https://github.com/dtretyakov/WindowsAzure</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.github.com/dtretyakov/WindowsAzure/master/LICENSE.txt</PackageLicenseUrl>
@@ -24,6 +24,7 @@
     <Compile Include="..\WindowsAzure\*.cs;..\WindowsAzure\**\*.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="..\WindowsAzure\obj\Debug\**" />
+    <Compile Remove="..\WindowsAzure\obj\**\**" />
+    <Compile Remove="..\WindowsAzure\bin\**\**" />
   </ItemGroup>
 </Project>
