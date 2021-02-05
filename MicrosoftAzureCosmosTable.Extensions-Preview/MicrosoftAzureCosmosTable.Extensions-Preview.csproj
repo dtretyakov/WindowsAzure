@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VersionPrefix>1.0.7</VersionPrefix>
+    <VersionPrefix>2.0.0-preview-00</VersionPrefix>
     <Description>
       Azure Storage Extensions is a .NET library aimed for managing and querying entities from Microsoft Azure Storage.
       It's built on top of Microsoft Azure Cosmos Table Library, provides LINQ to Azure Tables queries and async interfaces.
@@ -17,7 +17,7 @@
     <RepositoryUrl>https://github.com/StefH/WindowsAzure</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.7" />
+    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="2.0.0-preview" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="..\WindowsAzure\*\AssemblyInfo.cs" />
