@@ -27,6 +27,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftAzureCosmosTable.E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicrosoftAzureCosmosTable.Extensions-Preview", "MicrosoftAzureCosmosTable.Extensions-Preview\MicrosoftAzureCosmosTable.Extensions-Preview.csproj", "{F0895C59-247D-44D5-AEF2-80F69837F3E2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CFA88365-BFB6-408B-AF86-AAD298CFC1B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F0ED2120-3147-4F85-96BA-C9BCDB48698E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5EB09784-68A2-4FAD-8D27-9A4603CFAD0D}"
+	ProjectSection(SolutionItems) = preProject
+		GitHubReleaseNotes.txt = GitHubReleaseNotes.txt
+		README.md = README.md
+		ReleaseNotes.md = ReleaseNotes.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +63,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{489A3BD0-35AF-4E8E-939F-6597125603B7} = {CFA88365-BFB6-408B-AF86-AAD298CFC1B5}
+		{47178F90-F9A5-4413-8C34-607451F893D5} = {F0ED2120-3147-4F85-96BA-C9BCDB48698E}
+		{282B395D-99CD-43C9-A0C3-33053790D2FF} = {CFA88365-BFB6-408B-AF86-AAD298CFC1B5}
+		{F0895C59-247D-44D5-AEF2-80F69837F3E2} = {CFA88365-BFB6-408B-AF86-AAD298CFC1B5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9FEDDDB4-B550-4286-BF76-42A84A9421E2}

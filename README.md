@@ -1,7 +1,14 @@
 # Windows Azure Storage Extensions
 
 [<img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:wase_general),branch:(name:master)/statusIcon.svg"/>](http://teamcity.jetbrains.com/viewType.html?buildTypeId=wase_general&branch_WindowsAzureStorageExtensions=%3Cdefault%3E&guest=1)
-[![NuGet WindowsAzure.StorageExtensions](https://buildstats.info/nuget/WindowsAzure.StorageExtensions?includePreReleases=false)](https://www.nuget.org/packages/WindowsAzure.StorageExtensions)
+
+
+## Info
+| Version | Dependencies | Information 
+| :--- | :--- | :---
+[![WindowsAzure.StorageExtensions](https://buildstats.info/nuget/WindowsAzure.StorageExtensions)](https://www.nuget.org/packages/WindowsAzure.StorageExtensions) | [Windows.Azure.Storage](https://www.nuget.org/packages/WindowsAzure.Storage/) | This dependency is declared deprecated by Microsoft.
+[![MicrosoftAzureCosmos.TableExtensions](https://buildstats.info/nuget/MicrosoftAzureCosmosTable.Extensions)](https://www.nuget.org/packages/MicrosoftAzureCosmosTable.Extensions) | [Microsoft.Azure.Cosmos.Table](https://www.nuget.org/packages/Microsoft.Azure.Cosmos.Table/1.0.7) |
+[![V2-preview](https://img.shields.io/badge/nuget-v2.0.0_preview_00-blue)](https://www.nuget.org/packages/MicrosoftAzureCosmosTable.Extensions) | [Microsoft.Azure.Cosmos.Table - Preview](https://www.nuget.org/packages/Microsoft.Azure.Cosmos.Table/2.0.0-preview) | This is still a preview version.
 
 *Windows Azure Storage Extensions* is a .NET library aimed at managing and querying entities from [Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
 
@@ -9,8 +16,6 @@ It's built on top of the **[Azure .NET SDK](https://github.com/WindowsAzure/azur
 
 ## Table Of Contents
 * [Features](#features)
-* [Download](#download)
-* [Dependencies](#dependencies)
 * [Code Samples](#code-samples)
 * [Sponsors](#sponsors)
 
@@ -28,15 +33,17 @@ Fluent mapping is the namesake mapping style that we use as an alternative to th
 
 <code>EntityTypeMap<T></code> class is the basis of all your mappings, you derive from this to map anything.
 
-    public class AddressMap : EntityTypeMap<Address>
-    {
-      public AddressMap()
-      {
-          this.PartitionKey(p => p.CountryCode)
-              .RowKey(p => p.Id)
-              .Ignore(p => c.Country);
-      }
-    }
+``` c#
+public class AddressMap : EntityTypeMap<Address>
+{
+  public AddressMap()
+  {
+      this.PartitionKey(p => p.CountryCode)
+          .RowKey(p => p.Id)
+          .Ignore(p => c.Country);
+  }
+}
+```
 
 You map your entities properties inside the constructor.
 
@@ -145,26 +152,6 @@ blobs = await cloudBlobContainer.ListBlobsAsync();
 
 All of TAP-based methods accepts optional `CancellationToken` parameter for [Task Cancellation](http://msdn.microsoft.com/en-us/library/dd997396.aspx).
 
-## Download
-
-### Via NuGet
-To install library by using [Windows Azure Storage Extensions](https://nuget.org/packages/WindowsAzure.StorageExtensions/) nuget package execute next command:
-
-```
-Install-Package WindowsAzure.StorageExtensions
-```
-
-### Via Git
-To get the source code of the library via git just type:
-
-```git
-git clone git://github.com/dtretyakov/WindowsAzure.git
-cd ./WindowsAzure
-```
-
-## Dependencies
-Storage Extensions requires .NET Framework 4.0 or higher and [WindowsAzure.Storage](https://nuget.org/packages/WindowsAzure.Storage) nuget package.
-
 ## Code Samples
 
 * Declaring a new POCO class and using attribute mapping:
@@ -174,8 +161,10 @@ public sealed class Country
 {
     [PartitionKey]
     public string Continent { get; set; }
+
     [RowKey]
     public string Name { get; set; }
+
     public long Population { get; set; }
     public double Area { get; set; }
     public DateTime Formed { get; set; }
@@ -358,6 +347,7 @@ Great thanks to all of projects contributors.
 * [Gabriel Marquez](gblmarquez) for Fluent API mapping.
 * [Sebastian Betzin](sbetzin) for additional TableSet methods.
 * [Tom Dietrich](tdietrich513) for his contributions.
+* [Stef Heyenrath](StefH) for his contributions related to Microsoft.Azure.Cosmos.Table.
 * And [Community](https://github.com/dtretyakov/WindowsAzure/issues) for a valuable feedback.
 
 See complete list of [project contributors](https://github.com/dtretyakov/WindowsAzure/graphs/contributors).
