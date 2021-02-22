@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 using WindowsAzure.Common;
 using WindowsAzure.Properties;
 

@@ -5,7 +5,11 @@ using System.Reflection;
 using WindowsAzure.Properties;
 using WindowsAzure.Table.Attributes;
 using WindowsAzure.Table.EntityConverters.TypeData.Properties;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 using WindowsAzure.Common;
 using WindowsAzure.Table.EntityConverters.TypeData.Serializers;
 

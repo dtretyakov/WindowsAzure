@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 
 namespace WindowsAzure.Table.RequestExecutor
 {

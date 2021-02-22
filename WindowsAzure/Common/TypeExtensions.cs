@@ -57,7 +57,7 @@ namespace WindowsAzure.Common
 
         public static MemberTypes MemberType(this MemberInfo memberInfo)
         {
-#if NET452 || NET46
+#if NET452 || NET46 || NETSTANDARD2_0
             return memberInfo.MemberType;
         }
     }
@@ -89,7 +89,8 @@ namespace WindowsAzure.Common
             return type.GetTypeInfo().GetRuntimeInterfaceMap(interfaceType);
         }
     }
-    
+
+#if !NETSTANDARD2_0
     internal enum MemberTypes
     {
         Property = 0,
@@ -98,5 +99,6 @@ namespace WindowsAzure.Common
         Method = 3,
         Other = 4
     }
+#endif
 #endif
 }

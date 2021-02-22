@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Reflection;
+#if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#else
+using Microsoft.Azure.Cosmos.Table;
+#endif
 using WindowsAzure.Properties;
 using WindowsAzure.Table.EntityConverters.TypeData.ValueAccessors;
 

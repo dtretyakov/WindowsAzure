@@ -13,6 +13,7 @@
     <PackageLicenseUrl>https://raw.github.com/dtretyakov/WindowsAzure/master/LICENSE.txt</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/dtretyakov/WindowsAzure</RepositoryUrl>
+    <DefineConstants>$(DefineConstants);WINDOWSAZURE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
