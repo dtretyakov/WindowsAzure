@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 #if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#elif AZUREDATATABLES
+using Azure.Data.Tables;
+using DynamicTableEntity = Azure.Data.Tables.TableEntity;
 #else
 using Microsoft.Azure.Cosmos.Table;
 #endif

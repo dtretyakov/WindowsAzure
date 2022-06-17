@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <VersionPrefix>3.0.0-preview-00</VersionPrefix>
+        <LanguageVersion>10</LanguageVersion>
         <Description>
             Azure Storage Extensions is a .NET library aimed for managing and querying entities from Microsoft Azure Storage.
             It's built on top of Azure.Data.Tables Library, provides LINQ to Azure Tables queries and async interfaces.
