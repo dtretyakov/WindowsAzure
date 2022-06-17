@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 #if WINDOWSAZURE
 using Microsoft.WindowsAzure.Storage.Table;
+#elif AZUREDATATABLES
+using Azure.Data.Tables;
 #else
 using Microsoft.Azure.Cosmos.Table;
 #endif

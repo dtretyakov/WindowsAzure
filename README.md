@@ -1,14 +1,11 @@
 # Windows Azure Storage Extensions
 
-[<img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:wase_general),branch:(name:master)/statusIcon.svg"/>](http://teamcity.jetbrains.com/viewType.html?buildTypeId=wase_general&branch_WindowsAzureStorageExtensions=%3Cdefault%3E&guest=1)
-
-
 ## Info
 | Version | Dependencies | Information 
 | :--- | :--- | :---
 [![WindowsAzure.StorageExtensions](https://buildstats.info/nuget/WindowsAzure.StorageExtensions)](https://www.nuget.org/packages/WindowsAzure.StorageExtensions) | [Windows.Azure.Storage](https://www.nuget.org/packages/WindowsAzure.Storage/) | This dependency is declared deprecated by Microsoft.
 [![MicrosoftAzureCosmos.TableExtensions](https://buildstats.info/nuget/MicrosoftAzureCosmosTable.Extensions)](https://www.nuget.org/packages/MicrosoftAzureCosmosTable.Extensions) | [Microsoft.Azure.Cosmos.Table](https://www.nuget.org/packages/Microsoft.Azure.Cosmos.Table/1.0.7) |
-[![V2-preview](https://img.shields.io/badge/nuget-v2.0.0_preview_00-blue)](https://www.nuget.org/packages/MicrosoftAzureCosmosTable.Extensions) | [Microsoft.Azure.Cosmos.Table - Preview](https://www.nuget.org/packages/Microsoft.Azure.Cosmos.Table/2.0.0-preview) | This is still a preview version.
+[![V2-preview](https://img.shields.io/badge/nuget-v2.0.0_preview_00-blue)](https://www.nuget.org/packages/MicrosoftAzureCosmosTable.Extensions) | [Microsoft.Azure.Cosmos.Table - Preview](https://www.nuget.org/packages/Microsoft.Azure.Cosmos.Table/2.0.0-preview) | This was a preview version, but now declared deprecated by Microsoft.
 
 *Windows Azure Storage Extensions* is a .NET library aimed at managing and querying entities from [Azure Storage Tables](http://msdn.microsoft.com/en-us/library/windowsazure/dd179463.aspx).
 
@@ -17,7 +14,7 @@ It's built on top of the **[Azure .NET SDK](https://github.com/WindowsAzure/azur
 ## Table Of Contents
 * [Features](#features)
 * [Code Samples](#code-samples)
-* [Sponsors](#sponsors)
+* [Contributors](#Contributors)
 
 ## Features
 
